@@ -17,13 +17,14 @@ export function HomePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get('search') || '';
   const genres = searchParams.get('genres') || '';
-  const year = searchParams.get('year') || '';
-  const sort = searchParams.get('sort') || '';
   const minRating = searchParams.get('rating') ? parseFloat(searchParams.get('rating')!) : undefined;
-  const kind = searchParams.get('kind') || '';
 
   const [searchInput, setSearchInput] = useState(search);
   const isUserTypingRef = useRef(false);
+  const lastClearRef = useRef<number | null>(null);
+  const sortForward = searchParams.get('sort_forward') !== 'false';
+  const toYear = searchParams.get('to_year') || '';
+  const fromYear = searchParams.get('from_year') || '';
 
   useEffect(() => {
     if (!isUserTypingRef.current) {
@@ -36,6 +37,7 @@ export function HomePage() {
   }, [searchInput]);
 
   const clearSearch = () => {
+    lastClearRef.current = Date.now();
     setSearchInput('');
     isUserTypingRef.current = false;
     const params = new URLSearchParams(searchParams);
@@ -58,13 +60,26 @@ export function HomePage() {
     }
   }, [debouncedSearch, search, searchParams, setSearchParams]);
 
+  useEffect(() => {
+    if (lastClearRef.current && Date.now() - lastClearRef.current < 100) {
+      lastClearRef.current = null;
+      return;
+    }
+    lastClearRef.current = null;
+    if (!isUserTypingRef.current) {
+      setSearchInput(search);
+    }
+  }, [search]);
+
   const queryParams = {
     page: 1,
     limit: 100,
-    search: search || undefined,
-    genre: genres || undefined,
-    year: year || undefined,
-    order: sort === 'rating' ? 'score' : sort === 'year' ? 'aired_on' : sort || undefined,
+    q: search || undefined,
+    genres: genres || undefined,
+    from_year: fromYear ? parseInt(fromYear, 10) : undefined,
+    to_year: toYear ? parseInt(toYear, 10) : undefined,
+    min_rating: minRating,
+    sort_forward: sortForward,
   };
 
   const { data: animeData, isLoading } = useAnimeList(queryParams);
@@ -89,25 +104,17 @@ export function HomePage() {
     updateParams('genres', newGenres.join(','));
   };
 
-  const toggleYear = (yearValue: string) => {
-    const currentYears = year ? year.split(',') : [];
-    const newYears = currentYears.includes(yearValue)
-      ? currentYears.filter((y) => y !== yearValue)
-      : [...currentYears, yearValue];
-    updateParams('year', newYears.join(','));
-  };
-
   const clearFiltersOnly = () => {
     const params = new URLSearchParams(searchParams);
     params.delete('genres');
-    params.delete('year');
     params.delete('rating');
-    params.delete('sort');
-    params.delete('kind');
+    params.delete('sort_forward');
+    params.delete('to_year');
+    params.delete('from_year');
     setSearchParams(params);
   };
 
-  const hasActiveFilters = genres || year || minRating || sort || kind;
+  const hasActiveFilters = genres || minRating || fromYear || toYear;
 
   return (
     <div className="space-y-6">
@@ -155,10 +162,10 @@ export function HomePage() {
                 onOpenChange={setFiltersOpen}
                 genresData={genresData}
                 selectedGenres={genres}
-                selectedYear={year}
                 selectedRating={minRating}
+                toYear={toYear}
+                fromYear={fromYear}
                 onToggleGenre={toggleGenre}
-                onToggleYear={toggleYear}
                 onUpdateParams={updateParams}
                 onClearFilters={clearFiltersOnly}
               />
@@ -167,7 +174,8 @@ export function HomePage() {
         </div>
 
         <FilterBadges
-          year={year}
+          fromYear={fromYear}
+          toYear={toYear}
           minRating={minRating}
           genres={genres}
           onUpdateParams={updateParams}

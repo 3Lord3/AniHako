@@ -3,17 +3,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Star } from 'lucide-react';
-import { ALL_YEARS, RATING_OPTIONS } from '@/lib/constants';
+import { ALL_YEARS_RANGE, RATING_OPTIONS } from '@/lib/constants';
 
 interface FilterDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   genresData: { genres: Array<{ title: string; href: string; value: number }> } | undefined;
   selectedGenres: string;
-  selectedYear: string;
   selectedRating: number | undefined;
+  toYear?: string;
+  fromYear?: string;
   onToggleGenre: (genreName: string) => void;
-  onToggleYear: (yearValue: string) => void;
   onUpdateParams: (key: string, value: string) => void;
   onClearFilters: () => void;
 }
@@ -22,10 +22,10 @@ export function FilterDialogContent({
   onOpenChange,
   genresData,
   selectedGenres,
-  selectedYear,
   selectedRating,
+  toYear,
+  fromYear,
   onToggleGenre,
-  onToggleYear,
   onUpdateParams,
   onClearFilters,
 }: FilterDialogProps) {
@@ -35,10 +35,18 @@ export function FilterDialogContent({
     if (!genresData?.genres) return [];
     if (!genreSearchInput) return genresData.genres;
     const searchLower = genreSearchInput.toLowerCase();
-    return genresData.genres.filter((genre) => 
+    return genresData.genres.filter((genre) =>
       genre.title.toLowerCase().includes(searchLower)
     );
   }, [genresData, genreSearchInput]);
+
+  const handleYearChange = (type: 'from' | 'to', value: string) => {
+    onUpdateParams(type === 'from' ? 'from_year' : 'to_year', value);
+  };
+
+  const yearError = fromYear && toYear && parseInt(fromYear) > parseInt(toYear)
+    ? 'Год "От" должен быть меньше чем "До"'
+    : null;
 
   return (
     <div className="space-y-6">
@@ -61,18 +69,32 @@ export function FilterDialogContent({
 
       <div className="space-y-2">
         <h4 className="font-medium text-sm">Год выпуска</h4>
-        <div className="flex flex-wrap gap-2">
-          {ALL_YEARS.map((y) => (
-            <Badge
-              key={y}
-              variant={selectedYear.split(',').includes(y) ? 'default' : 'secondary'}
-              className="cursor-pointer"
-              onClick={() => onToggleYear(y)}
-            >
-              {y}
-            </Badge>
-          ))}
+        <div className="flex items-center gap-2 flex-wrap">
+          <select
+            className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+            value={fromYear}
+            onChange={(e) => handleYearChange('from', e.target.value)}
+          >
+            <option value="">От года</option>
+            {ALL_YEARS_RANGE.map((y) => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
+          <span className="text-sm text-muted-foreground">—</span>
+          <select
+            className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+            value={toYear}
+            onChange={(e) => handleYearChange('to', e.target.value)}
+          >
+            <option value="">До года</option>
+            {ALL_YEARS_RANGE.map((y) => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
         </div>
+        {yearError && (
+          <p className="text-sm text-destructive">{yearError}</p>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -110,6 +132,7 @@ export function FilterDialogContent({
           size="sm"
           className="cursor-pointer"
           onClick={() => onOpenChange(false)}
+          disabled={!!yearError}
         >
           Применить
         </Button>

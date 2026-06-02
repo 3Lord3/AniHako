@@ -16,7 +16,8 @@ export function AnimeCard({ anime, showRating = true, userStatus, isFavorite }: 
   const displayTitle = anime.title || 'Unknown';
 
   const rating = anime.rating?.average ?? null;
-  const validRating = rating !== null && !isNaN(rating);
+  const isAnnouncement = anime.anime_status?.alias === 'announcement';
+  const validRating = rating !== null && !isNaN(rating) && !isAnnouncement;
 
   const url = anime.anime_url?.startsWith('/anime/') 
     ? anime.anime_url 

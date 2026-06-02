@@ -13,10 +13,13 @@ import type { YummyUserAnimeRate } from '@/types/list';
 export function useAnimeList(params?: {
   page?: number;
   limit?: number;
+  q?: string;
   search?: string;
-  genre?: string | string[];
-  year?: string;
+  genres?: string | string[];
+  from_year?: number;
+  to_year?: number;
   min_rating?: number;
+  sort_forward?: boolean;
   kind?: string;
   status?: string;
   order?: string;
