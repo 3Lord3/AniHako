@@ -5,10 +5,10 @@ import type { UserAnimeRate } from '../types/list';
 
 export const userListApi = {
   getUserList: (userId: number, listId: YummyAnimeListId) =>
-    api.get<YummyUserAnimeRate[]>(`/users/${userId}/lists/${listId}`),
+    api.get<{ response: YummyUserAnimeRate[] }>(`/users/${userId}/lists/${listId}`).then(res => res.data.response),
 
   getUserLists: (userId: number) =>
-    api.get<YummyUserAnimeRate[]>(`/users/${userId}/lists`),
+    api.get<{ response: YummyUserAnimeRate[] }>(`/users/${userId}/lists`).then(res => res.data.response),
 
   getAnimeList: (animeId: number) =>
     api.get<{ list: number; is_favorite: boolean }>(`/anime/${animeId}/list`),

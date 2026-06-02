@@ -146,15 +146,13 @@ export function useUserAnimeList(status?: AnimeStatus, favorites?: boolean) {
       try {
         if (status) {
           const listId = mapStatusToListId(status);
-          const { data } = await userListApi.getUserList(user.id, listId);
-          const rates = data || [];
+          const rates = await userListApi.getUserList(user.id, listId) || [];
           return favorites 
             ? rates.filter((rate: YummyUserAnimeRate) => rate.user?.list?.is_fav === true)
             : rates;
         }
         
-        const { data } = await userListApi.getUserLists(user.id);
-        const rates = data || [];
+        const rates = await userListApi.getUserLists(user.id) || [];
         
         if (favorites) {
           return rates.filter((rate: YummyUserAnimeRate) => rate.user?.list?.is_fav === true);
@@ -277,8 +275,8 @@ export function useFavorites() {
       if (!user) return [];
       
       try {
-        const { data } = await userListApi.getUserLists(user.id);
-        return (data || []).filter((rate: YummyUserAnimeRate) => rate.user?.list?.is_fav === true);
+        const rates = await userListApi.getUserLists(user.id);
+        return (rates || []).filter((rate: YummyUserAnimeRate) => rate.user?.list?.is_fav === true);
       } catch (error: unknown) {
         if (error && typeof error === 'object' && 'response' in error) {
           const err = error as { response?: { status?: number } };
