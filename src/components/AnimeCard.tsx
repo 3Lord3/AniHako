@@ -1,26 +1,29 @@
 import { Link } from 'react-router-dom';
 import { Star } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import type { AnimeListItem } from '@/types';
+import type { AnimeCatalogItem } from '@/types';
 import { getImageUrl, getPosterUrl } from '@/lib/imageUrl';
 import { STATUS_ICONS, STATUS_COLORS, FAVORITE_ICON, getRatingColor, type StatusType } from '@/types/constants';
 
 interface AnimeCardProps {
-  anime: AnimeListItem;
+  anime: AnimeCatalogItem;
   showRating?: boolean;
   userStatus?: StatusType | null;
   isFavorite?: boolean;
 }
 
 export function AnimeCard({ anime, showRating = true, userStatus, isFavorite }: AnimeCardProps) {
-  // YummyAnime API uses 'name' and 'russian' fields instead of 'title'
-  const displayTitle = anime.russian || anime.name || 'Unknown';
-  
-  const rating = anime.score ? (typeof anime.score === 'number' ? anime.score : parseFloat(anime.score)) : null;
+  const displayTitle = anime.title || 'Unknown';
+
+  const rating = anime.rating?.average ?? null;
   const validRating = rating !== null && !isNaN(rating);
-  
+
+  const url = anime.anime_url?.startsWith('/anime/') 
+    ? anime.anime_url 
+    : `/anime/${anime.anime_url || anime.anime_id}`;
+
   return (
-    <Link to={`/anime/${anime.url}`} className="group block">
+    <Link to={url} className="group block">
       <div className="aspect-[3/4] relative overflow-hidden rounded-lg">
         <img
           src={getImageUrl(getPosterUrl(anime))}

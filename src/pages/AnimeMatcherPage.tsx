@@ -13,7 +13,6 @@ import { Loader2 } from 'lucide-react';
 import { SwipeCard } from '@/components/matcher/SwipeCard';
 import { ActionButtons, AddButton, ExternalLinkButton } from '@/components/matcher/ActionButtons';
 import { DescriptionPanel } from '@/components/matcher/DescriptionView';
-import type { AnimeDetail } from '@/types';
 
 export function AnimeMatcherPage() {
   const navigate = useNavigate();
@@ -132,7 +131,7 @@ export function AnimeMatcherPage() {
           />
           {currentAnime && (
             <ExternalLinkButton
-              onClick={() => navigate(`/anime/${currentAnime.anime_url}`)}
+              onClick={() => navigate(`/anime/${currentAnime.anime_url?.startsWith('/anime/') ? currentAnime.anime_url.slice(7) : currentAnime.anime_url || currentAnime.anime_id}`)}
             />
           )}
         </div>
@@ -158,7 +157,7 @@ export function AnimeMatcherPage() {
           onSkip={handleSkip}
           onAdd={handleAdd}
           onHome={() => navigate('/')}
-          onExternalLink={currentAnime ? () => navigate(`/anime/${currentAnime.anime_url}`) : undefined}
+          onExternalLink={currentAnime ? () => navigate(`/anime/${currentAnime.anime_url?.startsWith('/anime/') ? currentAnime.anime_url.slice(7) : currentAnime.anime_url || currentAnime.anime_id}`) : undefined}
           onInfo={() => setShowDescriptionModal(true)}
         />
       </div>
@@ -184,8 +183,8 @@ export function AnimeMatcherPage() {
               <div className="space-y-2">
                 <h4 className="text-sm font-medium">Жанры</h4>
                 <div className="flex flex-wrap gap-1.5">
-                  {currentAnime.genres.map((g) => (
-                    <Badge key={g.id} variant="outline" className="text-xs">
+                  {currentAnime.genres.slice(0, 2).map((g: { title: string }) => (
+                    <Badge key={g.title} variant="outline" className="text-xs">
                       {g.title}
                     </Badge>
                   ))}

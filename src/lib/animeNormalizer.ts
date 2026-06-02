@@ -26,7 +26,6 @@ export function extractAnimeStatus(animeStatus: any): string | null {
 
 export function normalizeAnimeItem(item: any) {
   const id = item.anime_id;
-  const posterUrl = extractPosterUrl(item.poster);
   const scoreStr = extractRating(item.rating);
   const kind = extractAnimeKind(item.type);
   const status = extractAnimeStatus(item.anime_status);
@@ -34,12 +33,12 @@ export function normalizeAnimeItem(item: any) {
   const description = item.description || null;
 
   return {
-    id: id,
+    anime_id: id,
     name: item.title || '',
     russian: item.title || null,
-    poster: posterUrl,
     cover: null,
     url: item.anime_url || String(id),
+    anime_url: item.anime_url || String(id),
     kind: kind,
     score: scoreStr,
     status: status,
@@ -53,6 +52,7 @@ export function normalizeAnimeItem(item: any) {
     rating: item.rating,
     genres: item.genres,
     year: year,
+    poster: item.poster,
   };
 }
 

@@ -29,9 +29,9 @@ export const animeApi = {
     
     if (queryParams.genre) {
       if (Array.isArray(queryParams.genre)) {
-        queryParams.genres = queryParams.genre.join(',') as any;
+        (queryParams as any).genres = queryParams.genre.join(',');
       } else {
-        queryParams.genres = queryParams.genre;
+        (queryParams as any).genres = queryParams.genre;
       }
       queryParams.genre = undefined;
     }

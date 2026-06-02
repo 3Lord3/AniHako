@@ -9,7 +9,7 @@ import { mapStatusToListId } from '@/types';
 import { AnimeDetailPageSkeleton } from '@/components/loaders/PageSkeletons';
 import { AnimeCharacteristics } from './AnimeDetailPage/components/AnimeCharacteristics';
 import { StatusButtonGroup } from '@/components/detail/StatusButtonGroup';
-import type { AnimeStatus } from '@/types';
+import type { AnimeStatus, YummyUserAnimeRate } from '@/types';
 
 export function AnimeDetailPage() {
   const { url } = useParams<{ url: string }>();
@@ -25,9 +25,11 @@ export function AnimeDetailPage() {
   const { mutate: updateListEntry } = useUpdateListEntry();
   const { mutate: removeFromList } = useRemoveFromList();
 
-  const userAnime = userAnimeList?.find((rate) => rate.anime_id === animeId);
+  const userAnime = userAnimeList && Array.isArray(userAnimeList)
+    ? userAnimeList.find((rate: YummyUserAnimeRate) => rate.anime_id === animeId)
+    : undefined;
   const isFavorite = anime?.user?.list?.is_fav || false;
-  const userListId: number | null = anime?.user?.list?.list?.id ?? userAnime?.list?.id ?? null;
+  const userListId: number | null = anime?.user?.list?.list?.id ?? userAnime?.user?.list?.list?.id ?? null;
 
   const handleAddToList = (status: AnimeStatus) => {
     if (!user) {

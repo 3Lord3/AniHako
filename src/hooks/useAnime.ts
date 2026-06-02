@@ -112,8 +112,8 @@ export function useGenres() {
   return useQuery({
     queryKey: ['genres'],
     queryFn: async () => {
-      const { data } = await animeApi.getGenres();
-      return data;
+      const result = await animeApi.getGenres();
+      return result;
     },
   });
 }
@@ -144,14 +144,14 @@ export function useUserAnimeList(status?: AnimeStatus, favorites?: boolean) {
         if (status) {
           const listId = mapStatusToListId(status);
           const { data } = await userListApi.getUserList(user.id, listId);
-          const rates = data.response || [];
+          const rates = data || [];
           return favorites 
             ? rates.filter((rate: YummyUserAnimeRate) => rate.user?.list?.is_fav === true)
             : rates;
         }
         
         const { data } = await userListApi.getUserLists(user.id);
-        const rates = data.response || [];
+        const rates = data || [];
         
         if (favorites) {
           return rates.filter((rate: YummyUserAnimeRate) => rate.user?.list?.is_fav === true);
@@ -275,7 +275,7 @@ export function useFavorites() {
       
       try {
         const { data } = await userListApi.getUserLists(user.id);
-        return data.filter((rate: YummyUserAnimeRate) => rate.user?.list?.is_fav === true);
+        return (data || []).filter((rate: YummyUserAnimeRate) => rate.user?.list?.is_fav === true);
       } catch (error: unknown) {
         if (error && typeof error === 'object' && 'response' in error) {
           const err = error as { response?: { status?: number } };

@@ -5,15 +5,17 @@ import { MemoryRouter } from 'react-router-dom';
 import { useAuth, useUser } from '@/hooks/useAuth';
 import * as apiModule from '@/lib/api';
 
-// Mock the API module
 vi.mock('@/lib/api', () => ({
   authApi: {
     login: vi.fn(),
     register: vi.fn(),
-  },
-  userApi: {
+    logout: vi.fn(),
     getProfile: vi.fn(),
   },
+  setAuthToken: vi.fn(),
+  clearAuth: vi.fn(),
+  setUser: vi.fn(),
+  getUser: vi.fn(),
 }));
 
 const createWrapper = () => {
@@ -24,7 +26,7 @@ const createWrapper = () => {
       },
     },
   });
-  
+
   return ({ children }: { children: React.ReactNode }) => (
     <MemoryRouter>
       <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
@@ -32,7 +34,6 @@ const createWrapper = () => {
   );
 };
 
-// Helper to set localStorage mock values
 const setLocalStorageMock = (storage: Record<string, string>) => {
   Object.defineProperty(window, 'localStorage', {
     value: {
@@ -56,8 +57,12 @@ describe('useAuth', () => {
 
   describe('login', () => {
     it('calls login API with correct credentials', async () => {
-      const mockResponse = { token: 'test-token', user: { id: 1, email: 'test@test.com', username: 'testuser' } };
-      vi.mocked(apiModule.authApi.login).mockResolvedValueOnce({ data: mockResponse });
+      vi.mocked(apiModule.authApi.login).mockResolvedValueOnce({
+        data: { response: { success: true, token: 'test-token' } }
+      } as any);
+      vi.mocked(apiModule.authApi.getProfile).mockResolvedValueOnce({
+        data: { id: 1, email: 'test@test.com', username: 'testuser' }
+      } as any);
 
       const { result } = renderHook(() => useAuth(), { wrapper: createWrapper() });
 
@@ -68,16 +73,19 @@ describe('useAuth', () => {
     });
 
     it('stores token in localStorage on successful login', async () => {
-      const mockResponse = { token: 'test-token', user: { id: 1, email: 'test@test.com', username: 'testuser' } };
-      vi.mocked(apiModule.authApi.login).mockResolvedValueOnce({ data: mockResponse });
+      vi.mocked(apiModule.authApi.login).mockResolvedValueOnce({
+        data: { response: { success: true, token: 'test-token' } }
+      } as any);
+      vi.mocked(apiModule.authApi.getProfile).mockResolvedValueOnce({
+        data: { id: 1, email: 'test@test.com', username: 'testuser' }
+      } as any);
 
       const { result } = renderHook(() => useAuth(), { wrapper: createWrapper() });
 
       result.current.login({ login: 'test@test.com', password: 'password123' });
 
       await waitFor(() => expect(result.current.isLoggingIn).toBe(false));
-      expect(storage['token']).toBe('test-token');
-      expect(storage['user']).toBeDefined();
+      expect(apiModule.setAuthToken).toHaveBeenCalledWith('test-token');
     });
 
     it('sets error state on failed login', async () => {
@@ -93,8 +101,9 @@ describe('useAuth', () => {
 
   describe('register', () => {
     it('calls register API with correct data', async () => {
-      const mockResponse = { token: 'test-token', user: { id: 1, email: 'test@test.com', username: 'testuser' } };
-      vi.mocked(apiModule.authApi.register).mockResolvedValueOnce({ data: mockResponse });
+      vi.mocked(apiModule.authApi.register).mockResolvedValueOnce({
+        data: { user: { id: 1, email: 'test@test.com', username: 'testuser' }, tokens: { access_token: 'test-token' } }
+      } as any);
 
       const { result } = renderHook(() => useAuth(), { wrapper: createWrapper() });
 
@@ -105,30 +114,28 @@ describe('useAuth', () => {
     });
 
     it('stores token in localStorage on successful register', async () => {
-      const mockResponse = { token: 'test-token', user: { id: 1, email: 'test@test.com', username: 'testuser' } };
-      vi.mocked(apiModule.authApi.register).mockResolvedValueOnce({ data: mockResponse });
+      vi.mocked(apiModule.authApi.register).mockResolvedValueOnce({
+        data: { user: { id: 1, email: 'test@test.com', username: 'testuser' }, tokens: { access_token: 'test-token' } }
+      } as any);
 
       const { result } = renderHook(() => useAuth(), { wrapper: createWrapper() });
 
       result.current.register({ email: 'test@test.com', username: 'testuser', password: 'password123' });
 
       await waitFor(() => expect(result.current.isRegistering).toBe(false));
-      expect(storage['token']).toBe('test-token');
-      expect(storage['user']).toBeDefined();
+      expect(apiModule.setAuthToken).toHaveBeenCalled();
     });
   });
 
   describe('logout', () => {
     it('clears localStorage on logout', () => {
-      storage['token'] = 'test-token';
-      storage['user'] = JSON.stringify({ id: 1 });
+      vi.mocked(apiModule.authApi.logout).mockResolvedValueOnce({} as any);
 
       const { result } = renderHook(() => useAuth(), { wrapper: createWrapper() });
 
       result.current.logout();
 
-      expect(storage['token']).toBeUndefined();
-      expect(storage['user']).toBeUndefined();
+      expect(apiModule.clearAuth).toHaveBeenCalled();
     });
   });
 });
@@ -143,6 +150,8 @@ describe('useUser', () => {
   });
 
   it('returns null when no token in localStorage', async () => {
+    vi.mocked(apiModule.getUser).mockReturnValueOnce(null);
+
     const { result } = renderHook(() => useUser(), { wrapper: createWrapper() });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -151,8 +160,7 @@ describe('useUser', () => {
 
   it('returns user from localStorage when available', async () => {
     const mockUser = { id: 1, email: 'test@test.com', username: 'testuser' };
-    storage['token'] = 'test-token';
-    storage['user'] = JSON.stringify(mockUser);
+    vi.mocked(apiModule.getUser).mockReturnValueOnce(mockUser as any);
 
     const { result } = renderHook(() => useUser(), { wrapper: createWrapper() });
 
@@ -162,13 +170,13 @@ describe('useUser', () => {
 
   it('fetches profile when token exists but no user in localStorage', async () => {
     const mockUser = { id: 1, email: 'test@test.com', username: 'testuser' };
-    storage['token'] = 'test-token';
-    vi.mocked(apiModule.userApi.getProfile).mockResolvedValueOnce({ data: mockUser });
+    vi.mocked(apiModule.getUser).mockReturnValueOnce(null);
+    vi.mocked(apiModule.authApi.getProfile).mockResolvedValueOnce(mockUser as any);
 
     const { result } = renderHook(() => useUser(), { wrapper: createWrapper() });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toEqual(mockUser);
-    expect(storage['user']).toBe(JSON.stringify(mockUser));
+    expect(apiModule.setUser).toHaveBeenCalledWith(mockUser);
   });
 });

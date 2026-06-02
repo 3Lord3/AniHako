@@ -36,7 +36,6 @@ export function TournamentMatch({
   totalMatchesInRound,
 }: TournamentMatchProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
-  const [showResult, setShowResult] = useState(false);
   const [isSelecting, setIsSelecting] = useState(false);
   const [showBackDialog, setShowBackDialog] = useState(false);
 
@@ -45,7 +44,6 @@ export function TournamentMatch({
 
   useEffect(() => {
     setSelectedId(null);
-    setShowResult(false);
     setIsSelecting(false);
   }, [match.id]);
 
@@ -54,7 +52,6 @@ export function TournamentMatch({
 
     setIsSelecting(true);
     setSelectedId(participant.id);
-    setShowResult(true);
 
     setTimeout(() => {
       onSelectWinner(match.id, participant.id);
@@ -97,7 +94,6 @@ export function TournamentMatch({
             isEliminated={match.winner ? match.winner.id !== participant1.id : false}
             isActive={isActive && !match.winner && !isSelecting}
             selectedId={selectedId}
-            showResult={showResult}
             onSelect={handleSelect}
           />
 
@@ -115,7 +111,6 @@ export function TournamentMatch({
             isEliminated={match.winner ? match.winner.id !== participant2.id : false}
             isActive={isActive && !match.winner && !isSelecting}
             selectedId={selectedId}
-            showResult={showResult}
             onSelect={handleSelect}
           />
           </motion.div>
@@ -149,7 +144,6 @@ interface ParticipantCardProps {
   isEliminated: boolean;
   isActive: boolean;
   selectedId: string | null;
-  showResult: boolean;
   onSelect: (participant: TournamentParticipant) => void;
 }
 
@@ -159,7 +153,6 @@ function ParticipantCard({
   isEliminated,
   isActive,
   selectedId,
-  showResult,
   onSelect,
 }: ParticipantCardProps) {
   const isSelected = selectedId === participant.id;

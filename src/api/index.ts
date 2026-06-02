@@ -13,11 +13,7 @@ export const api = axios.create({
   },
 });
 
-let redirectCallback: ((url: string) => void) | null = null;
-
-export const setAuthRedirectCallback = (callback: (url: string) => void) => {
-  redirectCallback = callback;
-};
+export const setAuthRedirectCallback = (_callback: (url: string) => void) => {};
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = localStorage.getItem('auth_token');

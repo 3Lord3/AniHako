@@ -32,7 +32,7 @@ export function SelectedAnimeGrid({
             className="relative group aspect-[2/3] rounded-lg overflow-hidden cursor-pointer"
           >
             <img
-              src={getImageUrl(anime.poster)}
+              src={getImageUrl(anime.poster.small)}
               alt={anime.title}
               className="object-cover w-full h-full transition-all duration-200 group-hover:brightness-50"
             />

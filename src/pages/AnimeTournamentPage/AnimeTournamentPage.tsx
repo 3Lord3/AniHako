@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useUserAnimeList } from '@/hooks';
 import { useTournament, type Pair } from '@/hooks/useTournament';
-import type { YummyUserAnimeRate, AnimeCatalogItem } from '@/types';
+import type { AnimeCatalogItem, YummyUserAnimeRate } from '@/types';
+import type { AnimeReleaseStatus } from '@/types';
 import { TournamentIntro } from './components/TournamentIntro';
 import { TournamentMatch } from './components/TournamentMatch';
 import { TournamentResults } from './components/TournamentResults';
@@ -30,18 +31,17 @@ export function AnimeTournamentPage() {
   const handleStart = (selectedAnime: YummyUserAnimeRate[]) => {
     if (selectedAnime.length >= 4) {
       const animeItems: AnimeCatalogItem[] = selectedAnime.map(rate => ({
-        id: rate.anime_id,
-        title: rate.title,
-        poster: rate.poster,
-        type: rate.type,
-        rating: { average: rate.rating, counters: 0 },
-        year: rate.year,
-        genres: rate.genres,
+        anime_id: rate.anime_id,
+        anime_status: rate.anime_status as AnimeReleaseStatus,
         anime_url: rate.anime_url,
-        anime_status: rate.anime_status,
+        poster: rate.poster,
+        rating: { average: rate.rating, counters: 0 },
+        title: rate.title,
+        type: rate.type,
+        year: rate.year || 0,
         description: '',
         views: 0,
-        season: 1,
+        season: 1 as const,
         episodes: { aired: 0, count: 0 },
       }));
       initializeTournament(animeItems);

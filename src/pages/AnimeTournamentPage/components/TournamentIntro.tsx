@@ -11,7 +11,7 @@ interface TournamentIntroProps {
 }
 
 export function TournamentIntro({ completedAnime, onStart }: TournamentIntroProps) {
-  const [selectedAnime, setSelectedAnime] = useState<AnimeListItem[]>([]);
+  const [selectedAnime, setSelectedAnime] = useState<YummyUserAnimeRate[]>([]);
   
   const hasEnoughAnime = selectedAnime.length >= 4;
   

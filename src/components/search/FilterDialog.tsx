@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Star, X } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { ALL_YEARS, RATING_OPTIONS } from '@/lib/constants';
 
 interface FilterDialogProps {
@@ -19,7 +19,6 @@ interface FilterDialogProps {
 }
 
 export function FilterDialogContent({
-  open,
   onOpenChange,
   genresData,
   selectedGenres,
