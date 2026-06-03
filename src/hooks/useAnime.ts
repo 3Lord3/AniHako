@@ -21,9 +21,11 @@ export function useAnimeList(params?: {
   min_rating?: number;
   sort_forward?: boolean;
   kind?: string;
-  status?: string;
+  status?: string | string[];
   order?: string;
   mylist?: string;
+  season?: string;
+  offset?: number;
 }) {
   return useQuery({
     queryKey: ['anime', 'catalog', params],
@@ -258,6 +260,20 @@ export function useToggleFavorite() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['anime', 'detail'] });
       queryClient.invalidateQueries({ queryKey: ['user', 'anime'] });
+    },
+  });
+}
+
+// =============================================================================
+// SCHEDULE
+// =============================================================================
+
+export function useSchedule() {
+  return useQuery({
+    queryKey: ['anime', 'schedule'],
+    queryFn: async () => {
+      const response = await animeApi.getSchedule();
+      return response || [];
     },
   });
 }

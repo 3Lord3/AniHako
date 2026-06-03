@@ -219,3 +219,19 @@ export function getRatingDisplay(rating: { average: number; counters?: number } 
   if (!rating) return '0.00';
   return rating.average.toFixed(2);
 }
+
+export interface AnimeScheduleItem {
+  title: string;
+  description: string;
+  poster: AnimePoster;
+  anime_url: string;
+  anime_id: number;
+  episodes: {
+    aired: number;
+    count: number;
+    next_date: number;
+    prev_date: number;
+  };
+}
+
+export type AnimeScheduleResponse = AnimeScheduleItem[];

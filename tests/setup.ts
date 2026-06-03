@@ -7,6 +7,24 @@ afterEach(() => {
   cleanup();
 });
 
+// Mock IntersectionObserver
+class IntersectionObserverMock {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+  takeRecords = vi.fn().mockReturnValue([]);
+}
+Object.defineProperty(window, 'IntersectionObserver', {
+  writable: true,
+  value: IntersectionObserverMock,
+});
+
+// Mock embla-carousel-react
+vi.mock('embla-carousel-react', () => ({
+  default: () => [vi.fn(), vi.fn()],
+  __esModule: true,
+}));
+
 // Mock localStorage
 const localStorageMock = {
   getItem: vi.fn(),

@@ -38,6 +38,14 @@ export function Layout() {
                 location.pathname === '/' ? 'text-primary font-medium' : ''
               }`}
             >
+              Главная
+            </Link>
+            <Link
+              to="/catalog"
+              className={`hover:text-primary transition-colors ${
+                location.pathname === '/catalog' ? 'text-primary font-medium' : ''
+              }`}
+            >
               Каталог
             </Link>
             <Link
