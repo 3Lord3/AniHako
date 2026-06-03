@@ -1,18 +1,24 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useTournament } from '@/hooks/useTournament';
-import type { AnimeListItem } from '@/types';
+import type { AnimeCatalogItem } from '@/types';
 
-// Helper to create mock anime items
-const createMockAnime = (id: number, title: string): AnimeListItem => ({
-  id,
+const createMockAnime = (id: number, title: string): AnimeCatalogItem => ({
+  anime_id: id,
+  anime_status: { title: 'Вышло', alias: 'released' as const, value: 0 },
+  anime_url: `/anime/${id}`,
+  poster: { small: '', medium: '', big: '', huge: '', fullsize: '', mega: '' },
+  rating: { average: 8.0, counters: 0 },
   title,
-  poster: null,
-  rating: 8.0,
+  type: { name: 'TV', value: 1, shortname: 'tv', alias: 'tv' },
+  year: 2024,
+  description: '',
+  views: 0,
+  season: 1 as const,
+  episodes: { aired: 12, count: 12 },
 });
 
-// Simple mock anime list for testing
-const mockAnime5: AnimeListItem[] = [
+const mockAnime5: AnimeCatalogItem[] = [
   createMockAnime(1, 'Anime A'),
   createMockAnime(2, 'Anime B'),
   createMockAnime(3, 'Anime C'),
@@ -20,7 +26,7 @@ const mockAnime5: AnimeListItem[] = [
   createMockAnime(5, 'Anime E'), // 5th participant - will get bye
 ];
 
-const mockAnime9: AnimeListItem[] = [
+const mockAnime9: AnimeCatalogItem[] = [
   createMockAnime(1, 'Anime 1'),
   createMockAnime(2, 'Anime 2'),
   createMockAnime(3, 'Anime 3'),

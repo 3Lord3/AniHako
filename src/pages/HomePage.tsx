@@ -1,30 +1,31 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAnimeList, useDebounce, useUserAnimeList, useGenreSearch } from '@/hooks';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { AnimeGrid } from '@/components/AnimeGrid';
 import {
   Dialog,
   DialogContent,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Search, Filter, Star, X } from 'lucide-react';
+import { Filter, X } from 'lucide-react';
+import { SearchBar } from '@/components/search/SearchBar';
+import { FilterDialogContent } from '@/components/search/FilterDialog';
+import { FilterBadges } from '@/components/search/FilterBadges';
 
 export function HomePage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get('search') || '';
   const genres = searchParams.get('genres') || '';
-  const year = searchParams.get('year') || '';
-  const sort = searchParams.get('sort') || '';
   const minRating = searchParams.get('rating') ? parseFloat(searchParams.get('rating')!) : undefined;
-  const kind = searchParams.get('kind') || '';
 
   const [searchInput, setSearchInput] = useState(search);
   const isUserTypingRef = useRef(false);
+  const lastClearRef = useRef<number | null>(null);
+  const sortForward = searchParams.get('sort_forward') !== 'false';
+  const toYear = searchParams.get('to_year') || '';
+  const fromYear = searchParams.get('from_year') || '';
 
-  // Sync with URL only when navigating (not on user typing)
   useEffect(() => {
     if (!isUserTypingRef.current) {
       setSearchInput(search);
@@ -36,6 +37,7 @@ export function HomePage() {
   }, [searchInput]);
 
   const clearSearch = () => {
+    lastClearRef.current = Date.now();
     setSearchInput('');
     isUserTypingRef.current = false;
     const params = new URLSearchParams(searchParams);
@@ -43,12 +45,9 @@ export function HomePage() {
     setSearchParams(params);
   };
 
-  // Debounce search input
   const debouncedSearch = useDebounce(searchInput, 300);
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [genreSearchInput, setGenreSearchInput] = useState('');
 
-  // Update URL when debounced search changes
   useEffect(() => {
     if (debouncedSearch !== search) {
       const params = new URLSearchParams(searchParams);
@@ -61,14 +60,26 @@ export function HomePage() {
     }
   }, [debouncedSearch, search, searchParams, setSearchParams]);
 
-  // Build query params for YummyAnime API
+  useEffect(() => {
+    if (lastClearRef.current && Date.now() - lastClearRef.current < 100) {
+      lastClearRef.current = null;
+      return;
+    }
+    lastClearRef.current = null;
+    if (!isUserTypingRef.current) {
+      setSearchInput(search);
+    }
+  }, [search]);
+
   const queryParams = {
     page: 1,
     limit: 100,
-    search: search || undefined,
-    genre: genres || undefined,
-    year: year || undefined,
-    order: sort === 'rating' ? 'score' : sort === 'year' ? 'aired_on' : sort || undefined,
+    q: search || undefined,
+    genres: genres || undefined,
+    from_year: fromYear ? parseInt(fromYear, 10) : undefined,
+    to_year: toYear ? parseInt(toYear, 10) : undefined,
+    min_rating: minRating,
+    sort_forward: sortForward,
   };
 
   const { data: animeData, isLoading } = useAnimeList(queryParams);
@@ -93,68 +104,30 @@ export function HomePage() {
     updateParams('genres', newGenres.join(','));
   };
 
-  const toggleYear = (yearValue: string) => {
-    const currentYears = year ? year.split(',') : [];
-    const newYears = currentYears.includes(yearValue)
-      ? currentYears.filter((y) => y !== yearValue)
-      : [...currentYears, yearValue];
-    updateParams('year', newYears.join(','));
-  };
-
-  // Filter genres by search
-  const filteredGenres = useMemo(() => {
-    if (!genresData?.genres) return [];
-    if (!genreSearchInput) return genresData.genres;
-    const searchLower = genreSearchInput.toLowerCase();
-    return genresData.genres.filter((genre) => 
-      genre.title.toLowerCase().includes(searchLower)
-    );
-  }, [genresData, genreSearchInput]);
-
-  // Get years range (2010-2025)
-  const allYears = ['2025', '2024', '2023', '2022', '2021', '2020', '2019', '2018', '2017', '2016', '2015', '2014', '2013', '2012', '2011', '2010'];
-
-  // Rating filter options
-  const ratingOptions = [9, 8, 7, 6];
-
-  // Clear all filters (only filters, not search)
   const clearFiltersOnly = () => {
     const params = new URLSearchParams(searchParams);
     params.delete('genres');
-    params.delete('year');
     params.delete('rating');
-    params.delete('sort');
-    params.delete('kind');
+    params.delete('sort_forward');
+    params.delete('to_year');
+    params.delete('from_year');
     setSearchParams(params);
   };
 
-  const hasActiveFilters = genres || year || minRating || sort || kind;
+  const hasActiveFilters = genres || minRating || fromYear || toYear;
 
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        {/* Search row */}
         <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Поиск аниме..."
-              value={searchInput}
-              onChange={(e) => {
-                isUserTypingRef.current = true;
-                setSearchInput(e.target.value);
-              }}
-              className="pl-10 pr-10"
-            />
-            {searchInput && (
-              <button
-                onClick={clearSearch}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
+          <SearchBar
+            value={searchInput}
+            onChange={(value) => {
+              isUserTypingRef.current = true;
+              setSearchInput(value);
+            }}
+            onClear={clearSearch}
+          />
           <Dialog open={filtersOpen} onOpenChange={setFiltersOpen}>
             <Button
               variant="outline"
@@ -184,114 +157,30 @@ export function HomePage() {
                 </Button>
               </div>
 
-              <div className="space-y-6">
-                {/* Rating filter */}
-                <div className="space-y-2">
-                  <h4 className="font-medium text-sm">Минимальный рейтинг</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {ratingOptions.map((r) => (
-                      <Badge
-                        key={r}
-                        variant={minRating === r ? 'default' : 'secondary'}
-                        className="cursor-pointer"
-                        onClick={() => updateParams('rating', minRating === r ? '' : String(r))}
-                      >
-                        <Star className="w-3 h-3 mr-1" />
-                        {r}+
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Year filter */}
-                <div className="space-y-2">
-                  <h4 className="font-medium text-sm">Год выпуска</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {allYears.map((y) => (
-                      <Badge
-                        key={y}
-                        variant={year.split(',').includes(y) ? 'default' : 'secondary'}
-                        className="cursor-pointer"
-                        onClick={() => toggleYear(y)}
-                      >
-                        {y}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Genres filter with search */}
-                <div className="space-y-2">
-                  <h4 className="font-medium text-sm">Жанры</h4>
-                  <Input
-                    placeholder="Поиск жанров..."
-                    value={genreSearchInput}
-                    onChange={(e) => setGenreSearchInput(e.target.value)}
-                    className="mb-2"
-                  />
-                  <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
-                    {filteredGenres.map((genre) => (
-                      <Badge
-                        key={genre.value}
-                        variant={genres.split(',').includes(genre.href) ? 'default' : 'secondary'}
-                        className="cursor-pointer"
-                        onClick={() => toggleGenre(genre.href)}
-                      >
-                        {genre.title}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Clear and apply buttons */}
-                <div className="flex gap-2 pt-4 justify-end">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="cursor-pointer"
-                    onClick={clearFiltersOnly}
-                  >
-                    Очистить
-                  </Button>
-                  <Button
-                    size="sm"
-                    className="cursor-pointer"
-                    onClick={() => setFiltersOpen(false)}
-                  >
-                    Применить
-                  </Button>
-                </div>
-              </div>
+              <FilterDialogContent
+                open={filtersOpen}
+                onOpenChange={setFiltersOpen}
+                genresData={genresData}
+                selectedGenres={genres}
+                selectedRating={minRating}
+                toYear={toYear}
+                fromYear={fromYear}
+                onToggleGenre={toggleGenre}
+                onUpdateParams={updateParams}
+                onClearFilters={clearFiltersOnly}
+              />
             </DialogContent>
           </Dialog>
         </div>
 
-        {/* Active filters badges */}
-        <div className="flex gap-2 flex-wrap items-center">
-          {year && (
-            <Button variant="secondary" size="sm" onClick={() => updateParams('year', '')}>
-              Год: {year.split(',').length > 1 ? `${year.split(',').length} годов` : year}
-              <X className="w-3 h-3 ml-1" />
-            </Button>
-          )}
-          {minRating && (
-            <Button variant="secondary" size="sm" onClick={() => updateParams('rating', '')}>
-              Рейтинг: {minRating}+
-              <X className="w-3 h-3 ml-1" />
-            </Button>
-          )}
-          {genres && (
-            <Button variant="secondary" size="sm" onClick={() => updateParams('genres', '')}>
-              Жанры: {genres.split(',').length}
-              <X className="w-3 h-3 ml-1" />
-            </Button>
-          )}
-          {hasActiveFilters && (
-            <Button variant="secondary" size="sm" onClick={clearFiltersOnly}>
-              Очистить фильтры
-            </Button>
-          )}
-        </div>
+        <FilterBadges
+          fromYear={fromYear}
+          toYear={toYear}
+          minRating={minRating}
+          genres={genres}
+          onUpdateParams={updateParams}
+          onClearFilters={clearFiltersOnly}
+        />
       </div>
 
       {isLoading ? (

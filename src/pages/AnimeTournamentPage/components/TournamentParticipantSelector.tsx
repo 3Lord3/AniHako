@@ -51,10 +51,11 @@ export function TournamentParticipantSelector({
       anime_id: anime.id,
       anime_url: anime.anime_url || String(anime.id),
       title: anime.title,
-      poster: anime.poster || { small: '', medium: '', big: '', huge: '', fullsize: '', mega: '' },
+      poster: anime.poster ? { small: anime.poster.small || '', medium: anime.poster.medium || '', big: '', huge: '', fullsize: '', mega: '' } : { small: '', medium: '', big: '', huge: '', fullsize: '', mega: '' },
       rating: anime.rating?.average || 0,
       type: anime.type || { name: '', value: 0, shortname: '', alias: '' },
       user: undefined,
+      date: Date.now(),
     };
     onSelectionChange([...selectedAnime, rate]);
     setSearchQuery('');
@@ -136,7 +137,7 @@ export function TournamentParticipantSelector({
                           {anime.title}
                         </p>
                         <p className="text-xs text-muted-foreground truncate">
-                          {anime.year || '—'} • {anime.genres?.slice(0, 2).map((g) => g.title).join(', ') || '—'}
+                          {anime.year || '—'} • {anime.genres?.slice(0, 2).map((g: { title: string }) => g.title).join(', ') || '—'}
                         </p>
                       </div>
                       <Plus className="w-4 h-4 text-muted-foreground flex-shrink-0" />
