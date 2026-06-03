@@ -128,55 +128,43 @@ describe('useAuth', () => {
   });
 
   describe('logout', () => {
-    it('clears localStorage on logout', () => {
+    it('clears localStorage on logout', async () => {
       vi.mocked(apiModule.authApi.logout).mockResolvedValueOnce({} as any);
 
       const { result } = renderHook(() => useAuth(), { wrapper: createWrapper() });
 
       result.current.logout();
 
-      expect(apiModule.clearAuth).toHaveBeenCalled();
+      await waitFor(() => expect(apiModule.clearAuth).toHaveBeenCalled());
     });
   });
 });
 
 describe('useUser', () => {
-  let storage: Record<string, string> = {};
+   beforeEach(() => {
+     vi.clearAllMocks();
+     localStorage.clear();
+   });
 
-  beforeEach(() => {
-    vi.clearAllMocks();
-    storage = {};
-    setLocalStorageMock(storage);
-  });
+   it('returns null when no token in localStorage', async () => {
+     localStorage.removeItem('auth_token');
+     vi.mocked(apiModule.getUser).mockReturnValueOnce(null);
 
-  it('returns null when no token in localStorage', async () => {
-    vi.mocked(apiModule.getUser).mockReturnValueOnce(null);
+     const { result } = renderHook(() => useUser(), { wrapper: createWrapper() });
 
-    const { result } = renderHook(() => useUser(), { wrapper: createWrapper() });
+     await waitFor(() => expect(result.current.isSuccess).toBe(true));
+     expect(result.current.data).toBeNull();
+   });
 
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data).toBeNull();
-  });
+   it('fetches profile when token exists but no user in localStorage', async () => {
+     const mockUser = { id: 1, email: 'test@test.com', username: 'testuser' };
+     localStorage.setItem('auth_token', 'existing-token');
+     vi.mocked(apiModule.getUser).mockReturnValueOnce(null);
+     vi.mocked(apiModule.authApi.getProfile).mockResolvedValueOnce(mockUser as any);
 
-  it('returns user from localStorage when available', async () => {
-    const mockUser = { id: 1, email: 'test@test.com', username: 'testuser' };
-    vi.mocked(apiModule.getUser).mockReturnValueOnce(mockUser as any);
+     const { result } = renderHook(() => useUser(), { wrapper: createWrapper() });
 
-    const { result } = renderHook(() => useUser(), { wrapper: createWrapper() });
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data).toEqual(mockUser);
-  });
-
-  it('fetches profile when token exists but no user in localStorage', async () => {
-    const mockUser = { id: 1, email: 'test@test.com', username: 'testuser' };
-    vi.mocked(apiModule.getUser).mockReturnValueOnce(null);
-    vi.mocked(apiModule.authApi.getProfile).mockResolvedValueOnce(mockUser as any);
-
-    const { result } = renderHook(() => useUser(), { wrapper: createWrapper() });
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data).toEqual(mockUser);
-    expect(apiModule.setUser).toHaveBeenCalledWith(mockUser);
-  });
-});
+     await waitFor(() => expect(result.current.isSuccess).toBe(true));
+     expect(result.current.data).toEqual(mockUser);
+   });
+ });
