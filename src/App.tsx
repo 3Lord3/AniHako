@@ -9,6 +9,7 @@ import { useUser } from '@/hooks';
 const LoginPage = lazy(() => import('@/pages/LoginPage').then(m => ({ default: m.LoginPage })));
 const RegisterPage = lazy(() => import('@/pages/RegisterPage').then(m => ({ default: m.RegisterPage })));
 const HomePage = lazy(() => import('@/pages/HomePage').then(m => ({ default: m.HomePage })));
+const CatalogPage = lazy(() => import('@/pages/CatalogPage').then(m => ({ default: m.CatalogPage })));
 const AnimeDetailPage = lazy(() => import('@/pages/AnimeDetailPage').then(m => ({ default: m.AnimeDetailPage })));
 const ProfilePage = lazy(() => import('@/pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
 const UserAnimeListPage = lazy(() => import('@/pages/UserAnimeListPage').then(m => ({ default: m.UserAnimeListPage })));
@@ -36,6 +37,7 @@ export function App() {
         <Routes>
           <Route path="/" element={<Layout />}>
             <Route index element={<HomePage />} />
+            <Route path="catalog" element={<CatalogPage />} />
             <Route path="login" element={<LoginPage />} />
             <Route path="register" element={<RegisterPage />} />
             <Route path="anime/:url" element={<AnimeDetailPage />} />

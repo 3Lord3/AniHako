@@ -12,12 +12,15 @@ export const animeApi = {
     from_year?: number;
     to_year?: number;
     kind?: string;
-    status?: string;
+    status?: string | string[];
     order?: string;
     mylist?: string;
     min_rating?: number;
+    season?: string;
+    sort_forward?: boolean;
+    offset?: number;
   }) => {
-    const offset = params?.page ? (params.page - 1) * (params.limit || 20) : undefined;
+    const offset = params?.offset ?? (params?.page ? (params.page - 1) * (params.limit || 20) : undefined);
     const searchQuery = params?.q || params?.search;
     const queryParams = {
       ...params,
@@ -34,6 +37,12 @@ export const animeApi = {
         (queryParams as any).genres = queryParams.genre;
       }
       queryParams.genre = undefined;
+    }
+
+    if (queryParams.status) {
+      if (Array.isArray(queryParams.status)) {
+        (queryParams as any).status = queryParams.status.join(',');
+      }
     }
     
     return api.get<{ response: any[] }>('/anime', { 
@@ -88,4 +97,8 @@ export const animeApi = {
   getGenres: () =>
     api.get<{ response: { genres: GenreResponse[]; groups: unknown[] } }>('/anime/genres')
       .then(res => res.data.response || { genres: [] }),
+
+  getSchedule: () =>
+    api.get<{ response: any[] }>('/anime/schedule')
+      .then(res => res.data.response),
 };

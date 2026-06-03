@@ -60,12 +60,12 @@ export const KIND_LABELS: Record<string, string> = {
 };
 
 export function getRatingColor(rating: number | string | null): string {
-  if (rating === null || rating === undefined) return 'bg-gray-500 text-white';
+  if (rating === null || rating === undefined) return 'bg-gray-500 text-white dark:bg-gray-600';
   const r = typeof rating === 'number' ? rating : parseFloat(rating);
-  if (isNaN(r)) return 'bg-gray-500 text-white';
-  if (r >= 8) return 'bg-green-500 text-white';
-  if (r >= 6) return 'bg-yellow-500 text-black';
-  return 'bg-red-500 text-white';
+  if (isNaN(r)) return 'bg-gray-500 text-white dark:bg-gray-600';
+  if (r >= 8) return 'bg-green-500 text-white dark:bg-green-600';
+  if (r >= 6) return 'bg-yellow-500 text-black dark:bg-yellow-500 dark:text-black';
+  return 'bg-red-500 text-white dark:bg-red-600';
 }
 
 export function getKindIcon(kind: string | null): string {
