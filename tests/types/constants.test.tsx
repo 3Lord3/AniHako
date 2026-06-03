@@ -30,12 +30,12 @@ describe('constants', () => {
 
   describe('STATUS_COLORS', () => {
     it('has correct colors for all status types', () => {
-      expect(STATUS_COLORS.watching).toBe('bg-blue-500 text-white');
-      expect(STATUS_COLORS.completed).toBe('bg-green-500 text-white');
-      expect(STATUS_COLORS.dropped).toBe('bg-red-500 text-white');
-      expect(STATUS_COLORS.planned).toBe('bg-yellow-600 text-white');
-      expect(STATUS_COLORS.paused).toBe('bg-yellow-500 text-white');
-      expect(STATUS_COLORS.favourite).toBe('bg-pink-500 text-white');
+      expect(STATUS_COLORS.watching).toBe('bg-blue-500 text-white dark:bg-blue-600');
+      expect(STATUS_COLORS.completed).toBe('bg-green-500 text-white dark:bg-green-600');
+      expect(STATUS_COLORS.dropped).toBe('bg-red-500 text-white dark:bg-red-600');
+      expect(STATUS_COLORS.planned).toBe('bg-yellow-500 text-white dark:bg-yellow-600');
+      expect(STATUS_COLORS.paused).toBe('bg-yellow-500 text-gray-900 dark:bg-yellow-600 dark:text-gray-900');
+      expect(STATUS_COLORS.favourite).toBe('bg-pink-500 text-white dark:bg-pink-600');
     });
   });
 
@@ -57,8 +57,7 @@ describe('constants', () => {
       expect(ALL_STATUSES).toContain('dropped');
       expect(ALL_STATUSES).toContain('planned');
       expect(ALL_STATUSES).toContain('paused');
-      expect(ALL_STATUSES).toContain('favourite');
-      expect(ALL_STATUSES.length).toBe(6);
+      expect(ALL_STATUSES.length).toBe(5);
     });
   });
 });

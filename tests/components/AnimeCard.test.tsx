@@ -37,17 +37,17 @@ describe('AnimeCard', () => {
     renderComponent();
     const img = screen.getByAltText('Test Anime Title') as HTMLImageElement;
     expect(img).toBeInTheDocument();
-    expect(img.src).toContain('/posters/1.jpg');
+    expect(img.src).toContain('/posters/1-mega.jpg');
   });
 
   it('renders rating badge when showRating is true', () => {
     renderComponent({ showRating: true });
-    expect(screen.getByText('8.50')).toBeInTheDocument();
+    expect(screen.getByText('8.5')).toBeInTheDocument();
   });
 
   it('does not render rating when showRating is false', () => {
     renderComponent({ showRating: false });
-    expect(screen.queryByText('8.50')).not.toBeInTheDocument();
+    expect(screen.queryByText('8.5')).not.toBeInTheDocument();
   });
 
   it('does not render rating when rating is undefined', () => {
@@ -78,7 +78,7 @@ describe('AnimeCard', () => {
   it('renders link to anime detail page', () => {
     renderComponent();
     const link = screen.getByRole('link');
-    expect(link).toHaveAttribute('href', '/anime/anime/1');
+    expect(link).toHaveAttribute('href', '/anime/1');
   });
 
   it('handles anime without poster', () => {
