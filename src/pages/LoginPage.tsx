@@ -50,17 +50,18 @@ export function LoginPage() {
               <Input
                 id="login"
                 type="text"
-                placeholder="user123 или user@mail.ru"
+                placeholder="example"
                 value={login}
                 onChange={(e) => setLogin(e.target.value)}
                 required
               />
             </div>
-            <div className="space-y-2 pb-4">
+            <div className="space-y-2">
               <Label htmlFor="password">Пароль</Label>
               <Input
                 id="password"
                 type="password"
+                placeholder="●●●●●●●●"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
