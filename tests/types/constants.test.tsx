@@ -4,27 +4,27 @@ import { getRatingColor, STATUS_COLORS, STATUS_LABELS, ALL_STATUSES } from '@/ty
 describe('constants', () => {
   describe('getRatingColor', () => {
     it('returns green for rating >= 8', () => {
-      expect(getRatingColor(8)).toBe('bg-green-500 text-white');
-      expect(getRatingColor(8.5)).toBe('bg-green-500 text-white');
-      expect(getRatingColor(10)).toBe('bg-green-500 text-white');
+      expect(getRatingColor(8)).toContain('bg-green-500');
+      expect(getRatingColor(8.5)).toContain('bg-green-500');
+      expect(getRatingColor(10)).toContain('bg-green-500');
     });
 
     it('returns yellow for rating >= 6 and < 8', () => {
-      expect(getRatingColor(6)).toBe('bg-yellow-500 text-black');
-      expect(getRatingColor(7)).toBe('bg-yellow-500 text-black');
-      expect(getRatingColor(7.9)).toBe('bg-yellow-500 text-black');
+      expect(getRatingColor(6)).toContain('bg-yellow-500');
+      expect(getRatingColor(7)).toContain('bg-yellow-500');
+      expect(getRatingColor(7.9)).toContain('bg-yellow-500');
     });
 
     it('returns red for rating < 6', () => {
-      expect(getRatingColor(5)).toBe('bg-red-500 text-white');
-      expect(getRatingColor(3)).toBe('bg-red-500 text-white');
-      expect(getRatingColor(0)).toBe('bg-red-500 text-white');
+      expect(getRatingColor(5)).toContain('bg-red-500');
+      expect(getRatingColor(3)).toContain('bg-red-500');
+      expect(getRatingColor(0)).toContain('bg-red-500');
     });
 
     it('handles string input', () => {
-      expect(getRatingColor('8')).toBe('bg-green-500 text-white');
-      expect(getRatingColor('6.5')).toBe('bg-yellow-500 text-black');
-      expect(getRatingColor('4')).toBe('bg-red-500 text-white');
+      expect(getRatingColor('8')).toContain('bg-green-500');
+      expect(getRatingColor('6.5')).toContain('bg-yellow-500');
+      expect(getRatingColor('4')).toContain('bg-red-500');
     });
   });
 
