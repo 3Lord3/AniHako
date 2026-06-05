@@ -11,41 +11,33 @@ interface TournamentIntroProps {
 }
 
 export function TournamentIntro({ completedAnime, onStart }: TournamentIntroProps) {
-<<<<<<< HEAD
   const [selectedAnime, setSelectedAnime] = useState<YummyUserAnimeRate[]>([]);
-=======
-  const [selectedAnime, setSelectedAnime] = useState<AnimeListItem[]>([]);
->>>>>>> main
-  
+
   const hasEnoughAnime = selectedAnime.length >= 4;
-  
+
   const handleStart = () => {
     if (hasEnoughAnime) {
       onStart(selectedAnime);
     }
   };
-  
+
   return (
     <div className="flex flex-col items-center justify-center min-h-[50vh] sm:min-h-[60vh] text-center">
-      {/* Trophy icon */}
       <div className="mb-4 sm:mb-6 md:mb-8">
         <div className="w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 mx-auto bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center shadow-2xl">
           <span className="text-4xl sm:text-5xl md:text-6xl">🏆</span>
         </div>
       </div>
-      
-      {/* Title */}
+
       <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 sm:mb-4 bg-gradient-to-r from-primary to-yellow-500 bg-clip-text text-transparent">
         Anime Tournament
       </h1>
-      
-      {/* Description */}
+
       <p className="text-sm sm:text-base md:text-lg text-muted-foreground mb-6 sm:mb-8 max-w-xs sm:max-w-sm md:max-w-md">
-        Выбери лучшее аниме из своего списка! Смотри, как твои фавориты сражаются друг с другом 
+        Выбери лучшее аниме из своего списка! Смотри, как твои фавориты сражаются друг с другом
         в напряжённой турнирной сетке.
       </p>
-      
-      {/* Participant Selector */}
+
       <div className="w-full max-w-xs sm:max-w-sm md:max-w-2xl mb-6 sm:mb-8">
         <TournamentParticipantSelector
           completedAnime={completedAnime}
@@ -53,10 +45,9 @@ export function TournamentIntro({ completedAnime, onStart }: TournamentIntroProp
           onSelectionChange={setSelectedAnime}
         />
       </div>
-      
-      {/* Button or message */}
+
       {hasEnoughAnime ? (
-        <Button 
+        <Button
           onClick={handleStart}
           size="default" className="gap-2 text-base sm:text-lg px-6 py-4 sm:px-8 sm:py-6 bg-gradient-to-r from-primary to-yellow-500 hover:from-primary/90 hover:to-yellow-500/90 text-white font-semibold"
         >
@@ -78,8 +69,7 @@ export function TournamentIntro({ completedAnime, onStart }: TournamentIntroProp
           </Link>
         </div>
       )}
-      
-      {/* How it works */}
+
       <div className="mt-8 sm:mt-12 max-w-xs sm:max-w-lg md:max-w-lg">
         <h3 className="font-semibold mb-3 sm:mb-4 text-foreground text-sm sm:text-base">Как это работает?</h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-sm">
@@ -93,11 +83,7 @@ export function TournamentIntro({ completedAnime, onStart }: TournamentIntroProp
           </div>
           <div className="p-3 sm:p-4 bg-muted/50 border border-border rounded-lg">
             <div className="text-xl sm:text-2xl mb-1 sm:mb-2">👑</div>
-<<<<<<< HEAD
             <p className="text-foreground text-xs sm:text-sm">Определяем лучшее аниме</p>
-=======
-            <p className="text-foreground text-xs sm:text-sm">Определяем абсолютного победителя</p>
->>>>>>> main
           </div>
         </div>
       </div>

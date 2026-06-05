@@ -1,10 +1,5 @@
-<<<<<<< HEAD
 import { X } from 'lucide-react';
 
-=======
-import { X, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
->>>>>>> main
 import { getImageUrl } from '@/lib/imageUrl';
 import type { AnimeListItem } from '@/types';
 
@@ -18,7 +13,6 @@ export function SelectedAnimeGrid({
   selectedAnime,
   onRemove,
 }: SelectedAnimeGridProps) {
-  // Empty state
   if (selectedAnime.length === 0) {
     return (
       <div className="text-center py-8 text-muted-foreground">
@@ -37,11 +31,7 @@ export function SelectedAnimeGrid({
             className="relative group aspect-[2/3] rounded-lg overflow-hidden cursor-pointer"
           >
             <img
-<<<<<<< HEAD
               src={getImageUrl(anime.poster.small)}
-=======
-              src={getImageUrl(anime.poster)}
->>>>>>> main
               alt={anime.title}
               className="object-cover w-full h-full transition-all duration-200 group-hover:brightness-50"
             />
@@ -61,57 +51,4 @@ export function SelectedAnimeGrid({
       </div>
     </>
   );
-<<<<<<< HEAD
-=======
-}
-
-interface SelectedAnimeActionsProps {
-  selectedCount: number;
-  totalAvailable: number;
-  onAddAll: () => void;
-  onClearAll: () => void;
-}
-
-export function SelectedAnimeActions({
-  selectedCount,
-  totalAvailable,
-  onAddAll,
-  onClearAll,
-}: SelectedAnimeActionsProps) {
-  const remaining = totalAvailable - selectedCount;
-  const hasRemaining = remaining > 0;
-
-  return (
-    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 w-full">
-      <div className="flex flex-wrap items-center gap-2">
-        {hasRemaining && (
-          <Button
-            variant="outline"
-            onClick={onAddAll}
-            className="gap-2 text-foreground dark:text-foreground"
-          >
-            Добавить все просмотренные ({remaining})
-          </Button>
-        )}
-
-        {selectedCount > 0 && (
-          <Button
-            variant="ghost"
-            onClick={onClearAll}
-            className="gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
-          >
-            <Trash2 className="w-4 h-4" />
-            Очистить
-          </Button>
-        )}
-      </div>
-
-      {selectedCount > 0 && (
-        <span className="text-sm text-muted-foreground">
-          Выбрано: {selectedCount}
-        </span>
-      )}
-    </div>
-  );
->>>>>>> main
 }

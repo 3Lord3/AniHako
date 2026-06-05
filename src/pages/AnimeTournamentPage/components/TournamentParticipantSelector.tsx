@@ -24,13 +24,11 @@ export function TournamentParticipantSelector({
 
   const debouncedSearch = useDebounce(searchQuery, 300);
 
-  // Search for anime in global catalog
   const { data: searchResults, isLoading: isSearching } = useAnimeList({
     search: debouncedSearch,
     limit: 10,
   });
 
-  // Filter out already selected or completed anime
   const availableResults = (searchResults?.data || []).filter(
     (anime) =>
       !selectedAnime.some((a) => a.anime_id === anime.id) &&
@@ -51,18 +49,11 @@ export function TournamentParticipantSelector({
       anime_id: anime.id,
       anime_url: anime.anime_url || String(anime.id),
       title: anime.title,
-<<<<<<< HEAD
       poster: anime.poster ? { small: anime.poster.small || '', medium: anime.poster.medium || '', big: '', huge: '', fullsize: '', mega: '' } : { small: '', medium: '', big: '', huge: '', fullsize: '', mega: '' },
       rating: anime.rating?.average || 0,
       type: anime.type || { name: '', value: 0, shortname: '', alias: '' },
       user: undefined,
       date: Date.now(),
-=======
-      poster: anime.poster || { small: '', medium: '', big: '', huge: '', fullsize: '', mega: '' },
-      rating: anime.rating?.average || 0,
-      type: anime.type || { name: '', value: 0, shortname: '', alias: '' },
-      user: undefined,
->>>>>>> main
     };
     onSelectionChange([...selectedAnime, rate]);
     setSearchQuery('');
@@ -90,7 +81,6 @@ export function TournamentParticipantSelector({
 
   return (
     <div className="w-full space-y-4">
-      {/* Search Section */}
       <div className="relative">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -115,13 +105,8 @@ export function TournamentParticipantSelector({
           )}
         </div>
 
-        {/* Dropdown */}
         {showDropdown && (
-<<<<<<< HEAD
           <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border-border rounded-lg shadow-lg overflow-hidden max-h-48 sm:max-h-64 overflow-y-auto">
-=======
-          <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border rounded-lg shadow-lg overflow-hidden max-h-48 sm:max-h-64 overflow-y-auto">
->>>>>>> main
             {isSearching ? (
               <div className="flex items-center justify-center py-4 text-muted-foreground">
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -148,11 +133,7 @@ export function TournamentParticipantSelector({
                           {anime.title}
                         </p>
                         <p className="text-xs text-muted-foreground truncate">
-<<<<<<< HEAD
                           {anime.year || '—'} • {anime.genres?.slice(0, 2).map((g: { title: string }) => g.title).join(', ') || '—'}
-=======
-                          {anime.year || '—'} • {anime.genres?.slice(0, 2).map((g) => g.title).join(', ') || '—'}
->>>>>>> main
                         </p>
                       </div>
                       <Plus className="w-4 h-4 text-muted-foreground flex-shrink-0" />
@@ -173,23 +154,15 @@ export function TournamentParticipantSelector({
         )}
       </div>
 
-      {/* Action buttons */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 w-full">
         <div className="flex flex-wrap items-center gap-2">
           {remaining.length > 0 && (
             <button
               onClick={handleAddAllCompleted}
-<<<<<<< HEAD
               className="inline-flex items-center gap-2 px-3 py-1.5 text-sm border border-input bg-background text-foreground hover:bg-accent rounded-md transition-colors"
             >
               <Plus className="w-4 h-4" />
               Просмотренные ({remaining.length})
-=======
-              className="inline-flex items-center gap-2 px-3 py-1.5 text-sm border border-input bg-background hover:bg-accent rounded-md transition-colors"
-            >
-              <Plus className="w-4 h-4" />
-              Добавить все ({remaining.length})
->>>>>>> main
             </button>
           )}
           {selectedAnime.length > 0 && (
@@ -208,7 +181,6 @@ export function TournamentParticipantSelector({
         )}
       </div>
 
-      {/* Selected Anime Grid */}
       {selectedAnime.length > 0 && (
         <div className="grid grid-cols-3 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 sm:gap-3">
           {selectedAnime.map((anime) => (
@@ -238,7 +210,6 @@ export function TournamentParticipantSelector({
         </div>
       )}
 
-      {/* Empty state */}
       {selectedAnime.length === 0 && completedAnime.length === 0 && (
         <div className="text-center py-8 text-muted-foreground">
           <p className="text-sm">У вас пока нет просмотренных аниме</p>

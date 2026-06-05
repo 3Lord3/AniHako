@@ -30,7 +30,6 @@ interface AnimeCharacteristicsProps {
   className?: string;
 }
 
-// Helper to get season label from season number (1-4)
 function getSeasonLabel(season: 1 | 2 | 3 | 4 | undefined): string | null {
   if (!season) return null;
   const seasonMap: Record<number, string> = {
@@ -42,45 +41,26 @@ function getSeasonLabel(season: 1 | 2 | 3 | 4 | undefined): string | null {
   return SEASON_LABELS[seasonMap[season]] || seasonMap[season];
 }
 
-<<<<<<< HEAD
 export function AnimeCharacteristics({ anime, className }: AnimeCharacteristicsProps) {
-=======
-// Helper to get kind label from type object
-function getKindLabel(kind: { name?: string; shortname?: string } | undefined): string | null {
-  if (!kind) return null;
-  if (kind.shortname && KIND_LABELS[kind.shortname]) {
-    return KIND_LABELS[kind.shortname];
-  }
-  return kind.name || null;
-}
-
-export function AnimeCharacteristics({ anime, className }: AnimeCharacteristicsProps) {
-  // YummyAnime API structure
->>>>>>> main
   const year = anime.year;
   const season = anime.season;
   const genres = anime.genres?.map(g => g.title) || [];
   const studios = anime.studios?.map(s => s.title) || anime.creators?.map(c => c.title) || [];
-  
-  // Rating from YummyAnime API
+
   const rating = anime.rating?.average;
-  
-  // Status - anime_status.alias
+
   const status = anime.anime_status?.alias;
   const statusTitle = anime.anime_status?.title;
-  
-  // Episodes - episodes.count and episodes.aired
+
   const episodesCount = anime.episodes?.count;
   const episodesAired = anime.episodes?.aired;
-  
-  // Duration
+
   const duration = anime.duration;
-  
-  // Type (kind) from YummyAnime API
+
   const typeName = anime.type?.name;
   const typeShortname = anime.type?.shortname;
-  const kindLabel = typeShortname && KIND_LABELS[typeShortname] 
-    ? KIND_LABELS[typeShortname] 
+  const kindLabel = typeShortname && KIND_LABELS[typeShortname]
+    ? KIND_LABELS[typeShortname]
     : typeName;
 
   return (
