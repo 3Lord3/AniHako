@@ -8,7 +8,10 @@ interface TournamentCardProps {
   anime: AnimeCatalogItem;
   isWinner?: boolean;
   isEliminated?: boolean;
+<<<<<<< HEAD
   isSelected?: boolean;
+=======
+>>>>>>> main
   onClick?: () => void;
   showDetails?: boolean;
   compact?: boolean;
@@ -19,7 +22,10 @@ export function TournamentCard({
   anime,
   isWinner = false,
   isEliminated = false,
+<<<<<<< HEAD
   isSelected = false,
+=======
+>>>>>>> main
   onClick,
   showDetails = true,
   compact = false,
@@ -36,9 +42,14 @@ export function TournamentCard({
         "group relative overflow-hidden rounded-xl transition-all duration-300 bg-card",
         onClick && !isEliminated && "cursor-pointer hover:scale-[1.02] hover:shadow-2xl",
         isWinner && "ring-4 ring-yellow-400 ring-offset-2 ring-offset-background",
+<<<<<<< HEAD
         isSelected && !isWinner && "relative z-20",
         isEliminated && "opacity-50 grayscale",
         compact ? "w-[58%] sm:w-4/5 lg:w-3/4 aspect-[2/3] max-h-full" : "aspect-[2/3]",
+=======
+        isEliminated && "opacity-50 grayscale",
+        compact ? "w-3/5 sm:w-4/5 lg:w-3/4 aspect-[2/3] max-h-full" : "aspect-[2/3]",
+>>>>>>> main
         className
       )}
     >
@@ -72,6 +83,7 @@ export function TournamentCard({
         
         {/* Genres in top-right corner */}
         {showDetails && anime.genres && anime.genres.length > 0 && (
+<<<<<<< HEAD
           <div className="absolute top-3 left-3 sm:top-4 sm:right-4 sm:left-auto right-3 flex flex-wrap gap-1 z-10 w-[calc(100%-1.5rem)] sm:w-auto sm:max-w-[60%] justify-start sm:justify-end">
             {anime.genres.slice(0, 2).map((g) => (
               <Badge
@@ -79,6 +91,16 @@ export function TournamentCard({
                 className={cn(
                   "text-white font-semibold border-0 backdrop-blur-sm",
                   compact ? "text-xs sm:text-sm px-2 py-1 bg-black/70" : "text-xs sm:text-sm px-2.5 py-1 bg-black/70"
+=======
+          <div className="absolute top-3 right-3 sm:top-4 sm:right-4 flex flex-wrap gap-1 z-10 max-w-[60%] justify-end">
+            {anime.genres.slice(0, 2).map((g) => (
+              <Badge
+                key={g.id}
+                variant="secondary"
+                className={cn(
+                  "text-muted-foreground border-0",
+                  compact ? "text-xs sm:text-sm px-2 py-1 bg-black/60" : "text-xs px-2 py-0.5 bg-black/60"
+>>>>>>> main
                 )}
               >
                 {g.title}
@@ -113,6 +135,7 @@ export function TournamentCard({
         </div>
       </div>
 
+<<<<<<< HEAD
       {/* Selection indicator */}
       {isSelected && !isWinner && (
         <div className="absolute inset-0 bg-green-500/30 rounded-xl z-20 transition-opacity duration-300 flex items-center justify-center">
@@ -122,6 +145,10 @@ export function TournamentCard({
 
       {/* Click indicator */}
       {onClick && !isEliminated && !isSelected && (
+=======
+      {/* Click indicator */}
+      {onClick && !isEliminated && (
+>>>>>>> main
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
           <div className={cn(
             "bg-white/90 text-black rounded-full font-semibold",

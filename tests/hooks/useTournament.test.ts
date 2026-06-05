@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { describe, it, expect } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { useTournament } from '@/hooks/useTournament';
@@ -19,6 +20,23 @@ const createMockAnime = (id: number, title: string): AnimeCatalogItem => ({
 });
 
 const mockAnime5: AnimeCatalogItem[] = [
+=======
+import { describe, it, expect, beforeEach } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
+import { useTournament } from '@/hooks/useTournament';
+import type { AnimeListItem } from '@/types';
+
+// Helper to create mock anime items
+const createMockAnime = (id: number, title: string): AnimeListItem => ({
+  id,
+  title,
+  poster: null,
+  rating: 8.0,
+});
+
+// Simple mock anime list for testing
+const mockAnime5: AnimeListItem[] = [
+>>>>>>> main
   createMockAnime(1, 'Anime A'),
   createMockAnime(2, 'Anime B'),
   createMockAnime(3, 'Anime C'),
@@ -26,7 +44,11 @@ const mockAnime5: AnimeCatalogItem[] = [
   createMockAnime(5, 'Anime E'), // 5th participant - will get bye
 ];
 
+<<<<<<< HEAD
 const mockAnime9: AnimeCatalogItem[] = [
+=======
+const mockAnime9: AnimeListItem[] = [
+>>>>>>> main
   createMockAnime(1, 'Anime 1'),
   createMockAnime(2, 'Anime 2'),
   createMockAnime(3, 'Anime 3'),
@@ -42,6 +64,7 @@ describe('useTournament', () => {
   describe('initialization', () => {
     it('should initialize tournament with 5 participants', () => {
       const { result } = renderHook(() => useTournament());
+<<<<<<< HEAD
 
       act(() => {
         result.current.initializeTournament(mockAnime5);
@@ -63,6 +86,34 @@ describe('useTournament', () => {
 
       expect(result.current.tournament).toBeDefined();
 
+=======
+      
+      act(() => {
+        result.current.initializeTournament(mockAnime5);
+      });
+      
+      expect(result.current.tournament).toBeDefined();
+      expect(result.current.tournament!.allParticipants.length).toBe(5);
+      expect(result.current.tournament!.rounds.length).toBeGreaterThanOrEqual(1);
+      
+      // First round should have 3 pairs (2 pairs + 1 bye)
+      const firstRound = result.current.tournament!.rounds[0];
+      expect(firstRound.pairs.length).toBe(3);
+    });
+    
+    it('should initialize tournament with 9 participants', () => {
+      const { result } = renderHook(() => useTournament());
+      
+      act(() => {
+        result.current.initializeTournament(mockAnime9);
+      });
+      
+      expect(result.current.tournament).toBeDefined();
+      expect(result.current.tournament!.allParticipants.length).toBe(9);
+      
+      // Round structure: 9 -> 5 -> 3 -> 2 -> 1 = 4 rounds total
+      // But since we create full structure, we have 4 rounds
+>>>>>>> main
       expect(result.current.tournament!.rounds.length).toBeGreaterThanOrEqual(1);
     });
     
@@ -217,6 +268,7 @@ describe('useTournament', () => {
     
     it('should progress all 9 participants through tournament', () => {
       const { result } = renderHook(() => useTournament());
+<<<<<<< HEAD
 
       act(() => {
         result.current.initializeTournament(mockAnime9);
@@ -226,6 +278,18 @@ describe('useTournament', () => {
         result.current.startRound();
       });
 
+=======
+      
+      act(() => {
+        result.current.initializeTournament(mockAnime9);
+      });
+      
+      act(() => {
+        result.current.startRound();
+      });
+      
+      // Complete first round
+>>>>>>> main
       const round0 = result.current.tournament!.rounds[0];
       for (const pair of round0.pairs) {
         if (pair.status !== 'bye' && !pair.winner) {
@@ -234,6 +298,7 @@ describe('useTournament', () => {
           });
         }
       }
+<<<<<<< HEAD
 
       const updatedTournament = result.current.tournament!;
       expect(
@@ -241,6 +306,13 @@ describe('useTournament', () => {
         updatedTournament.isComplete ||
         updatedTournament.rounds.length > 1
       ).toBe(true);
+=======
+      
+      // After first round complete, we should have 5 winners (4 from regular + 1 bye)
+      // Check that all original participants are still tracked
+      const allParticipantIds = result.current.tournament!.allParticipants.map(p => p.id);
+      expect(allParticipantIds.length).toBeGreaterThanOrEqual(5);
+>>>>>>> main
     });
   });
   

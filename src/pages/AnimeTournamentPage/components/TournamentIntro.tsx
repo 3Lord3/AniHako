@@ -11,7 +11,11 @@ interface TournamentIntroProps {
 }
 
 export function TournamentIntro({ completedAnime, onStart }: TournamentIntroProps) {
+<<<<<<< HEAD
   const [selectedAnime, setSelectedAnime] = useState<YummyUserAnimeRate[]>([]);
+=======
+  const [selectedAnime, setSelectedAnime] = useState<AnimeListItem[]>([]);
+>>>>>>> main
   
   const hasEnoughAnime = selectedAnime.length >= 4;
   
@@ -89,7 +93,11 @@ export function TournamentIntro({ completedAnime, onStart }: TournamentIntroProp
           </div>
           <div className="p-3 sm:p-4 bg-muted/50 border border-border rounded-lg">
             <div className="text-xl sm:text-2xl mb-1 sm:mb-2">👑</div>
+<<<<<<< HEAD
             <p className="text-foreground text-xs sm:text-sm">Определяем лучшее аниме</p>
+=======
+            <p className="text-foreground text-xs sm:text-sm">Определяем абсолютного победителя</p>
+>>>>>>> main
           </div>
         </div>
       </div>

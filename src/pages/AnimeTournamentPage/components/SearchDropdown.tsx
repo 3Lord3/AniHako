@@ -127,7 +127,11 @@ export function SearchDropdown({
                   )}
                 >
                   <img
+<<<<<<< HEAD
                     src={getImageUrl(anime.poster.small)}
+=======
+                    src={getImageUrl(anime.poster)}
+>>>>>>> main
                     alt={anime.title}
                     className="w-8 h-11 sm:w-10 sm:h-14 object-cover rounded flex-shrink-0"
                   />

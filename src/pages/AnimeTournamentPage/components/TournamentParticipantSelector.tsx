@@ -51,11 +51,18 @@ export function TournamentParticipantSelector({
       anime_id: anime.id,
       anime_url: anime.anime_url || String(anime.id),
       title: anime.title,
+<<<<<<< HEAD
       poster: anime.poster ? { small: anime.poster.small || '', medium: anime.poster.medium || '', big: '', huge: '', fullsize: '', mega: '' } : { small: '', medium: '', big: '', huge: '', fullsize: '', mega: '' },
       rating: anime.rating?.average || 0,
       type: anime.type || { name: '', value: 0, shortname: '', alias: '' },
       user: undefined,
       date: Date.now(),
+=======
+      poster: anime.poster || { small: '', medium: '', big: '', huge: '', fullsize: '', mega: '' },
+      rating: anime.rating?.average || 0,
+      type: anime.type || { name: '', value: 0, shortname: '', alias: '' },
+      user: undefined,
+>>>>>>> main
     };
     onSelectionChange([...selectedAnime, rate]);
     setSearchQuery('');
@@ -110,7 +117,11 @@ export function TournamentParticipantSelector({
 
         {/* Dropdown */}
         {showDropdown && (
+<<<<<<< HEAD
           <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border-border rounded-lg shadow-lg overflow-hidden max-h-48 sm:max-h-64 overflow-y-auto">
+=======
+          <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border rounded-lg shadow-lg overflow-hidden max-h-48 sm:max-h-64 overflow-y-auto">
+>>>>>>> main
             {isSearching ? (
               <div className="flex items-center justify-center py-4 text-muted-foreground">
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -137,7 +148,11 @@ export function TournamentParticipantSelector({
                           {anime.title}
                         </p>
                         <p className="text-xs text-muted-foreground truncate">
+<<<<<<< HEAD
                           {anime.year || '—'} • {anime.genres?.slice(0, 2).map((g: { title: string }) => g.title).join(', ') || '—'}
+=======
+                          {anime.year || '—'} • {anime.genres?.slice(0, 2).map((g) => g.title).join(', ') || '—'}
+>>>>>>> main
                         </p>
                       </div>
                       <Plus className="w-4 h-4 text-muted-foreground flex-shrink-0" />
@@ -164,10 +179,17 @@ export function TournamentParticipantSelector({
           {remaining.length > 0 && (
             <button
               onClick={handleAddAllCompleted}
+<<<<<<< HEAD
               className="inline-flex items-center gap-2 px-3 py-1.5 text-sm border border-input bg-background text-foreground hover:bg-accent rounded-md transition-colors"
             >
               <Plus className="w-4 h-4" />
               Просмотренные ({remaining.length})
+=======
+              className="inline-flex items-center gap-2 px-3 py-1.5 text-sm border border-input bg-background hover:bg-accent rounded-md transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              Добавить все ({remaining.length})
+>>>>>>> main
             </button>
           )}
           {selectedAnime.length > 0 && (

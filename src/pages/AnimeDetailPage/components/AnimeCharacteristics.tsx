@@ -42,7 +42,21 @@ function getSeasonLabel(season: 1 | 2 | 3 | 4 | undefined): string | null {
   return SEASON_LABELS[seasonMap[season]] || seasonMap[season];
 }
 
+<<<<<<< HEAD
 export function AnimeCharacteristics({ anime, className }: AnimeCharacteristicsProps) {
+=======
+// Helper to get kind label from type object
+function getKindLabel(kind: { name?: string; shortname?: string } | undefined): string | null {
+  if (!kind) return null;
+  if (kind.shortname && KIND_LABELS[kind.shortname]) {
+    return KIND_LABELS[kind.shortname];
+  }
+  return kind.name || null;
+}
+
+export function AnimeCharacteristics({ anime, className }: AnimeCharacteristicsProps) {
+  // YummyAnime API structure
+>>>>>>> main
   const year = anime.year;
   const season = anime.season;
   const genres = anime.genres?.map(g => g.title) || [];

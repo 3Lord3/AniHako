@@ -51,7 +51,11 @@ export function MatchHeader({
       </div>
 
       {/* Right side actions */}
+<<<<<<< HEAD
       <div className="flex items-center gap-4">
+=======
+      <div className="flex items-center gap-2">
+>>>>>>> main
         {onBackToBracket && (
           <button
             onClick={() => {
