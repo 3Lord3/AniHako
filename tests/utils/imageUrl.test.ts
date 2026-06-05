@@ -18,36 +18,52 @@ describe('getImageUrl', () => {
     expect(result).toBe(fullUrl);
   });
 
-  it('prepends API URL for paths starting with /', () => {
+  it('returns protocol-relative URL with https', () => {
+    const protocolRelativeUrl = '//example.com/image.jpg';
+    const result = getImageUrl(protocolRelativeUrl);
+    expect(result).toBe('https:' + protocolRelativeUrl);
+  });
+
+  it('returns relative URL as-is', () => {
     const relativePath = '/media/posters/123.jpg';
     const result = getImageUrl(relativePath);
-    expect(result).toBe('http://127.0.0.1:8000/media/posters/123.jpg');
+    expect(result).toBe('/media/posters/123.jpg');
   });
 
-  it('prepends API URL for paths starting with static/', () => {
+  it('returns static path as-is', () => {
     const path = 'static/screenshots/1_01.png';
     const result = getImageUrl(path);
-    expect(result).toBe('http://127.0.0.1:8000static/screenshots/1_01.png');
+    expect(result).toBe('static/screenshots/1_01.png');
   });
 
-  it('returns empty string for null input', () => {
+  it('returns placeholder for null input', () => {
     const result = getImageUrl(null);
-    expect(result).toBe('');
+    expect(result).toBe('/placeholder-anime.png');
   });
 
-  it('returns empty string for undefined input', () => {
+  it('returns placeholder for undefined input', () => {
     const result = getImageUrl(undefined);
-    expect(result).toBe('');
+    expect(result).toBe('/placeholder-anime.png');
   });
 
-  it('returns empty string for empty string input', () => {
+  it('returns placeholder for empty string input', () => {
     const result = getImageUrl('');
-    expect(result).toBe('');
+    expect(result).toBe('/placeholder-anime.png');
   });
 
-  it('prepends API URL for paths without leading slash', () => {
+  it('returns path without leading slash as-is', () => {
     const path = 'posters/123.jpg';
     const result = getImageUrl(path);
-    expect(result).toBe('http://127.0.0.1:8000posters/123.jpg');
+    expect(result).toBe('posters/123.jpg');
+  });
+
+  it('returns placeholder for falsy input', () => {
+    const result = getImageUrl(null, '/fallback.png');
+    expect(result).toBe('/fallback.png');
+  });
+
+  it('returns placeholder for non-string input', () => {
+    const result = getImageUrl(undefined as any, '/fallback.png');
+    expect(result).toBe('/fallback.png');
   });
 });

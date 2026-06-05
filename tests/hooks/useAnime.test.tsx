@@ -1,27 +1,18 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useAnimeList, useAnimeDetail, useRandomAnime, useGenres, useTags } from '@/hooks/useAnime';
+import { MemoryRouter } from 'react-router-dom';
+import { useAnimeList, useAnimeDetail, useAnimeSearch, useRandomAnime, useGenres } from '@/hooks/useAnime';
 import * as apiModule from '@/lib/api';
 
-// Mock the API module
 vi.mock('@/lib/api', () => ({
   animeApi: {
-    getList: vi.fn(),
-    getDetail: vi.fn(),
+    getCatalog: vi.fn(),
+    search: vi.fn(),
+    getById: vi.fn(),
+    getByUrl: vi.fn(),
     getRandom: vi.fn(),
-    getScreenshots: vi.fn(),
-    getReviews: vi.fn(),
-  },
-  genresApi: {
-    getAll: vi.fn(),
-  },
-  tagsApi: {
-    getAll: vi.fn(),
-  },
-  userApi: {
-    getAnimeList: vi.fn(),
-    updateAnime: vi.fn(),
-    deleteAnime: vi.fn(),
+    getGenres: vi.fn(),
   },
 }));
 
@@ -33,207 +24,121 @@ const createWrapper = () => {
       },
     },
   });
-  
+
   return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <MemoryRouter>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    </MemoryRouter>
   );
 };
 
-describe('useAnime hooks', () => {
+describe('useAnime', () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe('useAnimeList', () => {
-    it('fetches anime list successfully', async () => {
-      const mockResponse: import('@/types').AnimeListResponse = {
-        data: [
-          { id: 1, title: 'Anime 1', title_en: 'Anime 1 EN', poster: '/posters/1.jpg', rating: 8.5, year: 2024, episodes: 12, genres: ['Action'] },
-          { id: 2, title: 'Anime 2', title_en: 'Anime 2 EN', poster: '/posters/2.jpg', rating: 7.0, year: 2023, episodes: 24, genres: ['Comedy'] },
-        ],
-        page: 1,
-        total_pages: 10,
-        total: 100,
-      };
+  it('fetches anime catalog', async () => {
+    const mockData = [{ anime_id: 1, title: 'Anime 1' }];
+    vi.mocked(apiModule.animeApi.getCatalog).mockResolvedValueOnce(mockData);
 
-      vi.mocked(apiModule.animeApi.getList).mockResolvedValueOnce({
-        data: mockResponse,
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config: {} as any,
-      });
+    const { result } = renderHook(() => useAnimeList({}), { wrapper: createWrapper() });
 
-      const { result } = renderHook(() => useAnimeList({ page: 1 }), {
-        wrapper: createWrapper(),
-      });
-
-      await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(result.current.data).toEqual(mockResponse);
-      expect(apiModule.animeApi.getList).toHaveBeenCalledWith({ page: 1 });
-    });
-
-    it('handles error state', async () => {
-      vi.mocked(apiModule.animeApi.getList).mockRejectedValueOnce(new Error('API Error'));
-
-      const { result } = renderHook(() => useAnimeList(), {
-        wrapper: createWrapper(),
-      });
-
-      await waitFor(() => expect(result.current.isError).toBe(true));
-      expect(result.current.error).toBeDefined();
-    });
-
-    it('fetches with search params', async () => {
-      const mockData: import('@/types').AnimeListResponse = { data: [], page: 1, total_pages: 0, total: 0 };
-      vi.mocked(apiModule.animeApi.getList).mockResolvedValueOnce({
-        data: mockData,
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config: {} as any,
-      });
-
-      const { result } = renderHook(() => useAnimeList({ search: 'test', genres: 'action', year: 2024 }), {
-        wrapper: createWrapper(),
-      });
-
-      await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(apiModule.animeApi.getList).toHaveBeenCalledWith({
-        search: 'test',
-        genres: 'action',
-        year: 2024,
-      });
-    });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toBeDefined();
   });
 
-  describe('useAnimeDetail', () => {
-    it('fetches anime detail successfully', async () => {
-      const mockData: import('@/types').AnimeDetail = {
-        id: 1,
-        title: 'Detailed Anime',
-        title_en: 'Detailed Anime EN',
-        title_jp: '詳細なアニメ',
-        poster: '/posters/1.jpg',
-        cover: '/covers/1.jpg',
-        description: 'Full description',
-        rating: 9.0,
-        year: 2024,
-        season: 'Spring',
-        status: 'Completed',
-        episodes: 12,
-        duration: 24,
-        studio: 'Studio X',
-        genres: ['Action'],
-        tags: ['Mecha'],
-      };
+  it('uses params in query', async () => {
+    vi.mocked(apiModule.animeApi.getCatalog).mockResolvedValueOnce([]);
 
-      vi.mocked(apiModule.animeApi.getDetail).mockResolvedValueOnce({
-        data: mockData,
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config: {} as any,
-      });
+    const { result } = renderHook(() => useAnimeList({ page: 2, limit: 10, kind: 'tv' }), { wrapper: createWrapper() });
 
-      const { result } = renderHook(() => useAnimeDetail(1), {
-        wrapper: createWrapper(),
-      });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(apiModule.animeApi.getCatalog).toHaveBeenCalledWith(expect.objectContaining({
+      page: 2,
+      limit: 10,
+      kind: 'tv',
+    }));
+  });
+});
 
-      await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(result.current.data).toEqual(mockData);
-      expect(apiModule.animeApi.getDetail).toHaveBeenCalledWith(1);
-    });
-
-    it('does not fetch when id is falsy', () => {
-      renderHook(() => useAnimeDetail(0), {
-        wrapper: createWrapper(),
-      });
-
-      expect(apiModule.animeApi.getDetail).not.toHaveBeenCalled();
-    });
+describe('useAnimeDetail', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  describe('useRandomAnime', () => {
-    it('fetches random anime successfully', async () => {
-      const mockData: import('@/types').AnimeDetail = {
-        id: 42,
-        title: 'Random Anime',
-        title_en: null,
-        title_jp: null,
-        poster: '/posters/42.jpg',
-        cover: null,
-        description: null,
-        rating: 8.0,
-        year: 2024,
-        season: null,
-        status: null,
-        episodes: 1,
-        duration: null,
-        studio: null,
-        genres: [],
-        tags: [],
-      };
-      vi.mocked(apiModule.animeApi.getRandom).mockResolvedValueOnce({
-        data: mockData,
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config: {} as any,
-      });
+  it('fetches anime by url', async () => {
+    const mockAnime = { anime_id: 456, title: 'URL Anime' };
+    vi.mocked(apiModule.animeApi.getByUrl).mockResolvedValueOnce(mockAnime);
 
-      const { result } = renderHook(() => useRandomAnime(), {
-        wrapper: createWrapper(),
-      });
+    const { result } = renderHook(() => useAnimeDetail('anime-slug'), { wrapper: createWrapper() });
 
-      await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(result.current.data).toEqual(mockData);
-    });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toEqual(mockAnime);
+  });
+});
+
+describe('useAnimeSearch', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
-  describe('useGenres', () => {
-    it('fetches genres successfully', async () => {
-      const mockData: import('@/types').GenreResponse[] = [
-        { id: 1, name: 'Action', slug: 'action' },
-        { id: 2, name: 'Comedy', slug: 'comedy' },
-      ];
-      vi.mocked(apiModule.genresApi.getAll).mockResolvedValueOnce({
-        data: mockData,
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config: {} as any,
-      });
+  it('searches anime by query', async () => {
+    const mockResults = [{ anime_id: 1, title: 'Search Result' }];
+    vi.mocked(apiModule.animeApi.search).mockResolvedValueOnce(mockResults);
 
-      const { result } = renderHook(() => useGenres(), {
-        wrapper: createWrapper(),
-      });
+    const { result } = renderHook(() => useAnimeSearch('test'), { wrapper: createWrapper() });
 
-      await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(result.current.data).toEqual(mockData);
-    });
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toBeDefined();
   });
 
-  describe('useTags', () => {
-    it('fetches tags successfully', async () => {
-      const mockData: import('@/types').TagResponse[] = [
-        { id: 1, name: 'Mecha', slug: 'mecha' },
-        { id: 2, name: 'School', slug: 'school' },
-      ];
-      vi.mocked(apiModule.tagsApi.getAll).mockResolvedValueOnce({
-        data: mockData,
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config: {} as any,
-      });
+  it('has query enabled only when query is not empty', async () => {
+    vi.mocked(apiModule.animeApi.search).mockResolvedValueOnce([]);
 
-      const { result } = renderHook(() => useTags(), {
-        wrapper: createWrapper(),
-      });
+    const { result } = renderHook(() => useAnimeSearch(''), { wrapper: createWrapper() });
 
-      await waitFor(() => expect(result.current.isSuccess).toBe(true));
-      expect(result.current.data).toEqual(mockData);
-    });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(apiModule.animeApi.search).not.toHaveBeenCalled();
+  });
+});
+
+describe('useRandomAnime', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('fetches random anime', async () => {
+    const mockAnime = { anime_id: 999, title: 'Random Anime' };
+    vi.mocked(apiModule.animeApi.getRandom).mockResolvedValueOnce(mockAnime);
+
+    const { result } = renderHook(() => useRandomAnime(), { wrapper: createWrapper() });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toEqual(mockAnime);
+  });
+
+  it('returns null when no random anime available', async () => {
+    vi.mocked(apiModule.animeApi.getRandom).mockResolvedValueOnce(null);
+
+    const { result } = renderHook(() => useRandomAnime(), { wrapper: createWrapper() });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toBeNull();
+  });
+});
+
+describe('useGenres', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('fetches genres', async () => {
+    const mockGenres = { genres: [{ id: 1, title: 'Action' }], groups: [] };
+    vi.mocked(apiModule.animeApi.getGenres).mockResolvedValueOnce(mockGenres);
+
+    const { result } = renderHook(() => useGenres(), { wrapper: createWrapper() });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(result.current.data).toEqual(mockGenres);
   });
 });

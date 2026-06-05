@@ -29,7 +29,6 @@ export function SearchDropdown({
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Handle click outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -86,7 +85,7 @@ export function SearchDropdown({
           }}
           onFocus={() => {
             if (searchQuery.trim()) {
-              onClose(); // Let parent handle opening
+              onClose();
             }
           }}
           onKeyDown={handleKeyDown}
@@ -105,7 +104,6 @@ export function SearchDropdown({
         )}
       </div>
 
-      {/* Dropdown */}
       <div
         ref={dropdownRef}
         className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border rounded-lg shadow-lg overflow-hidden max-h-48 sm:max-h-64 overflow-y-auto"
@@ -127,7 +125,7 @@ export function SearchDropdown({
                   )}
                 >
                   <img
-                    src={getImageUrl(anime.poster)}
+                    src={getImageUrl(anime.poster.small)}
                     alt={anime.title}
                     className="w-8 h-11 sm:w-10 sm:h-14 object-cover rounded flex-shrink-0"
                   />

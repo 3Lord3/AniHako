@@ -30,11 +30,14 @@ export function HomePageSkeleton() {
 export function AnimeDetailPageSkeleton() {
   return (
     <div className="space-y-8">
+      <Skeleton className="h-9 w-20" />
       <div className="flex flex-col md:flex-row gap-8">
         {/* Poster column */}
         <div className="flex-shrink-0 flex flex-col items-center">
           <Skeleton className="w-64 h-96 rounded-lg" />
           <div className="flex gap-2 mt-4">
+            <Skeleton className="w-10 h-10 rounded-full" />
+            <Skeleton className="w-10 h-10 rounded-full" />
             <Skeleton className="w-10 h-10 rounded-full" />
             <Skeleton className="w-10 h-10 rounded-full" />
             <Skeleton className="w-10 h-10 rounded-full" />
@@ -71,20 +74,21 @@ export function UserAnimeListPageSkeleton() {
   return (
     <div className="space-y-6">
       {/* Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="p-4 border rounded-lg">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div key={i} className="p-4 rounded-lg">
             <Skeleton className="h-8 w-12 mx-auto mb-2" />
             <Skeleton className="h-4 w-16 mx-auto" />
           </div>
         ))}
       </div>
       {/* Filter buttons */}
-      <div className="flex gap-2">
+      <div className="flex gap-2 flex-wrap">
         <Skeleton className="w-24 h-10" />
         <Skeleton className="w-28 h-10" />
         <Skeleton className="w-20 h-10" />
         <Skeleton className="w-28 h-10" />
+        <Skeleton className="w-20 h-10" />
       </div>
       {/* Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
@@ -117,7 +121,7 @@ export function ProfilePageSkeleton() {
 export function FavoritesPageSkeleton() {
   return (
     <div className="space-y-6">
-      <Skeleton className="h-8 w-32" />
+      <Skeleton className="h-9 w-32" />
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {Array.from({ length: 10 }).map((_, i) => (
           <Skeleton key={i} className="aspect-[3/4] rounded-lg" />
