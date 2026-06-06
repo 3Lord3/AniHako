@@ -1,6 +1,7 @@
 import { Star, Calendar, Film } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { AnimeTitle } from '@/components/anime/AnimeTitle';
+import { AnimatePresence, motion } from 'framer-motion';
 import type { AnimeCatalogItem } from '@/types';
 import { getImageUrl, getHeroPosterUrl } from '@/lib/imageUrl';
 import { cn } from '@/lib/utils';
@@ -102,22 +103,31 @@ export function TournamentCard({
                   <span className="font-medium">{rating.toFixed(1)}</span>
                 </div>
               )}
-              {anime.year && (
+              {anime.year ? (
                 <div className="flex items-center gap-0.5 sm:gap-1">
                   <Calendar className={compact ? "w-3 h-3 sm:w-4 sm:h-4" : "w-4 h-4"} />
                   <span>{anime.year}</span>
                 </div>
-              )}
+              ) : null}
             </div>
           )}
         </div>
       </div>
 
-      {isSelected && !isWinner && (
-        <div className="absolute inset-0 bg-green-500/30 rounded-xl z-20 transition-opacity duration-300 flex items-center justify-center">
-          <span className="text-white font-bold text-2xl sm:text-4xl drop-shadow-lg">✓</span>
-        </div>
-      )}
+      <AnimatePresence>
+        {isSelected && !isWinner && (
+          <motion.div
+            key="selection"
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.96 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            className="absolute inset-0 bg-green-500/30 rounded-xl z-20 flex items-center justify-center"
+          >
+            <span className="text-white font-bold text-2xl sm:text-4xl drop-shadow-lg">✓</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {onClick && !isEliminated && !isSelected && (
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">

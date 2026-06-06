@@ -26,8 +26,8 @@ export function SelectedAnimeGrid({
       <div className="grid grid-cols-3 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 sm:gap-3">
         {selectedAnime.map((anime) => (
           <div
-            key={anime.id}
-            onClick={() => onRemove(anime.id)}
+            key={anime.anime_id}
+            onClick={() => onRemove(anime.anime_id)}
             className="relative group aspect-[2/3] rounded-lg overflow-hidden cursor-pointer"
           >
             <img

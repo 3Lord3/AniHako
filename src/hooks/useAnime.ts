@@ -10,23 +10,26 @@ import type { YummyUserAnimeRate } from '@/types/list';
 // ANIME LIST / CATALOG
 // =============================================================================
 
-export function useAnimeList(params?: {
-  page?: number;
-  limit?: number;
-  q?: string;
-  search?: string;
-  genres?: string | string[];
-  from_year?: number;
-  to_year?: number;
-  min_rating?: number;
-  sort_forward?: boolean;
-  kind?: string;
-  status?: string | string[];
-  order?: string;
-  mylist?: string;
-  season?: string;
-  offset?: number;
-}) {
+export function useAnimeList(
+  params?: {
+    page?: number;
+    limit?: number;
+    q?: string;
+    search?: string;
+    genres?: string | string[];
+    from_year?: number;
+    to_year?: number;
+    min_rating?: number;
+    sort_forward?: boolean;
+    kind?: string;
+    status?: string | string[];
+    order?: string;
+    mylist?: string;
+    season?: string;
+    offset?: number;
+  },
+  options?: { enabled?: boolean }
+) {
   return useQuery({
     queryKey: ['anime', 'catalog', params],
     queryFn: async () => {
@@ -34,6 +37,7 @@ export function useAnimeList(params?: {
       const normalizedData = normalizeAnimeResponse(response);
       return formatAnimeListResponse(normalizedData);
     },
+    enabled: options?.enabled ?? true,
   });
 }
 
