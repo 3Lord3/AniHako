@@ -103,12 +103,12 @@ export function TournamentCard({
                   <span className="font-medium">{rating.toFixed(1)}</span>
                 </div>
               )}
-              {anime.year && (
+              {anime.year ? (
                 <div className="flex items-center gap-0.5 sm:gap-1">
                   <Calendar className={compact ? "w-3 h-3 sm:w-4 sm:h-4" : "w-4 h-4"} />
                   <span>{anime.year}</span>
                 </div>
-              )}
+              ) : null}
             </div>
           )}
         </div>

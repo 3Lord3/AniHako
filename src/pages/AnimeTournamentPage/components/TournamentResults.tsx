@@ -81,7 +81,7 @@ export function TournamentResults({ participants, champion, onRestart }: Tournam
               <div className="flex-1 min-w-0">
                 <p className="font-semibold truncate text-foreground text-xs sm:text-sm">{participant.anime.title}</p>
                 <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
-                  {participant.anime.year && `${participant.anime.year} • `}
+                  {participant.anime.year ? `${participant.anime.year} • ` : ''}
                   {participant.anime.genres?.slice(0, 2).map((g) => g.title).join(', ')}
                 </p>
               </div>
