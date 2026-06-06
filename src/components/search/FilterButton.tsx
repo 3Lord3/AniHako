@@ -40,7 +40,7 @@ export function FilterButton({
         className="relative cursor-pointer text-foreground"
         onClick={() => setOpen(true)}
       >
-        <Filter className="w-4 h-4 mr-2" />
+        <Filter className="w-4 h-4 sm:mr-2" />
         <span className="hidden sm:inline">Фильтры</span>
         {hasActiveFilters && (
           <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full" />

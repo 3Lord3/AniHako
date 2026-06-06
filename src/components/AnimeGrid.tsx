@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Star, Calendar, Film } from 'lucide-react';
+import { Star, Calendar, Tag } from 'lucide-react';
 import { AnimeCard } from './AnimeCard';
 import type { AnimeCatalogItem, YummyUserAnimeRate } from '@/types';
 import { mapListIdToStatus } from '@/types';
@@ -25,14 +25,6 @@ function getStatusLabel(status: string | undefined): string {
   }
 }
 
-function formatDuration(minutes: number): string {
-  const hours = minutes / 60;
-  if (hours >= 1) {
-    return `${hours.toFixed(1).replace('.', ',')}ч`;
-  }
-  return `${minutes}м`;
-}
-
 function AnimeListItem({ anime, userAnime }: { anime: AnimeCatalogItem; userAnime?: YummyUserAnimeRate }) {
   const displayTitle = anime.title || 'Unknown';
   const rating = anime.rating?.average ?? null;
@@ -41,26 +33,9 @@ function AnimeListItem({ anime, userAnime }: { anime: AnimeCatalogItem; userAnim
   const userStatus = userAnime ? mapListIdToStatus(userAnime.user?.list?.list?.id) : undefined;
   const isFavorite = userAnime?.user?.list?.is_fav || false;
 
-  const url = anime.anime_url?.startsWith('/anime/') 
-    ? anime.anime_url 
+  const url = anime.anime_url?.startsWith('/anime/')
+    ? anime.anime_url
     : `/anime/${anime.anime_url || anime.anime_id}`;
-
-  const airedEpisodes = anime.episodes?.aired ?? 0;
-  const totalEpisodes = anime.episodes?.count ?? 0;
-  const isMovie = anime.type?.alias === 'movie';
-  
-  const episodeText = (() => {
-    if (isMovie && anime.duration) {
-      return formatDuration(anime.duration);
-    }
-    if (totalEpisodes > 0) {
-      return `${airedEpisodes}/${totalEpisodes}`;
-    }
-    if (airedEpisodes > 0) {
-      return `${airedEpisodes} из ${totalEpisodes}`;
-    }
-    return '';
-  })();
 
   return (
     <Link to={url} className="group flex gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
@@ -72,61 +47,49 @@ function AnimeListItem({ anime, userAnime }: { anime: AnimeCatalogItem; userAnim
           loading="lazy"
         />
       </div>
-      <div className="flex flex-col justify-center min-w-0 flex-1 py-0.5">
-        <div className="flex items-start justify-between gap-2 mb-1">
-          <h3 className="font-semibold text-sm sm:text-base text-foreground line-clamp-2 flex-1">
-            {displayTitle}
-          </h3>
-          {validRating && (
-            <span 
-              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs shrink-0 ${getRatingColor(rating)}`}
-              title={`Рейтинг: ${rating.toFixed(1)}`}
-            >
-              <Star className="w-3 h-3 fill-white text-white" />
-              <span className="font-bold text-white">{rating.toFixed(1)}</span>
-            </span>
-          )}
-        </div>
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
+      <div className="flex flex-col justify-start min-w-0 flex-1 py-0.5">
+        <h3 className="font-semibold text-sm sm:text-base text-foreground line-clamp-2 mb-1">
+          {displayTitle}
+        </h3>
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
           <span className="flex items-center gap-1">
             <Calendar className="w-3 h-3" />
             {anime.year}
           </span>
-          {episodeText && (
-            <span 
-              className="flex items-center gap-1 px-2 py-0.5 rounded bg-secondary/50 text-foreground"
-              title={isMovie ? 'Длительность' : 'Серии'}
-            >
-              <Film className="w-3 h-3" />
-              <span>{episodeText}</span>
-            </span>
-          )}
         </div>
         {anime.genres && anime.genres.length > 0 && (
-          <p className="text-xs text-muted-foreground line-clamp-1 mb-2">
-            {anime.genres.slice(0, 3).map(g => g.title).join(', ')}
+          <p className="text-xs text-muted-foreground line-clamp-1 flex items-center gap-1">
+            <Tag className="w-3 h-3 shrink-0" />
+            <span>{anime.genres.slice(0, 3).map(g => g.title).join(', ')}</span>
           </p>
         )}
-        <div className="flex items-center gap-1.5 flex-wrap justify-end">
-          {userStatus && STATUS_COLORS[userStatus] && (
-            <span 
-              className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs ${STATUS_COLORS[userStatus]}`}
-              title={getStatusLabel(userStatus)}
-            >
-              {STATUS_ICONS[userStatus]}
-              <span className="hidden sm:inline">{getStatusLabel(userStatus)}</span>
-            </span>
-          )}
-          {isFavorite && (
-            <span 
-              className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs bg-pink-500 text-white"
-              title="Избранное"
-            >
-              <span>{FAVORITE_ICON}</span>
-              <span className="hidden sm:inline">Избранное</span>
-            </span>
-          )}
-        </div>
+      </div>
+      <div className="flex items-start gap-1 sm:gap-1.5 shrink-0">
+        {userStatus && STATUS_COLORS[userStatus] && (
+          <span
+            className={`inline-flex items-center justify-center h-7 w-7 sm:h-9 sm:w-9 rounded-full [&>svg]:!w-3.5 [&>svg]:!h-3.5 sm:[&>svg]:!w-5 sm:[&>svg]:!h-5 ${STATUS_COLORS[userStatus]}`}
+            title={getStatusLabel(userStatus)}
+          >
+            {STATUS_ICONS[userStatus]}
+          </span>
+        )}
+        {isFavorite && userStatus !== 'favourite' && (
+          <span
+            className="inline-flex items-center justify-center h-7 w-7 sm:h-9 sm:w-9 rounded-full bg-pink-500 text-white [&>svg]:!w-3.5 [&>svg]:!h-3.5 sm:[&>svg]:!w-5 sm:[&>svg]:!h-5"
+            title="Любимое"
+          >
+            {FAVORITE_ICON}
+          </span>
+        )}
+        {validRating && (
+          <span
+            className={`inline-flex items-center gap-0.5 sm:gap-1 h-7 sm:h-9 px-1 sm:px-1.5 rounded ${getRatingColor(rating)}`}
+            title={`Рейтинг: ${rating.toFixed(1)}`}
+          >
+            <Star className="w-3 h-3 sm:w-4 sm:h-4 fill-white text-white" />
+            <span className="text-xs sm:text-sm font-bold text-white">{rating.toFixed(1)}</span>
+          </span>
+        )}
       </div>
     </Link>
   );
