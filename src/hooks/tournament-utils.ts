@@ -75,7 +75,7 @@ export function buildTournamentRounds(animeList: AnimeCatalogItem[]): Round[] {
   const shuffled = shuffleArray(animeList);
 
   const participants: TournamentParticipant[] = shuffled.map((anime, index) => ({
-    id: `participant-${anime.id}`,
+    id: `participant-${anime.anime_id}`,
     anime,
     seed: index + 1,
     eliminated: false,

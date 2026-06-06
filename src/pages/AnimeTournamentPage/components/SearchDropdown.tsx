@@ -116,7 +116,7 @@ export function SearchDropdown({
         ) : results.length > 0 ? (
           <ul className="py-1">
             {results.map((anime, index) => (
-              <li key={anime.id}>
+              <li key={anime.anime_id}>
                 <button
                   onClick={() => onSelect(anime)}
                   className={cn(
