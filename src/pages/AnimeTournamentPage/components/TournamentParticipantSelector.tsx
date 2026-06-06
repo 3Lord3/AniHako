@@ -31,8 +31,8 @@ export function TournamentParticipantSelector({
 
   const availableResults = (searchResults?.data || []).filter(
     (anime) =>
-      !selectedAnime.some((a) => a.anime_id === anime.id) &&
-      !completedAnime.some((a) => a.anime_id === anime.id)
+      !selectedAnime.some((a) => a.anime_id === anime.anime_id) &&
+      !completedAnime.some((a) => a.anime_id === anime.anime_id)
   );
 
   const handleAddAllCompleted = () => {
@@ -44,10 +44,10 @@ export function TournamentParticipantSelector({
     setShowDropdown(false);
   };
 
-  const handleAddFromSearch = (anime: { id: number; title: string; poster?: { medium?: string; small?: string }; anime_url?: string; rating?: { average?: number }; type?: { name: string; value: number; shortname: string; alias: string } }) => {
+  const handleAddFromSearch = (anime: { anime_id: number; title: string; poster?: { medium?: string; small?: string }; anime_url?: string; rating?: { average?: number }; type?: { name: string; value: number; shortname: string; alias: string } }) => {
     const rate: YummyUserAnimeRate = {
-      anime_id: anime.id,
-      anime_url: anime.anime_url || String(anime.id),
+      anime_id: anime.anime_id,
+      anime_url: anime.anime_url || String(anime.anime_id),
       title: anime.title,
       poster: anime.poster ? { small: anime.poster.small || '', medium: anime.poster.medium || '', big: '', huge: '', fullsize: '', mega: '' } : { small: '', medium: '', big: '', huge: '', fullsize: '', mega: '' },
       rating: anime.rating?.average || 0,
@@ -115,7 +115,7 @@ export function TournamentParticipantSelector({
             ) : availableResults.length > 0 ? (
               <ul className="py-1">
                 {availableResults.map((anime, index) => (
-                  <li key={anime.id}>
+                  <li key={anime.anime_id}>
                     <button
                       onClick={() => handleAddFromSearch(anime)}
                       className={cn(
