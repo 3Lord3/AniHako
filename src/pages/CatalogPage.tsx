@@ -1,16 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAnimeList, useDebounce, useUserAnimeList, useGenreSearch } from '@/hooks';
-import { Button } from '@/components/ui/button';
 import { AnimeGrid } from '@/components/AnimeGrid';
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Filter, X } from 'lucide-react';
-import { SearchBar } from '@/components/search/SearchBar';
-import { FilterDialogContent } from '@/components/search/FilterDialog';
+import { CatalogControls } from '@/components/search/CatalogControls';
 import { FilterBadges } from '@/components/search/FilterBadges';
 
 export function CatalogPage() {
@@ -46,7 +38,18 @@ export function CatalogPage() {
   };
 
   const debouncedSearch = useDebounce(searchInput, 300);
-  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [view, setView] = useState<'grid' | 'list'>('grid');
+
+  useEffect(() => {
+    const stored = localStorage.getItem('catalogView');
+    if (stored === 'list' || stored === 'grid') {
+      setView(stored);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('catalogView', view);
+  }, [view]);
 
   useEffect(() => {
     if (debouncedSearch !== search) {
@@ -114,64 +117,30 @@ export function CatalogPage() {
     setSearchParams(params);
   };
 
-  const hasActiveFilters = genres || minRating || fromYear || toYear;
+  const hasActiveFilters = !!(genres || minRating || fromYear || toYear);
 
   return (
     <div className="space-y-6">
       <div className="space-y-4">
-        <div className="flex gap-2">
-          <SearchBar
-            value={searchInput}
-            onChange={(value) => {
-              isUserTypingRef.current = true;
-              setSearchInput(value);
-            }}
-            onClear={clearSearch}
-          />
-          <Dialog open={filtersOpen} onOpenChange={setFiltersOpen}>
-            <Button
-              variant="outline"
-              className="relative cursor-pointer text-foreground"
-              onClick={() => setFiltersOpen(true)}
-            >
-              <Filter className="w-4 h-4 mr-2" />
-              Фильтры
-              {hasActiveFilters && (
-                <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full" />
-              )}
-            </Button>
-            <DialogContent 
-              className="w-[95vw] max-w-3xl max-h-[85vh] overflow-y-auto"
-              style={{ maxWidth: '42rem' }}
-              showCloseButton={false}
-            >
-              <div className="flex justify-between items-center">
-                <DialogTitle className="text-lg font-semibold">Фильтры</DialogTitle>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  className="cursor-pointer"
-                  onClick={() => setFiltersOpen(false)}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-
-              <FilterDialogContent
-                open={filtersOpen}
-                onOpenChange={setFiltersOpen}
-                genresData={genresData}
-                selectedGenres={genres}
-                selectedRating={minRating}
-                toYear={toYear}
-                fromYear={fromYear}
-                onToggleGenre={toggleGenre}
-                onUpdateParams={updateParams}
-                onClearFilters={clearFiltersOnly}
-              />
-            </DialogContent>
-          </Dialog>
-        </div>
+        <CatalogControls
+          searchInput={searchInput}
+          onSearchChange={(value) => {
+            isUserTypingRef.current = true;
+            setSearchInput(value);
+          }}
+          onSearchClear={clearSearch}
+          view={view}
+          onViewChange={setView}
+          hasActiveFilters={hasActiveFilters}
+          genresData={genresData}
+          selectedGenres={genres}
+          selectedRating={minRating}
+          toYear={toYear}
+          fromYear={fromYear}
+          onToggleGenre={toggleGenre}
+          onUpdateParams={updateParams}
+          onClearFilters={clearFiltersOnly}
+        />
 
         <FilterBadges
           fromYear={fromYear}
@@ -184,13 +153,13 @@ export function CatalogPage() {
       </div>
 
       {isLoading ? (
-        <AnimeGrid anime={[]} isLoading={true} />
+        <AnimeGrid anime={[]} isLoading={true} view={view} />
       ) : animeData?.data.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">
           Аниме не найдены
         </div>
       ) : (
-        <AnimeGrid anime={animeData?.data || []} userAnimeList={userAnimeList} />
+        <AnimeGrid anime={animeData?.data || []} userAnimeList={userAnimeList} view={view} />
       )}
     </div>
   );
