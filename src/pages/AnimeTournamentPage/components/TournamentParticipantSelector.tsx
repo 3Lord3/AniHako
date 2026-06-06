@@ -30,9 +30,7 @@ export function TournamentParticipantSelector({
   });
 
   const availableResults = (searchResults?.data || []).filter(
-    (anime) =>
-      !selectedAnime.some((a) => a.anime_id === anime.anime_id) &&
-      !completedAnime.some((a) => a.anime_id === anime.anime_id)
+    (anime) => !selectedAnime.some((a) => a.anime_id === anime.anime_id)
   );
 
   const handleAddAllCompleted = () => {
