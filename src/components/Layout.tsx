@@ -27,9 +27,11 @@ export function Layout() {
     <div className="min-h-screen bg-background">
       <header className="border-b border-border">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="text-2xl font-bold text-foreground" onClick={handleLogoClick}>
-            <span className="md:hidden">AH</span>
-            <span className="hidden md:inline">AnimeHako</span>
+          <Link to="/" className="flex items-center gap-3 text-2xl font-bold text-foreground" onClick={handleLogoClick}>
+            <img src="/favicon.svg" alt="" className="h-10 w-10 shrink-0" />
+            <span className="flex gap-0">
+              Anime<span className="text-[#7855d0]">Hako</span>
+            </span>
           </Link>
           <nav className="flex items-center gap-6 text-foreground">
             <Link
