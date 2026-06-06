@@ -113,7 +113,7 @@ export function AnimeTournamentPage() {
     return (
       <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
         <div className="text-center mb-6 sm:mb-8">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2">🏆 Турнир завершён!</h1>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 text-foreground">🏆 Турнир завершён!</h1>
           <p className="text-xs sm:text-sm text-muted-foreground">Поздравляем с определением победителя</p>
         </div>
         <TournamentResults
