@@ -106,7 +106,7 @@ export function SearchDropdown({
 
       <div
         ref={dropdownRef}
-        className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border rounded-lg shadow-lg overflow-hidden max-h-48 sm:max-h-64 overflow-y-auto"
+        className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border border-border rounded-lg shadow-lg overflow-hidden max-h-48 sm:max-h-64 overflow-y-auto"
       >
         {isLoading ? (
           <div className="flex items-center justify-center py-4 text-muted-foreground">

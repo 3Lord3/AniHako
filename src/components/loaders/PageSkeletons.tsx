@@ -104,7 +104,7 @@ export function UserAnimeListPageSkeleton() {
 export function ProfilePageSkeleton() {
   return (
     <div className="space-y-6">
-      <div className="p-6 border rounded-lg">
+      <div className="p-6 border border-border rounded-lg">
         <div className="flex items-center gap-6">
           <Skeleton className="w-24 h-24 rounded-full" />
           <div className="flex-1 space-y-2">
@@ -135,7 +135,7 @@ export function FavoritesPageSkeleton() {
 export function AuthPageSkeleton() {
   return (
     <div className="flex items-center justify-center min-h-[60vh]">
-      <div className="w-full max-w-md p-6 border rounded-lg space-y-4">
+      <div className="w-full max-w-md p-6 border border-border rounded-lg space-y-4">
         <Skeleton className="h-8 w-24" />
         <Skeleton className="h-4 w-48" />
         <div className="space-y-4">

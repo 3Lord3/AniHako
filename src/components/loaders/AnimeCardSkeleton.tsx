@@ -41,8 +41,8 @@ export function ScheduleSkeleton() {
           <Skeleton key={i} className="h-8 w-16 rounded-md" />
         ))}
       </div>
-      <div className="border rounded-lg overflow-hidden">
-        <div className="border-b p-4">
+      <div className="border border-border rounded-lg overflow-hidden">
+        <div className="border-b border-border p-4">
           <div className="flex gap-4">
             <Skeleton className="h-4 w-32" />
             <Skeleton className="h-4 w-20 hidden md:block" />
@@ -51,7 +51,7 @@ export function ScheduleSkeleton() {
           </div>
         </div>
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="border-b last:border-b-0 p-4">
+          <div key={i} className="border-b border-border last:border-b-0 p-4">
             <div className="flex gap-4 items-center">
               <div className="flex gap-3 items-center flex-1">
                 <Skeleton className="w-10 h-14 rounded" />
