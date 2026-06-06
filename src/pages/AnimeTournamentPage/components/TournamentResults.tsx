@@ -87,11 +87,11 @@ export function TournamentResults({ participants, champion, onRestart }: Tournam
               </div>
 
               {/* Rating */}
-              {participant.anime.rating && (
+              {participant.anime.rating?.average ? (
                 <div className="text-xs sm:text-sm font-medium text-muted-foreground">
-                  ★ {Number(participant.anime.rating).toFixed(1)}
+                  ★ {Number(participant.anime.rating.average).toFixed(1)}
                 </div>
-              )}
+              ) : null}
             </div>
           ))}
         </div>
