@@ -1,5 +1,6 @@
 import { Star, Calendar, Film } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { AnimeTitle } from '@/components/anime/AnimeTitle';
 import type { AnimeCatalogItem } from '@/types';
 import { getImageUrl, getHeroPosterUrl } from '@/lib/imageUrl';
 import { cn } from '@/lib/utils';
@@ -85,10 +86,13 @@ export function TournamentCard({
         )}
 
         <div className={cn("absolute bottom-0 left-0 right-0 text-white", compact ? "p-3 sm:p-4 md:p-6" : "p-4")}>
-          <h3 className={cn(
-            "font-bold line-clamp-2",
-            compact ? "text-sm sm:text-base md:text-lg" : "text-lg mb-1"
-          )}>{anime.title}</h3>
+          <AnimeTitle
+            title={anime.title}
+            className={cn(
+              "font-bold",
+              compact ? "text-sm sm:text-base md:text-lg" : "text-lg mb-1"
+            )}
+          />
 
           {showDetails && (
             <div className={cn("flex items-center gap-2 sm:gap-3", compact ? "text-xs sm:text-sm md:text-base" : "text-sm")}>

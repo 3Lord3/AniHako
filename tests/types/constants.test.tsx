@@ -33,7 +33,7 @@ describe('constants', () => {
       expect(STATUS_COLORS.watching).toBe('bg-blue-500 text-white dark:bg-blue-600');
       expect(STATUS_COLORS.completed).toBe('bg-green-500 text-white dark:bg-green-600');
       expect(STATUS_COLORS.dropped).toBe('bg-red-500 text-white dark:bg-red-600');
-      expect(STATUS_COLORS.planned).toBe('bg-yellow-500 text-white dark:bg-yellow-600');
+      expect(STATUS_COLORS.planned).toBe('bg-yellow-600 text-gray-900 dark:bg-yellow-700 dark:text-gray-900');
       expect(STATUS_COLORS.paused).toBe('bg-yellow-500 text-gray-900 dark:bg-yellow-600 dark:text-gray-900');
       expect(STATUS_COLORS.favourite).toBe('bg-pink-500 text-white dark:bg-pink-600');
     });

@@ -1,4 +1,4 @@
-# AnimeHako
+# AniHako
 
 Anime discovery and management web application based on YummyAnime API.
 

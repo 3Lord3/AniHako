@@ -30,7 +30,7 @@ export function Layout() {
           <Link to="/" className="flex items-center gap-3 text-2xl font-bold text-foreground" onClick={handleLogoClick}>
             <img src="/favicon.svg" alt="" className="h-10 w-10 shrink-0" />
             <span className="flex gap-0">
-              Anime<span className="text-[#7855d0]">Hako</span>
+              Ani<span className="text-[#7855d0]">Hako</span>
             </span>
           </Link>
           <nav className="flex items-center gap-6 text-foreground">
