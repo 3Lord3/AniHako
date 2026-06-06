@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Star, Calendar, Tag } from 'lucide-react';
 import { AnimeCard } from './AnimeCard';
+import { TooltipWrap } from '@/components/ui/tooltip';
 import type { AnimeCatalogItem, YummyUserAnimeRate } from '@/types';
 import { mapListIdToStatus } from '@/types';
 import { getImageUrl, getPosterUrl } from '@/lib/imageUrl';
@@ -66,29 +67,35 @@ function AnimeListItem({ anime, userAnime }: { anime: AnimeCatalogItem; userAnim
       </div>
       <div className="flex items-start gap-1 sm:gap-1.5 shrink-0">
         {userStatus && STATUS_COLORS[userStatus] && (
-          <span
-            className={`inline-flex items-center justify-center h-7 w-7 sm:h-9 sm:w-9 rounded-full [&>svg]:!w-3.5 [&>svg]:!h-3.5 sm:[&>svg]:!w-5 sm:[&>svg]:!h-5 ${STATUS_COLORS[userStatus]}`}
-            title={getStatusLabel(userStatus)}
-          >
-            {STATUS_ICONS[userStatus]}
-          </span>
+          <TooltipWrap content={getStatusLabel(userStatus)}>
+            <span
+              aria-label={getStatusLabel(userStatus)}
+              className={`inline-flex items-center justify-center h-7 w-7 sm:h-9 sm:w-9 rounded-full [&>svg]:!w-3.5 [&>svg]:!h-3.5 sm:[&>svg]:!w-5 sm:[&>svg]:!h-5 ${STATUS_COLORS[userStatus]}`}
+            >
+              {STATUS_ICONS[userStatus]}
+            </span>
+          </TooltipWrap>
         )}
         {isFavorite && userStatus !== 'favourite' && (
-          <span
-            className="inline-flex items-center justify-center h-7 w-7 sm:h-9 sm:w-9 rounded-full bg-pink-500 text-white [&>svg]:!w-3.5 [&>svg]:!h-3.5 sm:[&>svg]:!w-5 sm:[&>svg]:!h-5"
-            title="Любимое"
-          >
-            {FAVORITE_ICON}
-          </span>
+          <TooltipWrap content="Любимое">
+            <span
+              aria-label="Любимое"
+              className="inline-flex items-center justify-center h-7 w-7 sm:h-9 sm:w-9 rounded-full bg-pink-500 text-white [&>svg]:!w-3.5 [&>svg]:!h-3.5 sm:[&>svg]:!w-5 sm:[&>svg]:!h-5"
+            >
+              {FAVORITE_ICON}
+            </span>
+          </TooltipWrap>
         )}
         {validRating && (
-          <span
-            className={`inline-flex items-center gap-0.5 sm:gap-1 h-7 sm:h-9 px-1 sm:px-1.5 rounded ${getRatingColor(rating)}`}
-            title={`Рейтинг: ${rating.toFixed(1)}`}
-          >
-            <Star className="w-3 h-3 sm:w-4 sm:h-4 fill-white text-white" />
-            <span className="text-xs sm:text-sm font-bold text-white">{rating.toFixed(1)}</span>
-          </span>
+          <TooltipWrap content={`Рейтинг: ${rating.toFixed(1)}`}>
+            <span
+              aria-label={`Рейтинг: ${rating.toFixed(1)}`}
+              className={`inline-flex items-center gap-0.5 sm:gap-1 h-7 sm:h-9 px-1 sm:px-1.5 rounded ${getRatingColor(rating)}`}
+            >
+              <Star className="w-3 h-3 sm:w-4 sm:h-4 fill-white text-white" />
+              <span className="text-xs sm:text-sm font-bold text-white">{rating.toFixed(1)}</span>
+            </span>
+          </TooltipWrap>
         )}
       </div>
     </Link>

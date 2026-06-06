@@ -6,6 +6,8 @@ import { ChevronLeft, ChevronRight, Calendar, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { TooltipWrap } from '@/components/ui/tooltip';
+import { AnimeTitle } from '@/components/anime/AnimeTitle';
 import type { AnimeScheduleItem, AnimeCatalogItem } from '@/types/anime';
 import { getRatingColor } from '@/types/constants';
 
@@ -78,23 +80,23 @@ function CarouselCard({ anime }: CarouselCardProps) {
           loading="lazy"
         />
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3 pt-12">
-          <h3 className="font-semibold text-sm text-white line-clamp-2">
-            {displayTitle}
-          </h3>
+          <AnimeTitle title={displayTitle} className="font-semibold text-sm text-white" />
         </div>
         {validRating && (
-          <div
-            title={`Рейтинг: ${rating.toFixed(1)}`}
-            className={cn(
-              'absolute top-2 right-2 h-8 px-1.5 rounded flex items-center gap-0.5',
-              getRatingColor(rating)
-            )}
-          >
-            <Star className="w-4 h-4 fill-white text-white" />
-            <span className="text-sm font-bold text-white">
-              {rating.toFixed(1)}
-            </span>
-          </div>
+          <TooltipWrap content={`Рейтинг: ${rating.toFixed(1)}`}>
+            <div
+              aria-label={`Рейтинг: ${rating.toFixed(1)}`}
+              className={cn(
+                'absolute top-2 right-2 h-8 px-1.5 rounded flex items-center gap-0.5',
+                getRatingColor(rating)
+              )}
+            >
+              <Star className="w-4 h-4 fill-white text-white" />
+              <span className="text-sm font-bold text-white">
+                {rating.toFixed(1)}
+              </span>
+            </div>
+          </TooltipWrap>
         )}
       </div>
     </Link>

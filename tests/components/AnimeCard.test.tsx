@@ -57,22 +57,22 @@ describe('AnimeCard', () => {
 
   it('renders user status badge when provided', () => {
     renderComponent({ userStatus: 'watching' });
-    expect(screen.getByTitle('Смотрю')).toBeInTheDocument();
+    expect(screen.getByLabelText('Смотрю')).toBeInTheDocument();
   });
 
   it('renders completed status badge', () => {
     renderComponent({ userStatus: 'completed' });
-    expect(screen.getByTitle('Просмотрено')).toBeInTheDocument();
+    expect(screen.getByLabelText('Просмотрено')).toBeInTheDocument();
   });
 
   it('renders favorite badge when isFavorite is true', () => {
     renderComponent({ isFavorite: true });
-    expect(screen.getByTitle('Избранное')).toBeInTheDocument();
+    expect(screen.getByLabelText('Избранное')).toBeInTheDocument();
   });
 
   it('does not render favorite badge when isFavorite is false', () => {
     renderComponent({ isFavorite: false });
-    expect(screen.queryByTitle('Избранное')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Избранное')).not.toBeInTheDocument();
   });
 
   it('renders link to anime detail page', () => {

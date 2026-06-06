@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge';
+import { TooltipWrap } from '@/components/ui/tooltip';
 import { FAVORITE_ICON } from '@/types/constants';
 
 interface FavoriteBadgeProps {
@@ -13,10 +14,12 @@ export function FavoriteBadge({ size = 'md' }: FavoriteBadgeProps) {
   };
 
   return (
-    <Badge title="Избранное" className={`bg-pink-500 ${sizeClasses[size]} p-0 rounded-full cursor-pointer`}>
-      <span className="flex items-center justify-center w-full h-full">
-        {FAVORITE_ICON}
-      </span>
-    </Badge>
+    <TooltipWrap content="Избранное">
+      <Badge aria-label="Избранное" className={`bg-pink-500 ${sizeClasses[size]} p-0 rounded-full cursor-pointer`}>
+        <span className="flex items-center justify-center w-full h-full">
+          {FAVORITE_ICON}
+        </span>
+      </Badge>
+    </TooltipWrap>
   );
 }

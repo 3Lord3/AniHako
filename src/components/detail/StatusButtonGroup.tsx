@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { TooltipWrap } from '@/components/ui/tooltip';
 import { Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { STATUS_LABELS, STATUS_ICONS } from '@/types/constants';
@@ -21,39 +22,44 @@ export function StatusButtonGroup({
   disabled,
 }: StatusButtonGroupProps) {
   const statusOptions: AnimeStatus[] = ['watching', 'planned', 'completed', 'paused', 'dropped'];
+  const favoriteLabel = isFavorite ? 'В любимом' : 'В любимое';
 
   return (
     <div className="flex gap-2">
-      <Button
-        variant={isFavorite ? 'default' : 'outline'}
-        size="icon"
-        onClick={onToggleFavorite}
-        className="cursor-pointer"
-        title={isFavorite ? 'В любимом' : 'В любимое'}
-        disabled={disabled}
-      >
-        <Heart className={cn(
-          'w-5 h-5',
-          isFavorite ? 'fill-current text-primary-foreground' : 'text-foreground'
-        )} />
-      </Button>
+      <TooltipWrap content={favoriteLabel}>
+        <Button
+          variant={isFavorite ? 'default' : 'outline'}
+          size="icon"
+          onClick={onToggleFavorite}
+          className="cursor-pointer"
+          aria-label={favoriteLabel}
+          disabled={disabled}
+        >
+          <Heart className={cn(
+            'w-5 h-5',
+            isFavorite ? 'fill-current text-primary-foreground' : 'text-foreground'
+          )} />
+        </Button>
+      </TooltipWrap>
       {statusOptions.map((status) => {
         const statusId = mapStatusToListId(status);
         const isActive = userListId === statusId;
+        const label = STATUS_LABELS[status];
         return (
-          <Button
-            key={status}
-            variant={isActive ? 'default' : 'outline'}
-            size="icon"
-            onClick={() => onAddToList(status)}
-            className="cursor-pointer"
-            title={STATUS_LABELS[status]}
-            disabled={disabled}
-          >
-            <span className={cn(isActive && 'text-primary-foreground')}>
-              {STATUS_ICONS[status]}
-            </span>
-          </Button>
+          <TooltipWrap key={status} content={label}>
+            <Button
+              variant={isActive ? 'default' : 'outline'}
+              size="icon"
+              onClick={() => onAddToList(status)}
+              className="cursor-pointer"
+              aria-label={label}
+              disabled={disabled}
+            >
+              <span className={cn(isActive && 'text-primary-foreground')}>
+                {STATUS_ICONS[status]}
+              </span>
+            </Button>
+          </TooltipWrap>
         );
       })}
     </div>
