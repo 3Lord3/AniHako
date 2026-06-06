@@ -23,11 +23,13 @@ export function TournamentParticipantSelector({
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
 
   const debouncedSearch = useDebounce(searchQuery, 300);
+  const minQueryLength = 3;
+  const isQueryLongEnough = debouncedSearch.trim().length >= minQueryLength;
 
-  const { data: searchResults, isLoading: isSearching } = useAnimeList({
-    search: debouncedSearch,
-    limit: 10,
-  });
+  const { data: searchResults, isLoading: isSearching } = useAnimeList(
+    { search: debouncedSearch, limit: 10 },
+    { enabled: isQueryLongEnough }
+  );
 
   const availableResults = (searchResults?.data || []).filter(
     (anime) => !selectedAnime.some((a) => a.anime_id === anime.anime_id)
@@ -144,6 +146,10 @@ export function TournamentParticipantSelector({
                   </li>
                 ))}
               </ul>
+            ) : searchQuery.trim().length > 0 && searchQuery.trim().length < minQueryLength ? (
+              <div className="py-4 text-center text-sm text-muted-foreground">
+                Введите минимум {minQueryLength} символа
+              </div>
             ) : debouncedSearch ? (
               <div className="py-4 text-center text-sm text-muted-foreground">
                 Ничего не найдено
