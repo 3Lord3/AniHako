@@ -242,14 +242,14 @@ export function HomePage() {
                 <Skeleton key={i} className="h-8 w-16 rounded-md shrink-0" />
               ))}
             </div>
-            <div className="border rounded-lg p-4">
+            <div className="border border-border rounded-lg p-4">
               <div className="flex gap-4 mb-4">
                 <Skeleton className="h-4 w-32" />
                 <Skeleton className="h-4 w-20 hidden md:block" />
                 <Skeleton className="h-4 w-24 hidden lg:block" />
               </div>
               {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="flex gap-4 items-center py-3 border-b last:border-0">
+                <div key={i} className="flex gap-4 items-center py-3 border-b border-border last:border-0">
                   <Skeleton className="w-10 h-14 rounded" />
                   <Skeleton className="h-4 w-40 flex-1" />
                   <Skeleton className="h-4 w-16 hidden md:block" />
@@ -262,7 +262,7 @@ export function HomePage() {
           <div className="text-center py-8 text-muted-foreground">Нет данных</div>
         ) : (
           <>
-            <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
+            <div className="flex gap-2 mb-6 overflow-x-auto px-1 pt-1 pb-2">
               {sortedDates.map((dateKey) => {
                 const date = new Date(dateKey);
                 const isToday = dateKey === new Date().toDateString();
@@ -273,8 +273,8 @@ export function HomePage() {
                     size="sm"
                     onClick={() => setSelectedDateKey(dateKey)}
                     className={cn(
-                      'cursor-pointer shrink-0 dark:text-foreground',
-                      isToday && 'border-primary dark:border-primary dark:text-primary-foreground'
+                      'cursor-pointer shrink-0',
+                      isToday && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
                     )}
                   >
                     {formatDayMonth(date.getTime() / 1000)}
