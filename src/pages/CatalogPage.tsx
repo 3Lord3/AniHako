@@ -12,30 +12,11 @@ export function CatalogPage() {
   const minRating = searchParams.get('rating') ? parseFloat(searchParams.get('rating')!) : undefined;
 
   const [searchInput, setSearchInput] = useState(search);
-  const isUserTypingRef = useRef(false);
-  const lastClearRef = useRef<number | null>(null);
+  const searchInputRef = useRef('');
+  const lastCommittedInputRef = useRef(search);
   const sortForward = searchParams.get('sort_forward') !== 'false';
   const toYear = searchParams.get('to_year') || '';
   const fromYear = searchParams.get('from_year') || '';
-
-  useEffect(() => {
-    if (!isUserTypingRef.current) {
-      setSearchInput(search);
-    }
-  }, [search]);
-
-  useEffect(() => {
-    isUserTypingRef.current = false;
-  }, [searchInput]);
-
-  const clearSearch = () => {
-    lastClearRef.current = Date.now();
-    setSearchInput('');
-    isUserTypingRef.current = false;
-    const params = new URLSearchParams(searchParams);
-    params.delete('search');
-    setSearchParams(params);
-  };
 
   const debouncedSearch = useDebounce(searchInput, 300);
   const [view, setView] = useState<'grid' | 'list'>('grid');
@@ -52,27 +33,35 @@ export function CatalogPage() {
   }, [view]);
 
   useEffect(() => {
-    if (debouncedSearch !== search) {
-      const params = new URLSearchParams(searchParams);
-      if (debouncedSearch) {
-        params.set('search', debouncedSearch);
-      } else {
-        params.delete('search');
-      }
-      setSearchParams(params);
-    }
-  }, [debouncedSearch, search, searchParams, setSearchParams]);
+    searchInputRef.current = searchInput;
+  }, [searchInput]);
 
   useEffect(() => {
-    if (lastClearRef.current && Date.now() - lastClearRef.current < 100) {
-      lastClearRef.current = null;
-      return;
+    if (debouncedSearch !== searchInputRef.current) return;
+    if (debouncedSearch === lastCommittedInputRef.current) return;
+    lastCommittedInputRef.current = debouncedSearch;
+    const params = new URLSearchParams(searchParams);
+    if (debouncedSearch) {
+      params.set('search', debouncedSearch);
+    } else {
+      params.delete('search');
     }
-    lastClearRef.current = null;
-    if (!isUserTypingRef.current) {
-      setSearchInput(search);
-    }
+    setSearchParams(params);
+  }, [debouncedSearch, searchParams, setSearchParams]);
+
+  useEffect(() => {
+    if (search === lastCommittedInputRef.current) return;
+    lastCommittedInputRef.current = search;
+    setSearchInput(search);
   }, [search]);
+
+  const clearSearch = () => {
+    setSearchInput('');
+    lastCommittedInputRef.current = '';
+    const params = new URLSearchParams(searchParams);
+    params.delete('search');
+    setSearchParams(params);
+  };
 
   const queryParams = {
     page: 1,
@@ -125,7 +114,6 @@ export function CatalogPage() {
         <CatalogControls
           searchInput={searchInput}
           onSearchChange={(value) => {
-            isUserTypingRef.current = true;
             setSearchInput(value);
           }}
           onSearchClear={clearSearch}
