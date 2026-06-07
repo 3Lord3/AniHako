@@ -28,7 +28,7 @@ export const STATUS_COLORS: Record<StatusType, string> = {
   completed: 'bg-green-500 text-white dark:bg-green-600',
   paused: 'bg-yellow-500 text-gray-900 dark:bg-yellow-600 dark:text-gray-900',
   dropped: 'bg-red-500 text-white dark:bg-red-600',
-  planned: 'bg-yellow-500 text-white dark:bg-yellow-600',
+  planned: 'bg-yellow-600 text-gray-900 dark:bg-yellow-700 dark:text-gray-900',
   favourite: 'bg-pink-500 text-white dark:bg-pink-600',
 };
 

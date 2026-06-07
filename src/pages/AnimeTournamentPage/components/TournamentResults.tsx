@@ -81,17 +81,17 @@ export function TournamentResults({ participants, champion, onRestart }: Tournam
               <div className="flex-1 min-w-0">
                 <p className="font-semibold truncate text-foreground text-xs sm:text-sm">{participant.anime.title}</p>
                 <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
-                  {participant.anime.year && `${participant.anime.year} • `}
+                  {participant.anime.year ? `${participant.anime.year} • ` : ''}
                   {participant.anime.genres?.slice(0, 2).map((g) => g.title).join(', ')}
                 </p>
               </div>
 
               {/* Rating */}
-              {participant.anime.rating && (
+              {participant.anime.rating?.average ? (
                 <div className="text-xs sm:text-sm font-medium text-muted-foreground">
-                  ★ {Number(participant.anime.rating).toFixed(1)}
+                  ★ {Number(participant.anime.rating.average).toFixed(1)}
                 </div>
-              )}
+              ) : null}
             </div>
           ))}
         </div>

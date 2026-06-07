@@ -32,7 +32,7 @@ export function LoginPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-[60vh]">
+    <div className="flex items-center justify-center min-h-[calc(100dvh-10rem)] py-4">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Вход</CardTitle>

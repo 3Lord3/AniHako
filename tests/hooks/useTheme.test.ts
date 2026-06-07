@@ -36,7 +36,7 @@ describe('useTheme hook', () => {
     });
 
     expect(result.current.theme).toBe('light');
-    expect(localStorageMock.setItem).toHaveBeenCalledWith('animehako-theme', 'light');
+    expect(localStorageMock.setItem).toHaveBeenCalledWith('anihako-theme', 'light');
     expect(document.documentElement.classList.contains('dark')).toBe(false);
   });
 
@@ -48,7 +48,7 @@ describe('useTheme hook', () => {
     });
 
     expect(result.current.theme).toBe('dark');
-    expect(localStorageMock.setItem).toHaveBeenCalledWith('animehako-theme', 'dark');
+    expect(localStorageMock.setItem).toHaveBeenCalledWith('anihako-theme', 'dark');
     expect(document.documentElement.classList.contains('dark')).toBe(true);
   });
 
@@ -60,7 +60,7 @@ describe('useTheme hook', () => {
     });
 
     expect(result.current.theme).toBe('system');
-    expect(localStorageMock.setItem).toHaveBeenCalledWith('animehako-theme', 'system');
+    expect(localStorageMock.setItem).toHaveBeenCalledWith('anihako-theme', 'system');
   });
 
   it('loads theme from localStorage', () => {

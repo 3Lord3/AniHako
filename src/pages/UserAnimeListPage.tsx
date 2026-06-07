@@ -4,6 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { TooltipWrap } from '@/components/ui/tooltip';
+import { AnimeTitle } from '@/components/anime/AnimeTitle';
 import { getImageUrl } from '@/lib/imageUrl';
 import { STATUS_ICONS, STATUS_COLORS, FAVORITE_ICON, ALL_STATUSES, type StatusType } from '@/types/constants';
 import type { YummyUserAnimeRate } from '@/types';
@@ -152,26 +154,28 @@ export function UserAnimeListPage() {
                   loading="lazy"
                 />
                 <div className="absolute top-2 left-2 right-2 flex justify-between items-start gap-1">
-                  <Badge 
-                    title={statusLabels[status] || status}
-                    className={`h-9 w-9 p-0 rounded-full cursor-pointer ${status ? STATUS_COLORS[status as StatusType] : 'bg-gray-500'}`}
-                  >
-                    <span className="flex items-center justify-center w-full h-full">
-                      {STATUS_ICONS[status as StatusType] || STATUS_ICONS.watching}
-                    </span>
-                  </Badge>
-                  {isFavorite && (
-                    <Badge title="Избранное" className="bg-pink-500 text-white h-9 w-9 p-0 rounded-full cursor-pointer">
-                      <span className="flex items-center justify-center w-full h-full text-white">
-                        {FAVORITE_ICON}
+                  <TooltipWrap content={statusLabels[status] || status}>
+                    <Badge
+                      aria-label={statusLabels[status] || status}
+                      className={`h-9 w-9 p-0 rounded-full cursor-pointer ${status ? STATUS_COLORS[status as StatusType] : 'bg-gray-500'}`}
+                    >
+                      <span className="flex items-center justify-center w-full h-full">
+                        {STATUS_ICONS[status as StatusType] || STATUS_ICONS.watching}
                       </span>
                     </Badge>
+                  </TooltipWrap>
+                  {isFavorite && (
+                    <TooltipWrap content="Избранное">
+                      <Badge aria-label="Избранное" className="bg-pink-500 text-white h-9 w-9 p-0 rounded-full cursor-pointer">
+                        <span className="flex items-center justify-center w-full h-full text-white">
+                          {FAVORITE_ICON}
+                        </span>
+                      </Badge>
+                    </TooltipWrap>
                   )}
                 </div>
                 <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3 pt-12">
-                  <h3 className="font-semibold text-sm text-white line-clamp-2">
-                    {displayTitle}
-                  </h3>
+                  <AnimeTitle title={displayTitle} className="font-semibold text-sm text-white" />
                 </div>
               </Link>
             );

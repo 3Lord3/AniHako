@@ -106,7 +106,7 @@ export function SearchDropdown({
 
       <div
         ref={dropdownRef}
-        className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border rounded-lg shadow-lg overflow-hidden max-h-48 sm:max-h-64 overflow-y-auto"
+        className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border border-border rounded-lg shadow-lg overflow-hidden max-h-48 sm:max-h-64 overflow-y-auto"
       >
         {isLoading ? (
           <div className="flex items-center justify-center py-4 text-muted-foreground">
@@ -116,7 +116,7 @@ export function SearchDropdown({
         ) : results.length > 0 ? (
           <ul className="py-1">
             {results.map((anime, index) => (
-              <li key={anime.id}>
+              <li key={anime.anime_id}>
                 <button
                   onClick={() => onSelect(anime)}
                   className={cn(

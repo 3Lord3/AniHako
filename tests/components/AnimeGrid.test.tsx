@@ -5,9 +5,9 @@ import { AnimeGrid } from '@/components/AnimeGrid';
 import type { AnimeCatalogItem } from '@/types';
 
 const mockAnimeList: AnimeCatalogItem[] = [
-  { anime_id: 1, anime_status: { title: 'Вышло', alias: 'released', value: 0 }, anime_url: '/anime/1', poster: { small: '/posters/1-small.jpg', medium: '/posters/1.jpg', big: '/posters/1-big.jpg', huge: '/posters/1-huge.jpg', fullsize: '/posters/1-fullsize.jpg', mega: '/posters/1-mega.jpg' }, rating: { average: 8.0, counters: 100 }, title: 'Anime 1', type: { name: 'TV', value: 1, shortname: 'tv', alias: 'tv' }, year: 2024, description: 'Test', views: 100, season: 1, episodes: { aired: 12, count: 12 } },
-  { anime_id: 2, anime_status: { title: 'Вышло', alias: 'released', value: 0 }, anime_url: '/anime/2', poster: { small: '/posters/2-small.jpg', medium: '/posters/2.jpg', big: '/posters/2-big.jpg', huge: '/posters/2-huge.jpg', fullsize: '/posters/2-fullsize.jpg', mega: '/posters/2-mega.jpg' }, rating: { average: 7.5, counters: 80 }, title: 'Anime 2', type: { name: 'TV', value: 1, shortname: 'tv', alias: 'tv' }, year: 2023, description: 'Test', views: 200, season: 2, episodes: { aired: 24, count: 24 } },
-  { anime_id: 3, anime_status: { title: 'Вышло', alias: 'released', value: 0 }, anime_url: '/anime/3', poster: { small: '/posters/3-small.jpg', medium: '/posters/3.jpg', big: '/posters/3-big.jpg', huge: '/posters/3-huge.jpg', fullsize: '/posters/3-fullsize.jpg', mega: '/posters/3-mega.jpg' }, rating: { average: 9.0, counters: 200 }, title: 'Anime 3', type: { name: 'TV', value: 1, shortname: 'tv', alias: 'tv' }, year: 2024, description: 'Test', views: 300, season: 1, episodes: { aired: 13, count: 13 } },
+  { anime_id: 1, anime_status: { title: 'Вышло', alias: 'released', value: 0 }, anime_url: '/anime/1', poster: { small: '/posters/1-small.jpg', medium: '/posters/1.jpg', big: '/posters/1-big.jpg', huge: '/posters/1-huge.jpg', fullsize: '/posters/1-fullsize.jpg', mega: '/posters/1-mega.jpg' }, rating: { average: 8.0, counters: 100 }, title: 'Test Anime 1', type: { name: 'TV', value: 1, shortname: 'tv', alias: 'tv' }, year: 2024, description: 'Test', views: 100, season: 1, episodes: { aired: 12, count: 12 }, genres: [{ title: 'Action', id: 1, alias: 'action', url: '/genres/action' }, { title: 'Comedy', id: 2, alias: 'comedy', url: '/genres/comedy' }] },
+  { anime_id: 2, anime_status: { title: 'Вышло', alias: 'released', value: 0 }, anime_url: '/anime/2', poster: { small: '/posters/2-small.jpg', medium: '/posters/2.jpg', big: '/posters/2-big.jpg', huge: '/posters/2-huge.jpg', fullsize: '/posters/2-fullsize.jpg', mega: '/posters/2-mega.jpg' }, rating: { average: 7.5, counters: 80 }, title: 'Test Anime 2', type: { name: 'TV', value: 1, shortname: 'tv', alias: 'tv' }, year: 2023, description: 'Test', views: 200, season: 2, episodes: { aired: 24, count: 24 } },
+  { anime_id: 3, anime_status: { title: 'Вышло', alias: 'released', value: 0 }, anime_url: '/anime/3', poster: { small: '/posters/3-small.jpg', medium: '/posters/3.jpg', big: '/posters/3-big.jpg', huge: '/posters/3-huge.jpg', fullsize: '/posters/3-fullsize.jpg', mega: '/posters/3-mega.jpg' }, rating: { average: 9.0, counters: 200 }, title: 'Test Anime 3', type: { name: 'TV', value: 1, shortname: 'tv', alias: 'tv' }, year: 2024, description: 'Test', views: 300, season: 1, episodes: { aired: 13, count: 13 } },
 ];
 
 describe('AnimeGrid', () => {
@@ -18,9 +18,9 @@ describe('AnimeGrid', () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByText('Anime 1')).toBeInTheDocument();
-    expect(screen.getByText('Anime 2')).toBeInTheDocument();
-    expect(screen.getByText('Anime 3')).toBeInTheDocument();
+    expect(screen.getByText('Test Anime 1')).toBeInTheDocument();
+    expect(screen.getByText('Test Anime 2')).toBeInTheDocument();
+    expect(screen.getByText('Test Anime 3')).toBeInTheDocument();
   });
 
   it('renders correct number of cards', () => {
@@ -41,7 +41,7 @@ describe('AnimeGrid', () => {
       </BrowserRouter>
     );
 
-    expect(screen.queryByText('Anime 1')).not.toBeInTheDocument();
+    expect(screen.queryByText('Test Anime 1')).not.toBeInTheDocument();
   });
 
   it('renders loading skeleton when isLoading is true', () => {
@@ -73,8 +73,8 @@ describe('AnimeGrid', () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByText('Anime 1')).toBeInTheDocument();
-    expect(screen.queryByText('Anime 2')).not.toBeInTheDocument();
+    expect(screen.getByText('Test Anime 1')).toBeInTheDocument();
+    expect(screen.queryByText('Test Anime 2')).not.toBeInTheDocument();
   });
 
   it('renders anime without rating', () => {
@@ -85,7 +85,7 @@ describe('AnimeGrid', () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByText('Anime 1')).toBeInTheDocument();
+    expect(screen.getByText('Test Anime 1')).toBeInTheDocument();
   });
 
   it('renders anime with minimal poster', () => {
@@ -96,6 +96,52 @@ describe('AnimeGrid', () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByText('Anime 1')).toBeInTheDocument();
+    expect(screen.getByText('Test Anime 1')).toBeInTheDocument();
+  });
+
+  describe('list view', () => {
+    it('renders list view correctly', () => {
+      render(
+        <BrowserRouter>
+          <AnimeGrid anime={mockAnimeList} view="list" />
+        </BrowserRouter>
+      );
+
+      expect(screen.getByText('Test Anime 1')).toBeInTheDocument();
+      expect(screen.getByText('Test Anime 2')).toBeInTheDocument();
+      expect(screen.getByText('Test Anime 3')).toBeInTheDocument();
+    });
+
+    it('renders genres in list view', () => {
+      render(
+        <BrowserRouter>
+          <AnimeGrid anime={[mockAnimeList[0]]} view="list" />
+        </BrowserRouter>
+      );
+
+      expect(screen.getByText('Action, Comedy')).toBeInTheDocument();
+    });
+
+    it('renders correct number of items in list view', () => {
+      render(
+        <BrowserRouter>
+          <AnimeGrid anime={mockAnimeList} view="list" />
+        </BrowserRouter>
+      );
+
+      const links = screen.getAllByRole('link');
+      expect(links.length).toBe(3);
+    });
+
+    it('renders list view skeleton', () => {
+      render(
+        <BrowserRouter>
+          <AnimeGrid anime={[]} isLoading={true} view="list" />
+        </BrowserRouter>
+      );
+
+      const skeletons = document.querySelectorAll('.animate-pulse');
+      expect(skeletons.length).toBeGreaterThan(0);
+    });
   });
 });
