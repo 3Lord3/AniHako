@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import useEmblaCarousel from 'embla-carousel-react';
 import { useSchedule, useAnimeList } from '@/hooks';
-import { ChevronLeft, ChevronRight, Calendar, Star } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TooltipWrap } from '@/components/ui/tooltip';
 import { AnimeTitle } from '@/components/anime/AnimeTitle';
+import { ScheduleRow } from '@/components/anime/ScheduleRow';
 import type { AnimeScheduleItem, AnimeCatalogItem } from '@/types/anime';
 import { getRatingColor } from '@/types/constants';
 
@@ -24,14 +25,6 @@ function getCurrentSeason(): string {
   if (month >= 3 && month <= 5) return 'spring';
   if (month >= 6 && month <= 8) return 'summer';
   return 'autumn';
-}
-
-function formatDate(timestamp: number): string {
-  if (!timestamp) return '-';
-  return new Date(timestamp * 1000).toLocaleDateString('ru-RU', {
-    day: 'numeric',
-    month: 'short',
-  });
 }
 
 function formatDayMonth(timestamp: number): string {
@@ -145,49 +138,6 @@ function AnimeCarousel({ anime }: { anime: AnimeCatalogItem[] }) {
   );
 }
 
-interface ScheduleRowProps {
-  item: AnimeScheduleItem;
-}
-
-function ScheduleRow({ item }: ScheduleRowProps) {
-  const url = item.anime_url?.startsWith('/anime/')
-    ? item.anime_url
-    : `/anime/${item.anime_url || item.anime_id}`;
-
-  return (
-    <tr className="border-b border-border hover:bg-muted/50 transition-colors">
-      <td className="py-3 px-4">
-        <Link to={url} className="flex items-center gap-3 group">
-          <img
-            src={item.poster?.small || item.poster?.medium}
-            alt={item.title}
-            className="w-10 h-14 object-cover rounded"
-          />
-          <span className="group-hover:text-primary transition-colors line-clamp-2 text-foreground">
-            {item.title}
-          </span>
-        </Link>
-      </td>
-      <td className="py-3 px-4 hidden md:table-cell">
-        <span className="text-sm text-muted-foreground">
-          {item.episodes?.aired || 0} / {item.episodes?.count || '?'}
-        </span>
-      </td>
-      <td className="py-3 px-4 hidden lg:table-cell">
-        <div className="flex items-center gap-1 text-sm text-green-600 dark:text-green-400">
-          <Calendar className="w-3 h-3" />
-          {formatDate(item.episodes?.next_date)}
-        </div>
-      </td>
-      <td className="py-3 px-4 hidden sm:table-cell">
-        <span className="text-sm text-muted-foreground">
-          {formatDate(item.episodes?.prev_date)}
-        </span>
-      </td>
-    </tr>
-  );
-}
-
 export function HomePage() {
   const currentYear = new Date().getFullYear();
   const currentSeason = getCurrentSeason();
@@ -245,14 +195,16 @@ export function HomePage() {
             <div className="border border-border rounded-lg p-4">
               <div className="flex gap-4 mb-4">
                 <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-4 w-20 hidden md:block" />
-                <Skeleton className="h-4 w-24 hidden lg:block" />
+                <Skeleton className="h-4 w-20 hidden sm:block" />
+                <Skeleton className="h-4 w-24 hidden md:block" />
+                <Skeleton className="h-4 w-20 hidden lg:block" />
               </div>
               {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className="flex gap-4 items-center py-3 border-b border-border last:border-0">
                   <Skeleton className="w-10 h-14 rounded" />
                   <Skeleton className="h-4 w-40 flex-1" />
-                  <Skeleton className="h-4 w-16 hidden md:block" />
+                  <Skeleton className="h-4 w-16 hidden sm:block" />
+                  <Skeleton className="h-4 w-20 hidden md:block" />
                   <Skeleton className="h-4 w-20 hidden lg:block" />
                 </div>
               ))}
@@ -288,9 +240,9 @@ export function HomePage() {
                 <thead>
                   <tr className="border-b border-border">
                     <th className="text-left py-3 px-4 font-medium text-muted-foreground">Название</th>
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground hidden md:table-cell">Эпизоды</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground hidden sm:table-cell">Эпизоды</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground hidden md:table-cell">Предыдущий</th>
                     <th className="text-left py-3 px-4 font-medium text-muted-foreground hidden lg:table-cell">Следующий</th>
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground hidden sm:table-cell">Предыдущий</th>
                   </tr>
                 </thead>
                 <tbody>
