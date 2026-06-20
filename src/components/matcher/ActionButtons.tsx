@@ -24,17 +24,17 @@ export function ActionButtons({
   variant = 'desktop',
 }: ActionButtonsProps) {
   const baseSize = 'h-16 w-16';
-  const iconSkipSize = variant === 'desktop' ? 'w-8 h-8' : 'w-7 h-7';
+  const iconSkipSize = variant === 'desktop' ? 'w-10 h-10' : 'w-20 h-20 sm:w-24 sm:h-24';
 
   if (variant === 'mobile') {
     return (
       <div className="flex flex-col items-center gap-5 pt-3 pb-4 w-full max-w-[360px] mx-auto px-2">
-        <div className="flex justify-between w-full">
+        <div className="flex justify-between gap-3 w-full">
           <TooltipWrap content="Пропустить">
             <Button
               variant="outline"
               size="lg"
-              className={`${baseSize} rounded-full border-2 border-red-500 hover:bg-red-500/10 hover:text-red-500`}
+              className={`${baseSize} flex-1 aspect-square rounded-full border-2 border-red-500 p-0 hover:bg-red-500/10 hover:text-red-500`}
               onClick={onSkip}
               disabled={isTransitioning || isAdding}
               aria-label="Пропустить"
@@ -47,7 +47,7 @@ export function ActionButtons({
             <Button
               variant="outline"
               size="lg"
-              className={`${baseSize} rounded-full border-2 border-green-500 hover:bg-green-500/10 hover:text-green-500`}
+              className={`${baseSize} flex-1 aspect-square rounded-full border-2 border-green-500 p-0 hover:bg-green-500/10 hover:text-green-500`}
               onClick={onAdd}
               disabled={isTransitioning || isAdding}
               aria-label="В запланированное"
@@ -61,16 +61,16 @@ export function ActionButtons({
           </TooltipWrap>
         </div>
 
-        <div className="flex justify-between w-full">
+        <div className="flex justify-between gap-3 w-full">
           <TooltipWrap content="На главную">
             <Button
               variant="outline"
               size="lg"
-              className={baseSize + " rounded-full border-2 border-muted-foreground/30 hover:bg-muted"}
+              className={`${baseSize} flex-1 aspect-square rounded-full border-2 border-muted-foreground/30 p-0 hover:bg-muted`}
               onClick={onHome}
               aria-label="На главную"
             >
-              <Home className="w-6 h-6" />
+              <Home className="w-14 h-14 sm:w-16 sm:h-16" />
             </Button>
           </TooltipWrap>
 
@@ -79,11 +79,11 @@ export function ActionButtons({
               <Button
                 variant="outline"
                 size="lg"
-                className={baseSize + " rounded-full border-2 border-muted-foreground/30 hover:bg-muted"}
+                className={`${baseSize} flex-1 aspect-square rounded-full border-2 border-muted-foreground/30 p-0 hover:bg-muted`}
                 onClick={onExternalLink}
                 aria-label="Страница аниме"
               >
-                <ExternalLink className="w-6 h-6" />
+                <ExternalLink className="w-14 h-14 sm:w-16 sm:h-16" />
               </Button>
             </TooltipWrap>
           )}
@@ -93,11 +93,11 @@ export function ActionButtons({
               <Button
                 variant="outline"
                 size="lg"
-                className={baseSize + " rounded-full border-2 border-muted-foreground/30 hover:bg-muted"}
+                className={`${baseSize} flex-1 aspect-square rounded-full border-2 border-muted-foreground/30 p-0 hover:bg-muted`}
                 onClick={onInfo}
                 aria-label="Описание"
               >
-                <Info className="w-6 h-6" />
+                <Info className="w-14 h-14 sm:w-16 sm:h-16" />
               </Button>
             </TooltipWrap>
           )}
@@ -128,7 +128,7 @@ export function ActionButtons({
           onClick={onHome}
           aria-label="На главную"
         >
-          <Home className="w-6 h-6" />
+          <Home className="w-10 h-10" />
         </Button>
       </TooltipWrap>
     </div>
@@ -153,9 +153,9 @@ export function AddButton({ isTransitioning, isAdding, onAdd }: AddButtonProps) 
         aria-label="В запланированное"
       >
         {isAdding ? (
-          <Loader2 className="w-8 h-8 animate-spin text-green-500" />
+          <Loader2 className="w-10 h-10 animate-spin text-green-500" />
         ) : (
-          <CalendarClock className="w-8 h-8 text-green-500" />
+          <CalendarClock className="w-10 h-10 text-green-500" />
         )}
       </Button>
     </TooltipWrap>
@@ -176,7 +176,7 @@ export function ExternalLinkButton({ onClick }: ExternalLinkButtonProps) {
         onClick={onClick}
         aria-label="Открыть страницу аниме"
       >
-        <ExternalLink className="w-6 h-6" />
+        <ExternalLink className="w-8 h-8" />
       </Button>
     </TooltipWrap>
   );
