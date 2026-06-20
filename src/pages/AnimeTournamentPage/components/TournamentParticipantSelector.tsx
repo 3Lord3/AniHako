@@ -23,18 +23,16 @@ export function TournamentParticipantSelector({
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
 
   const debouncedSearch = useDebounce(searchQuery, 300);
+  const minQueryLength = 3;
+  const isQueryLongEnough = debouncedSearch.trim().length >= minQueryLength;
 
-  // Search for anime in global catalog
-  const { data: searchResults, isLoading: isSearching } = useAnimeList({
-    search: debouncedSearch,
-    limit: 10,
-  });
+  const { data: searchResults, isLoading: isSearching } = useAnimeList(
+    { search: debouncedSearch, limit: 10 },
+    { enabled: isQueryLongEnough }
+  );
 
-  // Filter out already selected or completed anime
   const availableResults = (searchResults?.data || []).filter(
-    (anime) =>
-      !selectedAnime.some((a) => a.anime_id === anime.id) &&
-      !completedAnime.some((a) => a.anime_id === anime.id)
+    (anime) => !selectedAnime.some((a) => a.anime_id === anime.anime_id)
   );
 
   const handleAddAllCompleted = () => {
@@ -46,15 +44,21 @@ export function TournamentParticipantSelector({
     setShowDropdown(false);
   };
 
-  const handleAddFromSearch = (anime: { id: number; title: string; poster?: { medium?: string; small?: string }; anime_url?: string; rating?: { average?: number }; type?: { name: string; value: number; shortname: string; alias: string } }) => {
+  const handleAddFromSearch = (anime: { anime_id: number; title: string; year?: number; poster?: { small?: string; medium?: string; big?: string; huge?: string; fullsize?: string; mega?: string }; anime_url?: string; rating?: { average?: number }; type?: { name: string; value: number; shortname: string; alias: string } }) => {
+    const emptyPoster = { small: '', medium: '', big: '', huge: '', fullsize: '', mega: '' };
+    const poster = anime.poster
+      ? { ...emptyPoster, ...anime.poster }
+      : emptyPoster;
     const rate: YummyUserAnimeRate = {
-      anime_id: anime.id,
-      anime_url: anime.anime_url || String(anime.id),
+      anime_id: anime.anime_id,
+      anime_url: anime.anime_url || String(anime.anime_id),
       title: anime.title,
-      poster: anime.poster || { small: '', medium: '', big: '', huge: '', fullsize: '', mega: '' },
+      poster,
       rating: anime.rating?.average || 0,
       type: anime.type || { name: '', value: 0, shortname: '', alias: '' },
+      year: anime.year,
       user: undefined,
+      date: Date.now(),
     };
     onSelectionChange([...selectedAnime, rate]);
     setSearchQuery('');
@@ -82,7 +86,6 @@ export function TournamentParticipantSelector({
 
   return (
     <div className="w-full space-y-4">
-      {/* Search Section */}
       <div className="relative">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -107,9 +110,8 @@ export function TournamentParticipantSelector({
           )}
         </div>
 
-        {/* Dropdown */}
         {showDropdown && (
-          <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border rounded-lg shadow-lg overflow-hidden max-h-48 sm:max-h-64 overflow-y-auto">
+          <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border-border rounded-lg shadow-lg overflow-hidden max-h-48 sm:max-h-64 overflow-y-auto">
             {isSearching ? (
               <div className="flex items-center justify-center py-4 text-muted-foreground">
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -118,7 +120,7 @@ export function TournamentParticipantSelector({
             ) : availableResults.length > 0 ? (
               <ul className="py-1">
                 {availableResults.map((anime, index) => (
-                  <li key={anime.id}>
+                  <li key={anime.anime_id}>
                     <button
                       onClick={() => handleAddFromSearch(anime)}
                       className={cn(
@@ -136,7 +138,7 @@ export function TournamentParticipantSelector({
                           {anime.title}
                         </p>
                         <p className="text-xs text-muted-foreground truncate">
-                          {anime.year || '—'} • {anime.genres?.slice(0, 2).map((g) => g.title).join(', ') || '—'}
+                          {anime.year || '—'} • {anime.genres?.slice(0, 2).map((g: { title: string }) => g.title).join(', ') || '—'}
                         </p>
                       </div>
                       <Plus className="w-4 h-4 text-muted-foreground flex-shrink-0" />
@@ -144,6 +146,10 @@ export function TournamentParticipantSelector({
                   </li>
                 ))}
               </ul>
+            ) : searchQuery.trim().length > 0 && searchQuery.trim().length < minQueryLength ? (
+              <div className="py-4 text-center text-sm text-muted-foreground">
+                Введите минимум {minQueryLength} символа
+              </div>
             ) : debouncedSearch ? (
               <div className="py-4 text-center text-sm text-muted-foreground">
                 Ничего не найдено
@@ -157,16 +163,15 @@ export function TournamentParticipantSelector({
         )}
       </div>
 
-      {/* Action buttons */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 w-full">
         <div className="flex flex-wrap items-center gap-2">
           {remaining.length > 0 && (
             <button
               onClick={handleAddAllCompleted}
-              className="inline-flex items-center gap-2 px-3 py-1.5 text-sm border border-input bg-background hover:bg-accent rounded-md transition-colors"
+              className="inline-flex items-center gap-2 px-3 py-1.5 text-sm border border-input bg-background text-foreground hover:bg-accent rounded-md transition-colors"
             >
               <Plus className="w-4 h-4" />
-              Добавить все ({remaining.length})
+              Просмотренные ({remaining.length})
             </button>
           )}
           {selectedAnime.length > 0 && (
@@ -185,7 +190,6 @@ export function TournamentParticipantSelector({
         )}
       </div>
 
-      {/* Selected Anime Grid */}
       {selectedAnime.length > 0 && (
         <div className="grid grid-cols-3 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2 sm:gap-3">
           {selectedAnime.map((anime) => (
@@ -215,7 +219,6 @@ export function TournamentParticipantSelector({
         </div>
       )}
 
-      {/* Empty state */}
       {selectedAnime.length === 0 && completedAnime.length === 0 && (
         <div className="text-center py-8 text-muted-foreground">
           <p className="text-sm">У вас пока нет просмотренных аниме</p>

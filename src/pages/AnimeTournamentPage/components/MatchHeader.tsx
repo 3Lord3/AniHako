@@ -1,5 +1,6 @@
 import { Trophy, Swords, ArrowLeft, Sun, Moon, Monitor } from 'lucide-react';
 import { useTheme } from '@/hooks';
+import { TooltipWrap } from '@/components/ui/tooltip';
 
 interface MatchHeaderProps {
   roundName: string;
@@ -24,6 +25,8 @@ export function MatchHeader({
   const themes = ['light', 'dark', 'system'] as const;
   const themeIcons = { light: Sun, dark: Moon, system: Monitor };
   const ThemeIcon = themeIcons[theme];
+  const themeLabel = `Тема: ${theme === 'light' ? 'Светлая' : theme === 'dark' ? 'Тёмная' : 'Системная'}`;
+  const backLabel = 'Вернуться к турнирной сетке (изменения не сохранятся)';
 
   return (
     <div className="flex items-center justify-between p-2 sm:p-3 md:p-4 border-b border-border bg-card shrink-0">
@@ -51,30 +54,34 @@ export function MatchHeader({
       </div>
 
       {/* Right side actions */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-4">
         {onBackToBracket && (
+          <TooltipWrap content={backLabel}>
+            <button
+              onClick={() => {
+                // Parent should handle showing confirmation dialog
+                onBackToBracket();
+              }}
+              aria-label={backLabel}
+              className="flex items-center gap-1 sm:gap-2 text-muted-foreground hover:text-foreground transition-colors text-xs sm:text-sm"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Назад</span>
+            </button>
+          </TooltipWrap>
+        )}
+        <TooltipWrap content={themeLabel}>
           <button
             onClick={() => {
-              // Parent should handle showing confirmation dialog
-              onBackToBracket();
+              const nextIndex = (themes.indexOf(theme) + 1) % themes.length;
+              setTheme(themes[nextIndex]);
             }}
-            className="flex items-center gap-1 sm:gap-2 text-muted-foreground hover:text-foreground transition-colors text-xs sm:text-sm"
-            title="Вернуться к турнирной сетке (изменения не сохранятся)"
+            aria-label={themeLabel}
+            className="flex items-center justify-center w-8 h-8 rounded-full bg-muted hover:bg-muted/80 transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" />
-            <span>Назад</span>
+            <ThemeIcon className="w-4 h-4 text-foreground" />
           </button>
-        )}
-        <button
-          onClick={() => {
-            const nextIndex = (themes.indexOf(theme) + 1) % themes.length;
-            setTheme(themes[nextIndex]);
-          }}
-          className="flex items-center justify-center w-8 h-8 rounded-full bg-muted hover:bg-muted/80 transition-colors"
-          title={`Тема: ${theme === 'light' ? 'Светлая' : theme === 'dark' ? 'Тёмная' : 'Системная'}`}
-        >
-          <ThemeIcon className="w-4 h-4 text-foreground" />
-        </button>
+        </TooltipWrap>
       </div>
     </div>
   );

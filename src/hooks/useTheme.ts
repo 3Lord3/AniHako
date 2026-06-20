@@ -2,7 +2,7 @@ import { useState, useLayoutEffect, useCallback } from 'react';
 
 export type Theme = 'light' | 'dark' | 'system';
 
-const STORAGE_KEY = 'animehako-theme';
+const STORAGE_KEY = 'anihako-theme';
 
 function getSystemTheme(): 'light' | 'dark' {
   if (typeof window === 'undefined') return 'light';

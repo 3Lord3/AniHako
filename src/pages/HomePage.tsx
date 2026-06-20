@@ -1,328 +1,260 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { useAnimeList, useDebounce, useUserAnimeList, useGenreSearch } from '@/hooks';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
+import useEmblaCarousel from 'embla-carousel-react';
+import { useSchedule, useAnimeList } from '@/hooks';
+import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { AnimeGrid } from '@/components/AnimeGrid';
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from '@/components/ui/dialog';
-import { Search, Filter, Star, Calendar, X } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { TooltipWrap } from '@/components/ui/tooltip';
+import { AnimeTitle } from '@/components/anime/AnimeTitle';
+import { ScheduleRow } from '@/components/anime/ScheduleRow';
+import type { AnimeScheduleItem, AnimeCatalogItem } from '@/types/anime';
+import { getRatingColor } from '@/types/constants';
 
-export function HomePage() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const search = searchParams.get('search') || '';
-  const genres = searchParams.get('genres') || '';
-  const year = searchParams.get('year') || '';
-  const sort = searchParams.get('sort') || '';
-  const minRating = searchParams.get('rating') ? parseFloat(searchParams.get('rating')!) : undefined;
-  const kind = searchParams.get('kind') || '';
+const SEASON_NAMES: Record<string, string> = {
+  winter: 'Зима',
+  spring: 'Весна',
+  summer: 'Лето',
+  autumn: 'Осень',
+};
 
-  const [searchInput, setSearchInput] = useState(search);
-  const isUserTypingRef = useRef(false);
+function getCurrentSeason(): string {
+  const month = new Date().getMonth();
+  if (month >= 0 && month <= 2) return 'winter';
+  if (month >= 3 && month <= 5) return 'spring';
+  if (month >= 6 && month <= 8) return 'summer';
+  return 'autumn';
+}
 
-  // Sync with URL only when navigating (not on user typing)
-  useEffect(() => {
-    if (!isUserTypingRef.current) {
-      setSearchInput(search);
+function formatDayMonth(timestamp: number): string {
+  if (!timestamp) return '';
+  return new Date(timestamp * 1000).toLocaleDateString('ru-RU', {
+    day: 'numeric',
+    month: 'short',
+  });
+}
+
+function groupByDate(items: AnimeScheduleItem[]): Map<string, AnimeScheduleItem[]> {
+  const groups = new Map<string, AnimeScheduleItem[]>();
+  for (const item of items) {
+    const nextDate = item.episodes?.next_date;
+    if (!nextDate) continue;
+    const dateKey = new Date(nextDate * 1000).toDateString();
+    if (!groups.has(dateKey)) {
+      groups.set(dateKey, []);
     }
-  }, [search]);
+    groups.get(dateKey)!.push(item);
+  }
+  return groups;
+}
 
-  useEffect(() => {
-    isUserTypingRef.current = false;
-  }, [searchInput]);
+interface CarouselCardProps {
+  anime: AnimeCatalogItem;
+}
 
-  const clearSearch = () => {
-    setSearchInput('');
-    isUserTypingRef.current = false;
-    const params = new URLSearchParams(searchParams);
-    params.delete('search');
-    setSearchParams(params);
-  };
+function CarouselCard({ anime }: CarouselCardProps) {
+  const displayTitle = anime.title || 'Unknown';
+  const rating = anime.rating?.average ?? null;
+  const isAnnouncement = anime.anime_status?.alias === 'announcement';
+  const validRating = rating !== null && !isNaN(rating) && !isAnnouncement;
 
-  // Debounce search input
-  const debouncedSearch = useDebounce(searchInput, 300);
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  const [genreSearchInput, setGenreSearchInput] = useState('');
-
-  // Update URL when debounced search changes
-  useEffect(() => {
-    if (debouncedSearch !== search) {
-      const params = new URLSearchParams(searchParams);
-      if (debouncedSearch) {
-        params.set('search', debouncedSearch);
-      } else {
-        params.delete('search');
-      }
-      setSearchParams(params);
-    }
-  }, [debouncedSearch, search, searchParams, setSearchParams]);
-
-  // Build query params for YummyAnime API
-  const queryParams = {
-    page: 1,
-    limit: 100,
-    search: search || undefined,
-    genre: genres || undefined,
-    year: year || undefined,
-    order: sort === 'rating' ? 'score' : sort === 'year' ? 'aired_on' : sort || undefined,
-  };
-
-  const { data: animeData, isLoading } = useAnimeList(queryParams);
-  const { data: genresData } = useGenreSearch();
-  const { data: userAnimeList } = useUserAnimeList();
-
-  const updateParams = (key: string, value: string) => {
-    const params = new URLSearchParams(searchParams);
-    if (value) {
-      params.set(key, value);
-    } else {
-      params.delete(key);
-    }
-    setSearchParams(params);
-  };
-
-  const toggleGenre = (genreName: string) => {
-    const currentGenres = genres ? genres.split(',') : [];
-    const newGenres = currentGenres.includes(genreName)
-      ? currentGenres.filter((g) => g !== genreName)
-      : [...currentGenres, genreName];
-    updateParams('genres', newGenres.join(','));
-  };
-
-  const toggleYear = (yearValue: string) => {
-    const currentYears = year ? year.split(',') : [];
-    const newYears = currentYears.includes(yearValue)
-      ? currentYears.filter((y) => y !== yearValue)
-      : [...currentYears, yearValue];
-    updateParams('year', newYears.join(','));
-  };
-
-  // Filter genres by search
-  const filteredGenres = useMemo(() => {
-    if (!genresData?.genres) return [];
-    if (!genreSearchInput) return genresData.genres;
-    const searchLower = genreSearchInput.toLowerCase();
-    return genresData.genres.filter((genre) => 
-      genre.title.toLowerCase().includes(searchLower)
-    );
-  }, [genresData, genreSearchInput]);
-
-  // Get years range (2010-2025)
-  const allYears = ['2025', '2024', '2023', '2022', '2021', '2020', '2019', '2018', '2017', '2016', '2015', '2014', '2013', '2012', '2011', '2010'];
-
-  // Rating filter options
-  const ratingOptions = [9, 8, 7, 6];
-
-  // Clear all filters (only filters, not search)
-  const clearFiltersOnly = () => {
-    const params = new URLSearchParams(searchParams);
-    params.delete('genres');
-    params.delete('year');
-    params.delete('rating');
-    params.delete('sort');
-    params.delete('kind');
-    setSearchParams(params);
-  };
-
-  const hasActiveFilters = genres || year || minRating || sort || kind;
+  const url = anime.anime_url?.startsWith('/anime/')
+    ? anime.anime_url
+    : `/anime/${anime.anime_url || anime.anime_id}`;
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-4">
-        {/* Search row */}
-        <div className="flex gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Поиск аниме..."
-              value={searchInput}
-              onChange={(e) => {
-                isUserTypingRef.current = true;
-                setSearchInput(e.target.value);
-              }}
-              className="pl-10 pr-10"
-            />
-            {searchInput && (
-              <button
-                onClick={clearSearch}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            )}
-          </div>
-          <Dialog open={filtersOpen} onOpenChange={setFiltersOpen}>
-            <Button
-              variant="outline"
-              className="relative cursor-pointer text-foreground"
-              onClick={() => setFiltersOpen(true)}
-            >
-              <Filter className="w-4 h-4 mr-2" />
-              Фильтры
-              {hasActiveFilters && (
-                <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full" />
-              )}
-            </Button>
-            <DialogContent 
-              className="w-[95vw] max-w-3xl max-h-[85vh] overflow-y-auto"
-              style={{ maxWidth: '42rem' }}
-              showCloseButton={false}
-            >
-              <div className="flex justify-between items-center">
-                <DialogTitle className="text-lg font-semibold">Фильтры</DialogTitle>
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  className="cursor-pointer"
-                  onClick={() => setFiltersOpen(false)}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
-              </div>
-
-              <div className="space-y-6">
-                {/* Rating filter */}
-                <div className="space-y-2">
-                  <h4 className="font-medium text-sm">Минимальный рейтинг</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {ratingOptions.map((r) => (
-                      <Badge
-                        key={r}
-                        variant={minRating === r ? 'default' : 'secondary'}
-                        className="cursor-pointer"
-                        onClick={() => updateParams('rating', minRating === r ? '' : String(r))}
-                      >
-                        <Star className="w-3 h-3 mr-1" />
-                        {r}+
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Year filter */}
-                <div className="space-y-2">
-                  <h4 className="font-medium text-sm">Год выпуска</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {allYears.map((y) => (
-                      <Badge
-                        key={y}
-                        variant={year.split(',').includes(y) ? 'default' : 'secondary'}
-                        className="cursor-pointer"
-                        onClick={() => toggleYear(y)}
-                      >
-                        {y}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Genres filter with search */}
-                <div className="space-y-2">
-                  <h4 className="font-medium text-sm">Жанры</h4>
-                  <Input
-                    placeholder="Поиск жанров..."
-                    value={genreSearchInput}
-                    onChange={(e) => setGenreSearchInput(e.target.value)}
-                    className="mb-2"
-                  />
-                  <div className="flex flex-wrap gap-2 max-h-40 overflow-y-auto">
-                    {filteredGenres.map((genre) => (
-                      <Badge
-                        key={genre.value}
-                        variant={genres.split(',').includes(genre.href) ? 'default' : 'secondary'}
-                        className="cursor-pointer"
-                        onClick={() => toggleGenre(genre.href)}
-                      >
-                        {genre.title}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Clear and apply buttons */}
-                <div className="flex gap-2 pt-4 justify-end">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="cursor-pointer"
-                    onClick={clearFiltersOnly}
-                  >
-                    Очистить
-                  </Button>
-                  <Button
-                    size="sm"
-                    className="cursor-pointer"
-                    onClick={() => setFiltersOpen(false)}
-                  >
-                    Применить
-                  </Button>
-                </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+    <Link to={url} className="group block flex-shrink-0 w-[160px]">
+      <div className="aspect-[3/4] relative overflow-hidden rounded-lg">
+        <img
+          src={anime.poster?.huge || anime.poster?.big || anime.poster?.medium}
+          alt={displayTitle}
+          className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
+          loading="lazy"
+        />
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3 pt-12">
+          <AnimeTitle title={displayTitle} className="font-semibold text-sm text-white" />
         </div>
+        {validRating && (
+          <TooltipWrap content={`Рейтинг: ${rating.toFixed(1)}`}>
+            <div
+              aria-label={`Рейтинг: ${rating.toFixed(1)}`}
+              className={cn(
+                'absolute top-2 right-2 h-8 px-1.5 rounded flex items-center gap-0.5',
+                getRatingColor(rating)
+              )}
+            >
+              <Star className="w-4 h-4 fill-white text-white" />
+              <span className="text-sm font-bold text-white">
+                {rating.toFixed(1)}
+              </span>
+            </div>
+          </TooltipWrap>
+        )}
+      </div>
+    </Link>
+  );
+}
 
-        {/* Quick filters row */}
-        <div className="flex gap-2 flex-wrap items-center">
-          <Button
-            variant={sort === 'rating' ? 'default' : 'outline'}
-            size="sm"
-            className="cursor-pointer text-foreground"
-            onClick={() => updateParams('sort', sort === 'rating' ? '' : 'rating')}
-          >
-            <Star className="w-4 h-4 mr-1" />
-            По рейтингу
-          </Button>
-          <Button
-            variant={sort === 'year' ? 'default' : 'outline'}
-            size="sm"
-            className="cursor-pointer text-foreground"
-            onClick={() => updateParams('sort', sort === 'year' ? '' : 'year')}
-          >
-            <Calendar className="w-4 h-4 mr-1" />
-            По году
-          </Button>
+function AnimeCarousel({ anime }: { anime: AnimeCatalogItem[] }) {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ loop: false, align: 'start' });
 
-          {/* Active filters badges */}
-          {year && (
-            <Button variant="secondary" size="sm" onClick={() => updateParams('year', '')}>
-              Год: {year.split(',').length > 1 ? `${year.split(',').length} годов` : year}
-              <X className="w-3 h-3 ml-1" />
-            </Button>
-          )}
-          {minRating && (
-            <Button variant="secondary" size="sm" onClick={() => updateParams('rating', '')}>
-              Рейтинг: {minRating}+
-              <X className="w-3 h-3 ml-1" />
-            </Button>
-          )}
-          {genres && (
-            <Button variant="secondary" size="sm" onClick={() => updateParams('genres', '')}>
-              Жанры: {genres.split(',').length}
-              <X className="w-3 h-3 ml-1" />
-            </Button>
-          )}
-          {hasActiveFilters && (
-            <Button variant="secondary" size="sm" onClick={clearFiltersOnly}>
-              Очистить фильтры
-            </Button>
-          )}
+  const scrollPrev = () => {
+    if (emblaApi) emblaApi.scrollPrev();
+  };
+
+  const scrollNext = () => {
+    if (emblaApi) emblaApi.scrollNext();
+  };
+
+  if (!anime.length) return null;
+
+  return (
+    <div className="relative">
+      <div className="overflow-hidden" ref={emblaRef}>
+        <div className="flex gap-4">
+          {anime.map((item) => (
+            <CarouselCard key={item.anime_id} anime={item} />
+          ))}
         </div>
       </div>
+      <Button
+        variant="outline"
+        size="icon"
+        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 cursor-pointer hidden md:flex"
+        onClick={scrollPrev}
+      >
+        <ChevronLeft className="w-4 h-4" />
+      </Button>
+      <Button
+        variant="outline"
+        size="icon"
+        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 cursor-pointer hidden md:flex"
+        onClick={scrollNext}
+      >
+        <ChevronRight className="w-4 h-4" />
+      </Button>
+    </div>
+  );
+}
 
-      {isLoading ? (
-        <AnimeGrid anime={[]} isLoading={true} />
-      ) : animeData?.data.length === 0 ? (
-        <div className="text-center py-12 text-muted-foreground">
-          Аниме не найдены
-        </div>
-      ) : (
-        <AnimeGrid anime={animeData?.data || []} userAnimeList={userAnimeList} />
-      )}
+export function HomePage() {
+  const currentYear = new Date().getFullYear();
+  const currentSeason = getCurrentSeason();
+  const seasonName = SEASON_NAMES[currentSeason];
+
+  const [selectedDateKey, setSelectedDateKey] = useState<string | null>(new Date().toDateString());
+
+  const { data: scheduleData, isLoading: scheduleLoading } = useSchedule();
+  const { data: seasonalData, isLoading: seasonalLoading } = useAnimeList({
+    season: currentSeason,
+    status: ['released', 'ongoing'],
+    from_year: currentYear,
+    sort_forward: true,
+    offset: 0,
+    limit: 20,
+  });
+
+  const dateGroups = scheduleData ? groupByDate(scheduleData) : new Map();
+  const sortedDates = Array.from(dateGroups.keys()).sort(
+    (a, b) => new Date(a).getTime() - new Date(b).getTime()
+  );
+
+  const displayItems: AnimeScheduleItem[] = selectedDateKey
+    ? dateGroups.get(selectedDateKey) || []
+    : scheduleData || [];
+
+  return (
+    <div className="space-y-10">
+      <section>
+        <h2 className="text-2xl font-bold text-foreground mb-6">
+          {seasonName} {currentYear}
+        </h2>
+        {seasonalLoading ? (
+          <div className="flex gap-4">
+            {Array.from({ length: 6 }).map((_, i) => (
+              <Skeleton key={i} className="flex-shrink-0 w-[160px] aspect-[3/4] rounded-lg" />
+            ))}
+          </div>
+        ) : !seasonalData?.data?.length ? (
+          <div className="text-center py-8 text-muted-foreground">Нет аниме</div>
+        ) : (
+          <AnimeCarousel anime={seasonalData.data} />
+        )}
+      </section>
+
+      <section>
+        <h2 className="text-2xl font-bold text-foreground mb-6">Расписание онгоингов</h2>
+        {scheduleLoading ? (
+          <div className="space-y-4">
+            <div className="flex gap-2 overflow-hidden pb-2">
+              {Array.from({ length: 16 }).map((_, i) => (
+                <Skeleton key={i} className="h-8 w-16 rounded-md shrink-0" />
+              ))}
+            </div>
+            <div className="border border-border rounded-lg p-4">
+              <div className="flex gap-4 mb-4">
+                <Skeleton className="h-4 w-32" />
+                <Skeleton className="h-4 w-20 hidden sm:block" />
+                <Skeleton className="h-4 w-24 hidden md:block" />
+                <Skeleton className="h-4 w-20 hidden lg:block" />
+              </div>
+              {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="flex gap-4 items-center py-3 border-b border-border last:border-0">
+                  <Skeleton className="w-10 h-14 rounded" />
+                  <Skeleton className="h-4 w-40 flex-1" />
+                  <Skeleton className="h-4 w-16 hidden sm:block" />
+                  <Skeleton className="h-4 w-20 hidden md:block" />
+                  <Skeleton className="h-4 w-20 hidden lg:block" />
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : !scheduleData?.length ? (
+          <div className="text-center py-8 text-muted-foreground">Нет данных</div>
+        ) : (
+          <>
+            <div className="flex gap-2 mb-6 overflow-x-auto px-1 pt-1 pb-2">
+              {sortedDates.map((dateKey) => {
+                const date = new Date(dateKey);
+                const isToday = dateKey === new Date().toDateString();
+                return (
+                  <Button
+                    key={dateKey}
+                    variant={selectedDateKey === dateKey ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => setSelectedDateKey(dateKey)}
+                    className={cn(
+                      'cursor-pointer shrink-0',
+                      isToday && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
+                    )}
+                  >
+                    {formatDayMonth(date.getTime() / 1000)}
+                  </Button>
+                );
+              })}
+            </div>
+
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">Название</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground hidden sm:table-cell">Эпизоды</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground hidden md:table-cell">Предыдущий</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground hidden lg:table-cell">Следующий</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {displayItems.map((item) => (
+                    <ScheduleRow key={item.anime_id} item={item} />
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+      </section>
     </div>
   );
 }

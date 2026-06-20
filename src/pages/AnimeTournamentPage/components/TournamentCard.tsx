@@ -1,5 +1,7 @@
 import { Star, Calendar, Film } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { AnimeTitle } from '@/components/anime/AnimeTitle';
+import { AnimatePresence, motion } from 'framer-motion';
 import type { AnimeCatalogItem } from '@/types';
 import { getImageUrl, getHeroPosterUrl } from '@/lib/imageUrl';
 import { cn } from '@/lib/utils';
@@ -8,6 +10,7 @@ interface TournamentCardProps {
   anime: AnimeCatalogItem;
   isWinner?: boolean;
   isEliminated?: boolean;
+  isSelected?: boolean;
   onClick?: () => void;
   showDetails?: boolean;
   compact?: boolean;
@@ -18,6 +21,7 @@ export function TournamentCard({
   anime,
   isWinner = false,
   isEliminated = false,
+  isSelected = false,
   onClick,
   showDetails = true,
   compact = false,
@@ -34,8 +38,9 @@ export function TournamentCard({
         "group relative overflow-hidden rounded-xl transition-all duration-300 bg-card",
         onClick && !isEliminated && "cursor-pointer hover:scale-[1.02] hover:shadow-2xl",
         isWinner && "ring-4 ring-yellow-400 ring-offset-2 ring-offset-background",
+        isSelected && !isWinner && "relative z-20",
         isEliminated && "opacity-50 grayscale",
-        compact ? "w-3/5 sm:w-4/5 lg:w-3/4 aspect-[2/3] max-h-full" : "aspect-[2/3]",
+        compact ? "w-[58%] sm:w-4/5 lg:w-3/4 aspect-[2/3] max-h-full" : "aspect-[2/3]",
         className
       )}
     >
@@ -51,11 +56,9 @@ export function TournamentCard({
             <Film className={cn("text-muted-foreground", compact ? "w-16 h-16 sm:w-24 sm:h-24" : "w-20 h-20")} />
           </div>
         )}
-        
-        {/* Gradient overlay */}
+
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-        
-        {/* Winner badge */}
+
         {isWinner && (
           <div className="absolute top-3 left-3 sm:top-4 sm:left-4 z-20">
             <Badge className={cn(
@@ -66,17 +69,15 @@ export function TournamentCard({
             </Badge>
           </div>
         )}
-        
-        {/* Genres in top-right corner */}
+
         {showDetails && anime.genres && anime.genres.length > 0 && (
-          <div className="absolute top-3 right-3 sm:top-4 sm:right-4 flex flex-wrap gap-1 z-10 max-w-[60%] justify-end">
+          <div className="absolute top-3 left-3 sm:top-4 sm:right-4 sm:left-auto right-3 flex flex-wrap gap-1 z-10 w-[calc(100%-1.5rem)] sm:w-auto sm:max-w-[60%] justify-start sm:justify-end">
             {anime.genres.slice(0, 2).map((g) => (
               <Badge
                 key={g.id}
-                variant="secondary"
                 className={cn(
-                  "text-muted-foreground border-0",
-                  compact ? "text-xs sm:text-sm px-2 py-1 bg-black/60" : "text-xs px-2 py-0.5 bg-black/60"
+                  "text-white font-semibold border-0 backdrop-blur-sm",
+                  compact ? "text-xs sm:text-sm px-2 py-1 bg-black/70" : "text-xs sm:text-sm px-2.5 py-1 bg-black/70"
                 )}
               >
                 {g.title}
@@ -84,13 +85,15 @@ export function TournamentCard({
             ))}
           </div>
         )}
-        
-        {/* Title and info at bottom */}
+
         <div className={cn("absolute bottom-0 left-0 right-0 text-white", compact ? "p-3 sm:p-4 md:p-6" : "p-4")}>
-          <h3 className={cn(
-            "font-bold line-clamp-2",
-            compact ? "text-sm sm:text-base md:text-lg" : "text-lg mb-1"
-          )}>{anime.title}</h3>
+          <AnimeTitle
+            title={anime.title}
+            className={cn(
+              "font-bold",
+              compact ? "text-sm sm:text-base md:text-lg" : "text-lg mb-1"
+            )}
+          />
 
           {showDetails && (
             <div className={cn("flex items-center gap-2 sm:gap-3", compact ? "text-xs sm:text-sm md:text-base" : "text-sm")}>
@@ -100,19 +103,33 @@ export function TournamentCard({
                   <span className="font-medium">{rating.toFixed(1)}</span>
                 </div>
               )}
-              {anime.year && (
+              {anime.year ? (
                 <div className="flex items-center gap-0.5 sm:gap-1">
                   <Calendar className={compact ? "w-3 h-3 sm:w-4 sm:h-4" : "w-4 h-4"} />
                   <span>{anime.year}</span>
                 </div>
-              )}
+              ) : null}
             </div>
           )}
         </div>
       </div>
 
-      {/* Click indicator */}
-      {onClick && !isEliminated && (
+      <AnimatePresence>
+        {isSelected && !isWinner && (
+          <motion.div
+            key="selection"
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.96 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+            className="absolute inset-0 bg-green-500/30 rounded-xl z-20 flex items-center justify-center"
+          >
+            <span className="text-white font-bold text-2xl sm:text-4xl drop-shadow-lg">✓</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {onClick && !isEliminated && !isSelected && (
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
           <div className={cn(
             "bg-white/90 text-black rounded-full font-semibold",

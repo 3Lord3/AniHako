@@ -1,120 +1,43 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { animeApi, userListApi, reviewsApi } from '@/lib/api';
+import { animeApi, userListApi } from '@/lib/api';
 import { useUser } from './useAuth';
 import type { UserAnimeUpdate, AnimeStatus } from '@/types';
 import { mapStatusToListId } from '@/types';
+import { normalizeAnimeResponse, formatAnimeListResponse } from '@/lib/animeNormalizer';
+import type { YummyUserAnimeRate } from '@/types/list';
 
 // =============================================================================
 // ANIME LIST / CATALOG
 // =============================================================================
 
-export function useAnimeList(params?: {
-  page?: number;
-  limit?: number;
-  search?: string;
-  genre?: string | string[];
-  year?: string;
-  min_rating?: number;
-  kind?: string;
-  status?: string;
-  order?: string;
-  mylist?: string;
-}) {
+export function useAnimeList(
+  params?: {
+    page?: number;
+    limit?: number;
+    q?: string;
+    search?: string;
+    genres?: string | string[];
+    from_year?: number;
+    to_year?: number;
+    min_rating?: number;
+    sort_forward?: boolean;
+    kind?: string;
+    status?: string | string[];
+    order?: string;
+    mylist?: string;
+    season?: string;
+    offset?: number;
+  },
+  options?: { enabled?: boolean }
+) {
   return useQuery({
     queryKey: ['anime', 'catalog', params],
     queryFn: async () => {
       const response = await animeApi.getCatalog(params);
-      
-      let animeArray: any[] = [];
-      
-      // Check if response is an object with numeric keys (new API format)
-      if (response && typeof response === 'object' && !Array.isArray(response)) {
-        const keys = Object.keys(response);
-        // Check if keys are numeric (0, 1, 2...)
-        if (keys.length > 0 && keys.every(k => !isNaN(Number(k)))) {
-          animeArray = Object.values(response);
-        }
-      } else if (response && response.data && Array.isArray(response.data.response)) {
-        animeArray = response.data.response;
-      } else if (Array.isArray(response)) {
-        animeArray = response;
-      }
-      
-      // Normalize anime items for backward compatibility
-      const normalizedData = (animeArray || [])
-        .filter((item): item is NonNullable<typeof item> => item != null)
-        .map((item: any) => {
-        // Get ID - API uses 'anime_id'
-        const id = item.anime_id;
-        
-        // Extract poster URL - API returns object with different sizes
-        let posterUrl = null;
-        if (item.poster) {
-          if (typeof item.poster === 'string') {
-            posterUrl = item.poster;
-          } else if (item.poster.huge) {
-            posterUrl = item.poster.huge;
-          } else if (item.poster.mega) {
-            posterUrl = item.poster.mega;
-          } else if (item.poster.big) {
-            posterUrl = item.poster.big;
-          } else if (item.poster.medium) {
-            posterUrl = item.poster.medium;
-          } else if (item.poster.small) {
-            posterUrl = item.poster.small;
-          }
-        }
-        
-        // Extract score/rating - API uses rating.average
-        let scoreStr = null;
-        if (item.rating?.average != null) {
-          const avg = item.rating.average;
-          scoreStr = avg != null ? String(avg.toFixed(2)) : null;
-        }
-        
-        // Extract kind/type - API uses type.alias (tv, movie, ova, etc.)
-        const kind = item.type?.alias ?? null;
-        
-        // Extract status - API uses anime_status.title
-        const status = item.anime_status?.title || null;
-        
-        // Extract year
-        const year = item.year || null;
-        
-        // Extract description
-        const description = item.description || null;
-        
-        return {
-          id: id,
-          name: item.title || '',
-          russian: item.title || null,
-          poster: posterUrl,
-          cover: null, // API doesn't provide separate cover field
-          url: item.anime_url || String(id),
-          kind: kind,
-          score: scoreStr,
-          status: status,
-          episodes: item.episodes || null,
-          episodes_aired: item.episodes_aired || null,
-          aired_on: item.aired_on || null,
-          released_on: item.released_on || null,
-          // Additional fields
-          title: item.title,
-          description: description,
-          duration: item.duration,
-          rating: item.rating,
-          genres: item.genres,
-          year: year,
-        };
-      });
-      
-      return {
-        data: normalizedData,
-        page: 1,
-        total_pages: 1,
-        total: normalizedData.length,
-      };
+      const normalizedData = normalizeAnimeResponse(response);
+      return formatAnimeListResponse(normalizedData);
     },
+    enabled: options?.enabled ?? true,
   });
 }
 
@@ -128,85 +51,8 @@ export function useAnimeSearch(query: string, limit: number = 30) {
     queryFn: async () => {
       if (!query.trim()) return [];
       const response = await animeApi.search(query, limit);
-
-      let animeArray: any[] = [];
-
-      // Handle object response with 'response' key (YummyAnime API format)
-      if (response && typeof response === 'object' && !Array.isArray(response)) {
-        if ('response' in response && Array.isArray((response as any).response)) {
-          animeArray = (response as any).response;
-        } else {
-          const keys = Object.keys(response);
-          if (keys.length > 0 && keys.every(k => !isNaN(Number(k)))) {
-            animeArray = Object.values(response);
-          }
-        }
-      } else if (Array.isArray(response)) {
-        animeArray = response;
-      }
-
-      const normalizedData = (animeArray || [])
-        .filter((item): item is NonNullable<typeof item> => item != null)
-        .map((item: any) => {
-          const id = item.anime_id;
-
-          let posterUrl = null;
-          if (item.poster) {
-            if (typeof item.poster === 'string') {
-              posterUrl = item.poster;
-            } else if (item.poster.huge) {
-              posterUrl = item.poster.huge;
-            } else if (item.poster.mega) {
-              posterUrl = item.poster.mega;
-            } else if (item.poster.big) {
-              posterUrl = item.poster.big;
-            } else if (item.poster.medium) {
-              posterUrl = item.poster.medium;
-            } else if (item.poster.small) {
-              posterUrl = item.poster.small;
-            }
-          }
-
-          let scoreStr = null;
-          if (item.rating?.average != null) {
-            const avg = item.rating.average;
-            scoreStr = avg != null ? String(avg.toFixed(2)) : null;
-          }
-
-          const kind = item.type?.alias ?? null;
-          const status = item.anime_status?.title || null;
-          const year = item.year || null;
-          const description = item.description || null;
-
-          return {
-            id: id,
-            name: item.title || '',
-            russian: item.title || null,
-            poster: posterUrl,
-            cover: null,
-            url: item.anime_url || String(id),
-            kind: kind,
-            score: scoreStr,
-            status: status,
-            episodes: item.episodes || null,
-            episodes_aired: item.episodes_aired || null,
-            aired_on: item.aired_on || null,
-            released_on: item.released_on || null,
-            title: item.title,
-            description: description,
-            duration: item.duration,
-            rating: item.rating,
-            genres: item.genres,
-            year: year,
-          };
-        });
-
-      return {
-        data: normalizedData,
-        page: 1,
-        total_pages: 1,
-        total: normalizedData.length,
-      };
+      const normalizedData = normalizeAnimeResponse(response);
+      return formatAnimeListResponse(normalizedData);
     },
     enabled: !!query.trim(),
   });
@@ -222,7 +68,6 @@ export function useAnimeDetail(idOrUrl: string | number) {
     queryFn: async () => {
       const response = await animeApi.getByUrl(String(idOrUrl));
       
-      // Handle object response with numeric keys (new API format)
       if (response && typeof response === 'object' && !Array.isArray(response)) {
         const keys = Object.keys(response);
         if (keys.length === 1 && !isNaN(Number(keys[0]))) {
@@ -269,21 +114,6 @@ export function useAnimeScreenshots(id: number) {
 }
 
 // =============================================================================
-// ANIME REVIEWS
-// =============================================================================
-
-export function useAnimeReviews(id: number, limit?: number, offset?: number) {
-  return useQuery({
-    queryKey: ['anime', 'reviews', id, limit, offset],
-    queryFn: async () => {
-      const { data } = await reviewsApi.getByAnimeId(id, limit, offset);
-      return data;
-    },
-    enabled: !!id,
-  });
-}
-
-// =============================================================================
 // GENRES
 // =============================================================================
 
@@ -291,8 +121,8 @@ export function useGenres() {
   return useQuery({
     queryKey: ['genres'],
     queryFn: async () => {
-      const { data } = await animeApi.getGenres();
-      return data;
+      const result = await animeApi.getGenres();
+      return result;
     },
   });
 }
@@ -320,28 +150,22 @@ export function useUserAnimeList(status?: AnimeStatus, favorites?: boolean) {
       if (!user) return [];
       
       try {
-        // If status is provided, use specific list endpoint
         if (status) {
           const listId = mapStatusToListId(status);
-          const { data } = await userListApi.getUserList(user.id, listId);
-          const rates = data.response || [];
+          const rates = await userListApi.getUserList(user.id, listId) || [];
           return favorites 
             ? rates.filter((rate: YummyUserAnimeRate) => rate.user?.list?.is_fav === true)
             : rates;
         }
         
-        // Otherwise get all lists and combine
-        const { data } = await userListApi.getUserLists(user.id);
-        const rates = data.response || [];
+        const rates = await userListApi.getUserLists(user.id) || [];
         
         if (favorites) {
-          // Filter anime that have is_fav = true (YummyAnime API)
           return rates.filter((rate: YummyUserAnimeRate) => rate.user?.list?.is_fav === true);
         }
         
         return rates;
       } catch (error: unknown) {
-        // Return empty array on auth errors to prevent redirect on public pages
         if (error && typeof error === 'object' && 'response' in error) {
           const err = error as { response?: { status?: number } };
           if (err.response?.status === 401) {
@@ -445,6 +269,20 @@ export function useToggleFavorite() {
 }
 
 // =============================================================================
+// SCHEDULE
+// =============================================================================
+
+export function useSchedule() {
+  return useQuery({
+    queryKey: ['anime', 'schedule'],
+    queryFn: async () => {
+      const response = await animeApi.getSchedule();
+      return response || [];
+    },
+  });
+}
+
+// =============================================================================
 // FAVORITES
 // =============================================================================
 
@@ -457,9 +295,8 @@ export function useFavorites() {
       if (!user) return [];
       
       try {
-        // Get all lists and filter favorites
-        const { data } = await userListApi.getUserLists(user.id);
-        return data.filter((rate: YummyUserAnimeRate) => rate.user?.list?.is_fav === true);
+        const rates = await userListApi.getUserLists(user.id);
+        return (rates || []).filter((rate: YummyUserAnimeRate) => rate.user?.list?.is_fav === true);
       } catch (error: unknown) {
         if (error && typeof error === 'object' && 'response' in error) {
           const err = error as { response?: { status?: number } };
