@@ -23,13 +23,13 @@ export function ActionButtons({
   onInfo,
   variant = 'desktop',
 }: ActionButtonsProps) {
-  const baseSize = variant === 'desktop' ? 'h-16 w-16' : 'h-14 w-14';
-  const iconSkipSize = variant === 'desktop' ? 'w-8 h-8' : 'w-6 h-6';
+  const baseSize = 'h-16 w-16';
+  const iconSkipSize = variant === 'desktop' ? 'w-8 h-8' : 'w-7 h-7';
 
   if (variant === 'mobile') {
     return (
-      <div className="flex flex-col items-center gap-4 pb-4">
-        <div className="flex justify-center gap-8">
+      <div className="flex flex-col items-center gap-5 pt-3 pb-4 w-full max-w-[360px] mx-auto px-2">
+        <div className="flex justify-between w-full">
           <TooltipWrap content="Пропустить">
             <Button
               variant="outline"
@@ -61,7 +61,7 @@ export function ActionButtons({
           </TooltipWrap>
         </div>
 
-        <div className="flex justify-center gap-4">
+        <div className="flex justify-between w-full">
           <TooltipWrap content="На главную">
             <Button
               variant="outline"

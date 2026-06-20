@@ -96,7 +96,7 @@ export function AnimeMatcherPage() {
         </p>
       </div>
 
-      <div className="md:hidden text-center">
+      <div className="md:hidden text-center mb-3">
         <p className="text-sm text-muted-foreground select-text">
           Свайпайте влево чтобы пропустить, вправо чтобы добавить в запланированное
         </p>
@@ -139,7 +139,7 @@ export function AnimeMatcherPage() {
 
       {/* Mobile layout */}
       <div className="md:hidden flex flex-col h-[calc(100vh-150px)]">
-        <div className="relative flex-grow flex items-center justify-center">
+        <div className="relative flex-grow flex items-center justify-center py-2">
           {currentAnime && (
             <SwipeCard
               key={currentAnime.anime_id}
