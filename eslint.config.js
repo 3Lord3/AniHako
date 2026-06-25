@@ -20,10 +20,10 @@ export default defineConfig([
       globals: globals.browser,
     },
     rules: {
-      // Allow setState in useLayoutEffect for theme synchronization
       'react-hooks/set-state-in-effect': 'off',
-      // Allow exporting cva variants from component files for backward compatibility
       'react-refresh/only-export-components': 'off',
+      '@typescript-eslint/no-explicit-any': 'error',
+      '@typescript-eslint/no-non-null-assertion': 'warn',
     },
   },
 ])

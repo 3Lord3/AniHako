@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
-import { Avatar, AvatarImage, AvatarFallback, AvatarBadge, AvatarGroup, AvatarGroupCount } from '@/components/ui/avatar';
+import { Avatar, AvatarBadge, AvatarGroup, AvatarGroupCount } from '@/components/ui/avatar';
 
 describe('Avatar', () => {
   it('renders avatar container', () => {

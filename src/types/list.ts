@@ -1,7 +1,32 @@
 import type { AnimeCatalogItem } from './anime';
 
-export type YummyAnimeListId = 0 | 1 | 2 | 3 | 4 | 5;
-export type AnimeStatus = 'watching' | 'completed' | 'dropped' | 'planned' | 'paused' | 'favourite';
+/**
+ * ID списка YummyAnime API:
+ *   0 = watching (Смотрю)
+ *   1 = planned  (В планах)
+ *   2 = completed (Просмотрено)
+ *   3 = dropped  (Брошено)
+ *   5 = paused   (Отложено)
+ *
+ * `4` (favourite) — НЕ существует как отдельный список, фильтрация
+ * выполняется через `user.list.is_fav` (см. `getUserLists` + `is_fav`).
+ */
+export type YummyAnimeListId = 0 | 1 | 2 | 3 | 5;
+
+export type ListStatus = 'watching' | 'planned' | 'completed' | 'paused' | 'dropped';
+
+/**
+ * UI-only статус "Любимое" — никогда не отправляется в API напрямую.
+ */
+export type AnimeStatus = ListStatus | 'favourite';
+
+export const API_STATUS_IDS: Record<ListStatus, YummyAnimeListId> = {
+  watching: 0,
+  planned: 1,
+  completed: 2,
+  dropped: 3,
+  paused: 5,
+};
 
 export interface YummyUserAnimeRate {
   rating_counters?: number;
@@ -74,7 +99,6 @@ export interface UserAnimeRate {
   score: number | null;
   created_at: string;
   updated_at: string;
-  [key: string]: any;
 }
 
 export interface UserAnimeCreate {
@@ -106,41 +130,7 @@ export interface UserAnimeResponse {
   episodes_watched: number;
   is_favorite: boolean;
   anime: AnimeCatalogItem;
-  [key: string]: any;
 }
-
-export const YUMMY_LIST_IDS = {
-  watch_now: 0,
-  will: 1,
-  watched: 2,
-  lost: 3,
-  postpone: 5,
-} as const;
-
-export const API_STATUS_VALUES = {
-  watching: 'watching',
-  completed: 'completed',
-  paused: 'paused',
-  dropped: 'dropped',
-  planned: 'planned',
-  favourite: 'favourite',
-} as const;
-
-export const mapStatusToApi = (status: AnimeStatus): string => {
-  return API_STATUS_VALUES[status] || status;
-};
-
-export const mapStatusFromApi = (apiStatus: string): AnimeStatus => {
-  const statusMap: Record<string, AnimeStatus> = {
-    watching: 'watching',
-    completed: 'completed',
-    paused: 'paused',
-    dropped: 'dropped',
-    planned: 'planned',
-    favourite: 'favourite',
-  };
-  return statusMap[apiStatus] || 'planned';
-};
 
 export function mapListIdToStatus(listId: number | undefined): AnimeStatus {
   switch (listId) {
@@ -148,20 +138,12 @@ export function mapListIdToStatus(listId: number | undefined): AnimeStatus {
     case 1: return 'planned';
     case 2: return 'completed';
     case 3: return 'dropped';
-    case 4: return 'favourite';
     case 5: return 'paused';
     default: return 'planned';
   }
 }
 
 export function mapStatusToListId(status: AnimeStatus): YummyAnimeListId {
-  switch (status) {
-    case 'watching': return 0;
-    case 'planned': return 1;
-    case 'completed': return 2;
-    case 'dropped': return 3;
-    case 'favourite': return 4;
-    case 'paused': return 5;
-    default: return 1;
-  }
+  if (status === 'favourite') return 1; // 'favourite' is UI-only; fall back to "planned"
+  return API_STATUS_IDS[status] ?? 1;
 }

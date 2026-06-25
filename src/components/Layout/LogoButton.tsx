@@ -26,7 +26,7 @@ export function LogoButton({ variant }: LogoButtonProps) {
       >
         <img src="/favicon.svg" alt="" className="h-10 w-10 shrink-0" />
         <span className="flex gap-0">
-          Ani<span className="text-[#7855d0]">Hako</span>
+          Ani<span className="text-brand">Hako</span>
         </span>
       </Link>
     );

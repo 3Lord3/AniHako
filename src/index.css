@@ -3,7 +3,7 @@
 @theme {
   --font-sans: var(--font-geist-sans), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono), monospace;
-  
+
   /* Shadcn default theme colors */
   --color-background: oklch(1 0 0);
   --color-foreground: oklch(0.145 0 0);
@@ -25,6 +25,10 @@
   --color-input: oklch(0.922 0 0);
   --color-ring: oklch(0.708 0 0);
   --color-radius: 0.625rem;
+
+  /* Brand color */
+  --color-brand: #7855d0;
+  --color-brand-foreground: #ffffff;
 }
 
 .dark {
@@ -70,16 +74,15 @@
     --tw-ring-color: oklch(var(--color-border));
   }
 
-  /* Disable text selection */
-  * {
+  /* Allow text selection by default (anime titles, descriptions).
+     Disable it on interactive chrome to keep tap targets comfortable. */
+  button,
+  nav,
+  header,
+  [data-slot="dropdown-menu-item"],
+  [data-slot="select-item"] {
     user-select: none;
     -webkit-user-select: none;
-  }
-
-  /* Allow input fields to be selectable */
-  input, textarea {
-    user-select: text;
-    -webkit-user-select: text;
   }
 
   /* Cursor pointer for interactive elements */

@@ -3,13 +3,14 @@ import type { AnimeListItem } from '@/types';
 import {
   type TournamentState,
   type TournamentParticipant,
+  type TournamentResult,
 } from './tournament-types';
 import {
   buildTournamentRounds,
   createPairsForRound,
 } from './tournament-utils';
 
-export type { TournamentParticipant, Pair, Round, TournamentState } from './tournament-types';
+export type { TournamentParticipant, Pair, Round, TournamentState, TournamentResult } from './tournament-types';
 export type { PairStatus } from './tournament-types';
 export { getRoundName } from './tournament-utils';
 
@@ -49,7 +50,6 @@ export function useTournament() {
     setTournament(prev => {
       if (!prev) return prev;
 
-      // Пары с двумя участниками становятся 'playing'
       const updatedPairs = prev.rounds[prev.currentRoundIndex].pairs.map(pair => {
         if (pair.status === 'pending' && pair.participants.length === 2) {
           return { ...pair, status: 'playing' as const };
@@ -141,21 +141,7 @@ export function useTournament() {
     });
   }, []);
 
-  const getNextAvailablePair = useCallback(() => {
-    if (!tournament || !tournament.roundStarted) return null;
-
-    const currentRound = tournament.rounds[tournament.currentRoundIndex];
-    const pendingPairs = currentRound.pairs.filter(
-      p => p.status === 'playing' && !p.winner
-    );
-
-    if (currentPairIndex < pendingPairs.length) {
-      return pendingPairs[currentPairIndex];
-    }
-    return null;
-  }, [tournament, currentPairIndex]);
-
-  const getResults = useCallback(() => {
+  const getResults = useCallback((): TournamentResult[] => {
     if (!tournament) return [];
 
     const sorted = [...tournament.allParticipants].sort((a, b) => {
@@ -174,7 +160,6 @@ export function useTournament() {
     setTournament(prev => {
       if (!prev) return prev;
 
-      // Сбросить все пары текущего раунда
       const updatedRounds = prev.rounds.map((round, idx) => {
         if (idx === prev.currentRoundIndex) {
           return {
@@ -208,7 +193,6 @@ export function useTournament() {
     initializeTournament,
     startRound,
     selectWinner,
-    getNextAvailablePair,
     getResults,
     resetTournament,
     resetRound,

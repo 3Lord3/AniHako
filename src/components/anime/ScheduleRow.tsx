@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Calendar } from 'lucide-react';
 import type { AnimeScheduleItem } from '@/types/anime';
+import { buildAnimeUrl } from '@/lib/animeUrl';
 
 function formatDate(timestamp: number | undefined): string {
   if (!timestamp) return '-';
@@ -15,9 +16,7 @@ interface ScheduleRowProps {
 }
 
 export function ScheduleRow({ item }: ScheduleRowProps) {
-  const url = item.anime_url?.startsWith('/anime/')
-    ? item.anime_url
-    : `/anime/${item.anime_url || item.anime_id}`;
+  const url = buildAnimeUrl(item);
 
   return (
     <tr className="border-b border-border hover:bg-muted/50 transition-colors">

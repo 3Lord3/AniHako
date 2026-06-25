@@ -1,75 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import {
-  mapStatusToApi,
-  mapStatusFromApi,
   mapListIdToStatus,
   mapStatusToListId,
-  YUMMY_LIST_IDS,
-  API_STATUS_VALUES,
+  API_STATUS_IDS,
 } from '@/types/list';
 import type { AnimeStatus } from '@/types/list';
 
 describe('types/list', () => {
-  describe('mapStatusToApi', () => {
-    it('maps watching to watching', () => {
-      expect(mapStatusToApi('watching')).toBe('watching');
-    });
-
-    it('maps completed to completed', () => {
-      expect(mapStatusToApi('completed')).toBe('completed');
-    });
-
-    it('maps paused to paused', () => {
-      expect(mapStatusToApi('paused')).toBe('paused');
-    });
-
-    it('maps dropped to dropped', () => {
-      expect(mapStatusToApi('dropped')).toBe('dropped');
-    });
-
-    it('maps planned to planned', () => {
-      expect(mapStatusToApi('planned')).toBe('planned');
-    });
-
-    it('maps favourite to favourite', () => {
-      expect(mapStatusToApi('favourite')).toBe('favourite');
-    });
-
-    it('returns unknown status as-is', () => {
-      expect(mapStatusToApi('unknown' as AnimeStatus)).toBe('unknown');
-    });
-  });
-
-  describe('mapStatusFromApi', () => {
-    it('maps watching to watching', () => {
-      expect(mapStatusFromApi('watching')).toBe('watching');
-    });
-
-    it('maps completed to completed', () => {
-      expect(mapStatusFromApi('completed')).toBe('completed');
-    });
-
-    it('maps paused to paused', () => {
-      expect(mapStatusFromApi('paused')).toBe('paused');
-    });
-
-    it('maps dropped to dropped', () => {
-      expect(mapStatusFromApi('dropped')).toBe('dropped');
-    });
-
-    it('maps planned to planned', () => {
-      expect(mapStatusFromApi('planned')).toBe('planned');
-    });
-
-    it('maps favourite to favourite', () => {
-      expect(mapStatusFromApi('favourite')).toBe('favourite');
-    });
-
-    it('returns planned for unknown status', () => {
-      expect(mapStatusFromApi('unknown')).toBe('planned');
-    });
-  });
-
   describe('mapListIdToStatus', () => {
     it('maps 0 to watching', () => {
       expect(mapListIdToStatus(0)).toBe('watching');
@@ -85,10 +22,6 @@ describe('types/list', () => {
 
     it('maps 3 to dropped', () => {
       expect(mapListIdToStatus(3)).toBe('dropped');
-    });
-
-    it('maps 4 to favourite', () => {
-      expect(mapListIdToStatus(4)).toBe('favourite');
     });
 
     it('maps 5 to paused', () => {
@@ -118,12 +51,12 @@ describe('types/list', () => {
       expect(mapStatusToListId('dropped')).toBe(3);
     });
 
-    it('maps favourite to 4', () => {
-      expect(mapStatusToListId('favourite')).toBe(4);
-    });
-
     it('maps paused to 5', () => {
       expect(mapStatusToListId('paused')).toBe(5);
+    });
+
+    it('falls back to planned for favourite (UI-only status)', () => {
+      expect(mapStatusToListId('favourite')).toBe(1);
     });
 
     it('returns 1 for unknown status', () => {
@@ -131,36 +64,13 @@ describe('types/list', () => {
     });
   });
 
-  describe('YUMMY_LIST_IDS', () => {
-    it('has correct watch_now value', () => {
-      expect(YUMMY_LIST_IDS.watch_now).toBe(0);
-    });
-
-    it('has correct will value', () => {
-      expect(YUMMY_LIST_IDS.will).toBe(1);
-    });
-
-    it('has correct watched value', () => {
-      expect(YUMMY_LIST_IDS.watched).toBe(2);
-    });
-
-    it('has correct lost value', () => {
-      expect(YUMMY_LIST_IDS.lost).toBe(3);
-    });
-
-    it('has correct postpone value', () => {
-      expect(YUMMY_LIST_IDS.postpone).toBe(5);
-    });
-  });
-
-  describe('API_STATUS_VALUES', () => {
-    it('has all status mappings', () => {
-      expect(API_STATUS_VALUES.watching).toBe('watching');
-      expect(API_STATUS_VALUES.completed).toBe('completed');
-      expect(API_STATUS_VALUES.paused).toBe('paused');
-      expect(API_STATUS_VALUES.dropped).toBe('dropped');
-      expect(API_STATUS_VALUES.planned).toBe('planned');
-      expect(API_STATUS_VALUES.favourite).toBe('favourite');
+  describe('API_STATUS_IDS', () => {
+    it('exposes a complete status -> id mapping', () => {
+      expect(API_STATUS_IDS.watching).toBe(0);
+      expect(API_STATUS_IDS.planned).toBe(1);
+      expect(API_STATUS_IDS.completed).toBe(2);
+      expect(API_STATUS_IDS.dropped).toBe(3);
+      expect(API_STATUS_IDS.paused).toBe(5);
     });
   });
 });

@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Star, Calendar, Clock, Film, Building2, Tag } from 'lucide-react';
-import { SEASON_LABELS, KIND_LABELS } from '@/types/constants';
+import { KIND_LABELS } from '@/types/constants';
+import { SEASONS, type Season } from '@/lib/seasons';
 import type { AnimeDetailResponse } from '@/types';
 
 interface CharacteristicItemProps {
@@ -30,20 +31,14 @@ interface AnimeCharacteristicsProps {
   className?: string;
 }
 
-function getSeasonLabel(season: 1 | 2 | 3 | 4 | undefined): string | null {
+function getSeasonLabel(season: Season | undefined): string | null {
   if (!season) return null;
-  const seasonMap: Record<number, string> = {
-    1: 'winter',
-    2: 'spring',
-    3: 'summer',
-    4: 'autumn'
-  };
-  return SEASON_LABELS[seasonMap[season]] || seasonMap[season];
+  return SEASONS[season].label;
 }
 
 export function AnimeCharacteristics({ anime, className }: AnimeCharacteristicsProps) {
   const year = anime.year;
-  const season = anime.season;
+  const season = anime.season as Season | undefined;
   const genres = anime.genres?.map(g => g.title) || [];
   const studios = anime.studios?.map(s => s.title) || anime.creators?.map(c => c.title) || [];
 

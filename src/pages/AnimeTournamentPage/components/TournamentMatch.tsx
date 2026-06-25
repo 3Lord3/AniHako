@@ -20,7 +20,6 @@ interface TournamentMatchProps {
   onBack?: () => void;
   onBackToBracket?: () => void;
   isActive: boolean;
-  matchIndex: number;
   totalMatchesInRound: number;
 }
 
@@ -32,7 +31,6 @@ export function TournamentMatch({
   onBack,
   onBackToBracket,
   isActive,
-  matchIndex,
   totalMatchesInRound,
 }: TournamentMatchProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -69,7 +67,6 @@ export function TournamentMatch({
     <div className="w-full h-full flex flex-col bg-background">
       <MatchHeader
         roundName={roundName}
-        matchIndex={matchIndex}
         totalMatches={totalMatchesInRound}
         isFinal={isFinal}
         onBack={onBack}

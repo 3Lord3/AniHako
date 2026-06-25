@@ -5,27 +5,14 @@ import { useSchedule, useAnimeList } from '@/hooks';
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { TooltipWrap } from '@/components/ui/tooltip';
 import { AnimeTitle } from '@/components/anime/AnimeTitle';
 import { ScheduleRow } from '@/components/anime/ScheduleRow';
+import { CarouselSkeleton, ScheduleSkeleton } from '@/components/loaders/AnimeCardSkeleton';
 import type { AnimeScheduleItem, AnimeCatalogItem } from '@/types/anime';
 import { getRatingColor } from '@/types/constants';
-
-const SEASON_NAMES: Record<string, string> = {
-  winter: 'Зима',
-  spring: 'Весна',
-  summer: 'Лето',
-  autumn: 'Осень',
-};
-
-function getCurrentSeason(): string {
-  const month = new Date().getMonth();
-  if (month >= 0 && month <= 2) return 'winter';
-  if (month >= 3 && month <= 5) return 'spring';
-  if (month >= 6 && month <= 8) return 'summer';
-  return 'autumn';
-}
+import { buildAnimeUrl } from '@/lib/animeUrl';
+import { SEASONS, getCurrentSeason } from '@/lib/seasons';
 
 function formatDayMonth(timestamp: number): string {
   if (!timestamp) return '';
@@ -59,9 +46,7 @@ function CarouselCard({ anime }: CarouselCardProps) {
   const isAnnouncement = anime.anime_status?.alias === 'announcement';
   const validRating = rating !== null && !isNaN(rating) && !isAnnouncement;
 
-  const url = anime.anime_url?.startsWith('/anime/')
-    ? anime.anime_url
-    : `/anime/${anime.anime_url || anime.anime_id}`;
+  const url = buildAnimeUrl(anime);
 
   return (
     <Link to={url} className="group block flex-shrink-0 w-[160px]">
@@ -141,14 +126,14 @@ function AnimeCarousel({ anime }: { anime: AnimeCatalogItem[] }) {
 export function HomePage() {
   const currentYear = new Date().getFullYear();
   const currentSeason = getCurrentSeason();
-  const seasonName = SEASON_NAMES[currentSeason];
+  const seasonName = SEASONS[currentSeason].label;
 
   const [selectedDateKey, setSelectedDateKey] = useState<string | null>(new Date().toDateString());
 
   const { data: scheduleData, isLoading: scheduleLoading } = useSchedule();
   const { data: seasonalData, isLoading: seasonalLoading } = useAnimeList({
-    season: currentSeason,
-    status: ['released', 'ongoing'],
+    season: SEASONS[currentSeason].alias,
+    status: ['released', 'ongoing', 'announcement'],
     from_year: currentYear,
     sort_forward: true,
     offset: 0,
@@ -171,11 +156,7 @@ export function HomePage() {
           {seasonName} {currentYear}
         </h2>
         {seasonalLoading ? (
-          <div className="flex gap-4">
-            {Array.from({ length: 6 }).map((_, i) => (
-              <Skeleton key={i} className="flex-shrink-0 w-[160px] aspect-[3/4] rounded-lg" />
-            ))}
-          </div>
+          <CarouselSkeleton />
         ) : !seasonalData?.data?.length ? (
           <div className="text-center py-8 text-muted-foreground">Нет аниме</div>
         ) : (
@@ -186,30 +167,7 @@ export function HomePage() {
       <section>
         <h2 className="text-2xl font-bold text-foreground mb-6">Расписание онгоингов</h2>
         {scheduleLoading ? (
-          <div className="space-y-4">
-            <div className="flex gap-2 overflow-hidden pb-2">
-              {Array.from({ length: 16 }).map((_, i) => (
-                <Skeleton key={i} className="h-8 w-16 rounded-md shrink-0" />
-              ))}
-            </div>
-            <div className="border border-border rounded-lg p-4">
-              <div className="flex gap-4 mb-4">
-                <Skeleton className="h-4 w-32" />
-                <Skeleton className="h-4 w-20 hidden sm:block" />
-                <Skeleton className="h-4 w-24 hidden md:block" />
-                <Skeleton className="h-4 w-20 hidden lg:block" />
-              </div>
-              {Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="flex gap-4 items-center py-3 border-b border-border last:border-0">
-                  <Skeleton className="w-10 h-14 rounded" />
-                  <Skeleton className="h-4 w-40 flex-1" />
-                  <Skeleton className="h-4 w-16 hidden sm:block" />
-                  <Skeleton className="h-4 w-20 hidden md:block" />
-                  <Skeleton className="h-4 w-20 hidden lg:block" />
-                </div>
-              ))}
-            </div>
-          </div>
+          <ScheduleSkeleton />
         ) : !scheduleData?.length ? (
           <div className="text-center py-8 text-muted-foreground">Нет данных</div>
         ) : (
