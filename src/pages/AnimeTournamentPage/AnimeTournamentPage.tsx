@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useUserAnimeList } from '@/hooks';
-import { useTournament, type Pair } from '@/hooks/useTournament';
+import { useTournament, getRoundName, type Pair } from '@/hooks/useTournament';
 import type { AnimeCatalogItem, YummyUserAnimeRate } from '@/types';
 import type { AnimeReleaseStatus } from '@/types';
 import { TournamentIntro } from './components/TournamentIntro';
@@ -158,23 +158,11 @@ export function AnimeTournamentPage() {
           onBack={undefined}
           onBackToBracket={handleBackToBracket}
           isActive={true}
-          matchIndex={currentPairIdx}
           totalMatchesInRound={totalInRound}
         />
       </div>
     );
   }
-
-  const getRoundName = (roundIndex: number, total: number) => {
-    const displayRound = roundIndex + 1;
-    if (displayRound === total) return 'Финал';
-    if (total === 2 && displayRound === 1) return 'Полуфинал';
-    if (total === 3 && displayRound === 1) return 'Четвертьфинал';
-    if (total === 3 && displayRound === 2) return 'Полуфинал';
-    if (displayRound === total - 1) return 'Полуфинал';
-    if (displayRound === total - 2) return 'Четвертьфинал';
-    return `${displayRound} раунд`;
-  };
 
   return (
     <div className="container mx-auto py-4 sm:py-8">

@@ -4,7 +4,6 @@ import { TooltipWrap } from '@/components/ui/tooltip';
 
 interface MatchHeaderProps {
   roundName: string;
-  matchIndex: number;
   totalMatches: number;
   isFinal: boolean;
   onBack?: () => void;
@@ -14,7 +13,6 @@ interface MatchHeaderProps {
 
 export function MatchHeader({
   roundName,
-  matchIndex,
   totalMatches,
   isFinal,
   onBack,
@@ -49,7 +47,7 @@ export function MatchHeader({
         )}
         {roundName}
         <span className="text-muted-foreground hidden sm:inline">
-          ({matchIndex + 1}/{totalMatches})
+          ({totalMatches})
         </span>
       </div>
 

@@ -2,19 +2,7 @@ import type { TournamentParticipant, Pair, Round } from './tournament-types';
 import type { AnimeCatalogItem } from '@/types';
 
 /**
- * Участник турнира (для локального использования в утилитах)
- */
-export interface LocalAnimeItem {
-  id: number;
-  name: string;
-  russian: string | null;
-  poster: string | null;
-  score: string | null;
-  [key: string]: any;
-}
-
-/**
- * Перемешать массив (Fisher-Yates shuffle)
+ * Перемешать массив (Fisher-Yates shuffle).
  */
 export function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];

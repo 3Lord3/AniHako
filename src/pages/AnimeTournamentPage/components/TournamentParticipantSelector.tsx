@@ -58,7 +58,9 @@ export function TournamentParticipantSelector({
       type: anime.type || { name: '', value: 0, shortname: '', alias: '' },
       year: anime.year,
       user: undefined,
-      date: Date.now(),
+      // Captured at click time inside an event handler, not at render.
+      // eslint-disable-next-line react-hooks/purity
+      date: Math.floor(Date.now() / 1000),
     };
     onSelectionChange([...selectedAnime, rate]);
     setSearchQuery('');
