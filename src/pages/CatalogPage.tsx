@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { useAnimeList, useDebounce, useUserAnimeList, useGenreSearch } from '@/hooks';
+import { useAnimeList, useDebounce, useUserAnimeList, useGenres } from '@/hooks';
 import { AnimeGrid } from '@/components/AnimeGrid';
 import { CatalogControls } from '@/components/search/CatalogControls';
 import { FilterBadges } from '@/components/search/FilterBadges';
@@ -67,7 +67,7 @@ export function CatalogPage() {
     page: 1,
     limit: 100,
     q: search || undefined,
-    genres: genres || undefined,
+    genre: genres ? genres.split(',') : undefined,
     from_year: fromYear ? parseInt(fromYear, 10) : undefined,
     to_year: toYear ? parseInt(toYear, 10) : undefined,
     min_rating: minRating,
@@ -75,7 +75,7 @@ export function CatalogPage() {
   };
 
   const { data: animeData, isLoading } = useAnimeList(queryParams);
-  const { data: genresData } = useGenreSearch();
+  const { data: genresData } = useGenres();
   const { data: userAnimeList } = useUserAnimeList();
 
   const updateParams = (key: string, value: string) => {
