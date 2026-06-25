@@ -15,18 +15,19 @@ const ProfilePage = lazy(() => import('@/pages/ProfilePage').then(m => ({ defaul
 const UserAnimeListPage = lazy(() => import('@/pages/UserAnimeListPage').then(m => ({ default: m.UserAnimeListPage })));
 const AnimeMatcherPage = lazy(() => import('@/pages/AnimeMatcherPage').then(m => ({ default: m.AnimeMatcherPage })));
 const AnimeTournamentPage = lazy(() => import('@/pages/AnimeTournamentPage').then(m => ({ default: m.AnimeTournamentPage })));
+const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { data: user, isLoading } = useUser();
-  
+
   if (isLoading) {
     return <SuspenseFallback message="Проверка авторизации..." />;
   }
-  
+
   if (!user) {
     return <Navigate to="/login" replace />;
   }
-  
+
   return <>{children}</>;
 }
 
@@ -47,12 +48,17 @@ export function App() {
                 <UserAnimeListPage />
               </ProtectedRoute>
             } />
-            <Route path="matcher" element={<AnimeMatcherPage />} />
+            <Route path="matcher" element={
+              <ProtectedRoute>
+                <AnimeMatcherPage />
+              </ProtectedRoute>
+            } />
             <Route path="tournament" element={
               <ProtectedRoute>
                 <AnimeTournamentPage />
               </ProtectedRoute>
             } />
+            <Route path="*" element={<NotFoundPage />} />
           </Route>
         </Routes>
       </Suspense>
