@@ -1,5 +1,6 @@
 import axios, { AxiosError } from 'axios';
 import type { InternalAxiosRequestConfig } from 'axios';
+import type { YummyUser } from '../types/user';
 
 const YUMMY_API_URL = 'https://api.yani.tv';
 const APP_TOKEN = import.meta.env.VITE_APP_TOKEN || '';
@@ -13,8 +14,7 @@ export const api = axios.create({
   },
 });
 
-export const setAuthRedirectCallback = (_callback: (url: string) => void) => {};
-
+// 401-handler: clear auth and let consumers re-route as needed (e.g. via <Navigate> in ProtectedRoute).
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = localStorage.getItem('auth_token');
   if (token && config.headers) {
@@ -60,5 +60,3 @@ export const getUser = (): YummyUser | null => {
   }
   return null;
 };
-
-import type { YummyUser } from '../types/user';
