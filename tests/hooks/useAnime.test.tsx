@@ -3,16 +3,16 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
 import { useAnimeList, useAnimeDetail, useAnimeSearch, useRandomAnime, useGenres } from '@/hooks/useAnime';
-import * as apiModule from '@/lib/api';
+import * as animeApiModule from '@/api/anime';
 
-vi.mock('@/lib/api', () => ({
+vi.mock('@/api/anime', () => ({
   animeApi: {
     getCatalog: vi.fn(),
     search: vi.fn(),
-    getById: vi.fn(),
     getByUrl: vi.fn(),
     getRandom: vi.fn(),
     getGenres: vi.fn(),
+    getSchedule: vi.fn(),
   },
 }));
 
@@ -37,23 +37,34 @@ describe('useAnime', () => {
     vi.clearAllMocks();
   });
 
-  it('fetches anime catalog', async () => {
-    const mockData = [{ anime_id: 1, title: 'Anime 1' }];
-    vi.mocked(apiModule.animeApi.getCatalog).mockResolvedValueOnce(mockData);
+  it('fetches anime catalog and exposes normalized data + pagination', async () => {
+    vi.mocked(animeApiModule.animeApi.getCatalog).mockResolvedValueOnce({
+      data: [{ anime_id: 1, title: 'Anime 1' }],
+      page: 1,
+      totalPages: 1,
+      total: 1,
+    });
 
     const { result } = renderHook(() => useAnimeList({}), { wrapper: createWrapper() });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data).toBeDefined();
+    expect(result.current.data?.data).toHaveLength(1);
+    expect(result.current.data?.data[0]?.anime_id).toBe(1);
+    expect(result.current.data?.total).toBe(1);
   });
 
   it('uses params in query', async () => {
-    vi.mocked(apiModule.animeApi.getCatalog).mockResolvedValueOnce([]);
+    vi.mocked(animeApiModule.animeApi.getCatalog).mockResolvedValueOnce({
+      data: [],
+      page: 1,
+      totalPages: 1,
+      total: 0,
+    });
 
     const { result } = renderHook(() => useAnimeList({ page: 2, limit: 10, kind: 'tv' }), { wrapper: createWrapper() });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(apiModule.animeApi.getCatalog).toHaveBeenCalledWith(expect.objectContaining({
+    expect(animeApiModule.animeApi.getCatalog).toHaveBeenCalledWith(expect.objectContaining({
       page: 2,
       limit: 10,
       kind: 'tv',
@@ -68,7 +79,7 @@ describe('useAnimeDetail', () => {
 
   it('fetches anime by url', async () => {
     const mockAnime = { anime_id: 456, title: 'URL Anime' };
-    vi.mocked(apiModule.animeApi.getByUrl).mockResolvedValueOnce(mockAnime);
+    vi.mocked(animeApiModule.animeApi.getByUrl).mockResolvedValueOnce(mockAnime as never);
 
     const { result } = renderHook(() => useAnimeDetail('anime-slug'), { wrapper: createWrapper() });
 
@@ -82,23 +93,29 @@ describe('useAnimeSearch', () => {
     vi.clearAllMocks();
   });
 
-  it('searches anime by query', async () => {
-    const mockResults = [{ anime_id: 1, title: 'Search Result' }];
-    vi.mocked(apiModule.animeApi.search).mockResolvedValueOnce(mockResults);
+  it('searches anime by query and surfaces server pagination', async () => {
+    vi.mocked(animeApiModule.animeApi.search).mockResolvedValueOnce({
+      data: [{ anime_id: 1, title: 'Search Result' }],
+      page: 1,
+      totalPages: 5,
+      total: 123,
+    });
 
     const { result } = renderHook(() => useAnimeSearch('test'), { wrapper: createWrapper() });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data).toBeDefined();
+    expect(result.current.data?.data).toHaveLength(1);
+    expect(result.current.data?.total).toBe(123);
+    expect(result.current.data?.totalPages).toBe(5);
   });
 
   it('has query enabled only when query is not empty', async () => {
-    vi.mocked(apiModule.animeApi.search).mockResolvedValueOnce([]);
+    vi.mocked(animeApiModule.animeApi.search).mockResolvedValueOnce([]);
 
     const { result } = renderHook(() => useAnimeSearch(''), { wrapper: createWrapper() });
 
     await waitFor(() => expect(result.current.isLoading).toBe(false));
-    expect(apiModule.animeApi.search).not.toHaveBeenCalled();
+    expect(animeApiModule.animeApi.search).not.toHaveBeenCalled();
   });
 });
 
@@ -109,7 +126,7 @@ describe('useRandomAnime', () => {
 
   it('fetches random anime', async () => {
     const mockAnime = { anime_id: 999, title: 'Random Anime' };
-    vi.mocked(apiModule.animeApi.getRandom).mockResolvedValueOnce(mockAnime);
+    vi.mocked(animeApiModule.animeApi.getRandom).mockResolvedValueOnce(mockAnime as never);
 
     const { result } = renderHook(() => useRandomAnime(), { wrapper: createWrapper() });
 
@@ -118,7 +135,7 @@ describe('useRandomAnime', () => {
   });
 
   it('returns null when no random anime available', async () => {
-    vi.mocked(apiModule.animeApi.getRandom).mockResolvedValueOnce(null);
+    vi.mocked(animeApiModule.animeApi.getRandom).mockResolvedValueOnce(null);
 
     const { result } = renderHook(() => useRandomAnime(), { wrapper: createWrapper() });
 
@@ -134,7 +151,7 @@ describe('useGenres', () => {
 
   it('fetches genres', async () => {
     const mockGenres = { genres: [{ id: 1, title: 'Action' }], groups: [] };
-    vi.mocked(apiModule.animeApi.getGenres).mockResolvedValueOnce(mockGenres);
+    vi.mocked(animeApiModule.animeApi.getGenres).mockResolvedValueOnce(mockGenres as never);
 
     const { result } = renderHook(() => useGenres(), { wrapper: createWrapper() });
 
