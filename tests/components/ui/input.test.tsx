@@ -19,9 +19,7 @@ describe('Input', () => {
   });
 
   it('handles value and onChange', () => {
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      // just verifying onChange is called
-    };
+    const handleChange = () => {};
     render(<Input value="test" onChange={handleChange} />);
     expect(screen.getByRole('textbox')).toHaveValue('test');
   });

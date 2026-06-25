@@ -51,12 +51,15 @@ describe('constants', () => {
   });
 
   describe('ALL_STATUSES', () => {
-    it('contains all status types', () => {
+    it('only includes statuses that map to a YummyAnime list', () => {
+      // `favourite` is UI-only and intentionally excluded here.
+      // See `UserAnimeListPage` which toggles `?favorites=true` instead.
       expect(ALL_STATUSES).toContain('watching');
       expect(ALL_STATUSES).toContain('completed');
       expect(ALL_STATUSES).toContain('dropped');
       expect(ALL_STATUSES).toContain('planned');
       expect(ALL_STATUSES).toContain('paused');
+      expect(ALL_STATUSES).not.toContain('favourite');
       expect(ALL_STATUSES.length).toBe(5);
     });
   });

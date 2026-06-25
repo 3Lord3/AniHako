@@ -89,7 +89,7 @@ describe('imageUrl', () => {
     });
 
     it('returns placeholder for null', () => {
-      expect(getScreenshotUrl(null as any)).toBe('/placeholder-screenshot.png');
+      expect(getScreenshotUrl(null as unknown as string)).toBe('/placeholder-screenshot.png');
     });
   });
 
