@@ -1,9 +1,11 @@
 import { Eye, CheckCircle, XCircle, CalendarClock, Heart, Pause, Star } from 'lucide-react';
-import type { AnimeStatus } from '@/types';
+import type { AnimeStatus, ListStatus } from '@/types';
 
 export type StatusType = AnimeStatus;
+export type ListStatusType = ListStatus;
 
-// YummyAnime API lists: watch_now=0, will=1, watched=2, lost=3, favourite=4, postpone=5
+// YummyAnime API lists: watch_now=0, will=1, watched=2, lost=3, postpone=5
+// `favourite` is UI-only and is not in the API.
 export const STATUS_ICONS: Record<StatusType, React.ReactNode> = {
   watching: <Eye size={24} strokeWidth={2.5} />,
   completed: <CheckCircle size={24} strokeWidth={2.5} />,
@@ -32,23 +34,15 @@ export const STATUS_COLORS: Record<StatusType, string> = {
   favourite: 'bg-pink-500 text-white dark:bg-pink-600',
 };
 
-// статусы которые есть в YummyAnime API (id списка)
-export const YUMMY_LIST_STATUSES: StatusType[] = ['watching', 'planned', 'completed', 'paused', 'dropped'];
+export const YUMMY_LIST_STATUSES: ListStatusType[] = ['watching', 'planned', 'completed', 'paused', 'dropped'];
 
-// OLDStatuses - статусы без соответствующего списка в YummyAnime API
-export const OLDStatuses: StatusType[] = [];
-
-// All statuses for UI display
-export const ALL_STATUSES: StatusType[] = [...YUMMY_LIST_STATUSES, ...OLDStatuses];
+// `favourite` is UI-only; it's exposed in the union for display purposes
+// (e.g. icon/label lookup) but should not be used in `ALL_STATUSES` to drive
+// filters — see `UserAnimeListPage` which has a dedicated "Любимое" button
+// that toggles `?favorites=true` instead.
+export const ALL_STATUSES: StatusType[] = YUMMY_LIST_STATUSES;
 
 export const FAVORITE_ICON = <Heart size={24} strokeWidth={2.5} />;
-
-export const SEASON_LABELS: Record<string, string> = {
-  winter: 'Зима',
-  spring: 'Весна',
-  summer: 'Лето',
-  autumn: 'Осень',
-};
 
 export const KIND_LABELS: Record<string, string> = {
   tv: 'TV сериал',

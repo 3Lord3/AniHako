@@ -5,4 +5,4 @@ export interface GenreResponse {
   group_id: number;
 }
 
-export interface TagResponse extends GenreResponse {}
+export type TagResponse = GenreResponse;
