@@ -7,7 +7,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { TooltipWrap } from '@/components/ui/tooltip';
 import { AnimeTitle } from '@/components/anime/AnimeTitle';
 import { getImageUrl } from '@/lib/imageUrl';
-import { STATUS_ICONS, STATUS_COLORS, FAVORITE_ICON, ALL_STATUSES, type StatusType } from '@/types/constants';
+import { buildAnimeUrl } from '@/lib/animeUrl';
+import { STATUS_ICONS, STATUS_COLORS, STATUS_LABELS, FAVORITE_ICON, ALL_STATUSES, type StatusType } from '@/types/constants';
 import type { YummyUserAnimeRate } from '@/types';
 import { mapListIdToStatus } from '@/types';
 
@@ -25,26 +26,15 @@ export function UserAnimeListPage() {
   })();
   const allLists = allListsRaw;
 
-  const statusLabels: Record<string, string> = {
-    watching: 'Смотрю',
-    completed: 'Просмотрено',
-    paused: 'Отложено',
-    dropped: 'Брошено',
-    planned: 'В планах',
-  };
-
-  // Helper to get status from YummyAnime rate
   const getRateStatus = (rate: YummyUserAnimeRate): string => {
     const listId = rate.user?.list?.list?.id;
     return mapListIdToStatus(listId);
   };
 
-  // Helper to check if rate is favorite
   const isRateFavorite = (rate: YummyUserAnimeRate): boolean => {
     return rate.user?.list?.is_fav === true;
   };
 
-  // Count by status from all lists
   const watching = allLists.filter((a: YummyUserAnimeRate) => getRateStatus(a) === 'watching').length || 0;
   const planned = allLists.filter((a: YummyUserAnimeRate) => getRateStatus(a) === 'planned').length || 0;
   const completed = allLists.filter((a: YummyUserAnimeRate) => getRateStatus(a) === 'completed').length || 0;
@@ -53,11 +43,11 @@ export function UserAnimeListPage() {
   const favoritesCount = allLists.filter((a: YummyUserAnimeRate) => isRateFavorite(a)).length || 0;
 
   const stats = [
-    { label: 'Смотрю', count: watching },
-    { label: 'В планах', count: planned },
-    { label: 'Просмотрено', count: completed },
-    { label: 'Отложено', count: paused },
-    { label: 'Брошено', count: dropped },
+    { label: STATUS_LABELS.watching, count: watching },
+    { label: STATUS_LABELS.planned, count: planned },
+    { label: STATUS_LABELS.completed, count: completed },
+    { label: STATUS_LABELS.paused, count: paused },
+    { label: STATUS_LABELS.dropped, count: dropped },
     { label: 'Любимое', count: favoritesCount },
   ];
 
@@ -114,7 +104,7 @@ export function UserAnimeListPage() {
                   setSearchParams(statusParam === s ? {} : { status: s })
                 }
               >
-                {statusLabels[s]}
+                {STATUS_LABELS[s as keyof typeof STATUS_LABELS] || s}
               </Button>
             ))}
             <Button
@@ -146,7 +136,7 @@ export function UserAnimeListPage() {
             const status = getRateStatus(rate);
             
             return (
-              <Link key={rate.anime_id} to={`/anime/${rate.anime_id}`} className="group block relative rounded-lg overflow-hidden">
+              <Link key={rate.anime_id} to={buildAnimeUrl(rate)} className="group block relative rounded-lg overflow-hidden">
                 <img
                   src={getImageUrl(rate.poster?.medium || rate.poster?.small)}
                   alt={displayTitle}
@@ -154,9 +144,9 @@ export function UserAnimeListPage() {
                   loading="lazy"
                 />
                 <div className="absolute top-2 left-2 right-2 flex justify-between items-start gap-1">
-                  <TooltipWrap content={statusLabels[status] || status}>
+                  <TooltipWrap content={STATUS_LABELS[status as keyof typeof STATUS_LABELS] || status}>
                     <Badge
-                      aria-label={statusLabels[status] || status}
+                      aria-label={STATUS_LABELS[status as keyof typeof STATUS_LABELS] || status}
                       className={`h-9 w-9 p-0 rounded-full cursor-pointer ${status ? STATUS_COLORS[status as StatusType] : 'bg-gray-500'}`}
                     >
                       <span className="flex items-center justify-center w-full h-full">
