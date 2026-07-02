@@ -152,10 +152,13 @@ export const animeApi = {
     return unwrapCatalogResponse(res.data);
   },
 
-  getByUrl: (url: string) =>
-    api
-      .get<{ response: YummyAnimeDetailResponse }>(`/anime/${url}`)
-      .then((res) => res.data.response),
+  getByUrl: (url: string, options?: { needVideos?: boolean }) => {
+    const params: Record<string, boolean> = {};
+    if (options?.needVideos) params.need_videos = true;
+    return api
+      .get<{ response: YummyAnimeDetailResponse }>(`/anime/${url}`, { params })
+      .then((res) => res.data.response);
+  },
 
   getRandom: (excludeLists: YummyAnimeListId[] = [0, 1, 2, 3, 5]) =>
     api
