@@ -140,8 +140,19 @@ describe('animeApi', () => {
 
       const result = await animeApi.getByUrl('anime-slug');
 
-      expect(api.get).toHaveBeenCalledWith('/anime/anime-slug');
+      expect(api.get).toHaveBeenCalledWith('/anime/anime-slug', { params: {} });
       expect(result).toEqual({ anime_id: 456, anime_url: 'anime-slug' });
+    });
+
+    it('passes need_videos param when needVideos option is true', async () => {
+      const mockResponse = { data: { response: { anime_id: 1, anime_url: 'a' } } };
+      vi.mocked(api.get).mockResolvedValueOnce(mockResponse);
+
+      await animeApi.getByUrl('a', { needVideos: true });
+
+      expect(api.get).toHaveBeenCalledWith('/anime/a', {
+        params: { need_videos: true },
+      });
     });
   });
 

@@ -1,0 +1,288 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, within, fireEvent } from '@testing-library/react';
+import { userEvent } from '@testing-library/user-event';
+import { EpisodeViewer } from '@/pages/AnimeDetailPage/components/EpisodeViewer';
+import type { AnimeTranslate, AnimeVideo } from '@/types';
+
+const anidubVideo: AnimeVideo = {
+  video_id: 1,
+  iframe_url: 'https://player.example.com/embed/1',
+  data: { dubbing: 'AniDub', player: 'Kodik', player_id: 1 },
+  number: '1',
+  date: 0,
+  index: 1,
+  views: 0,
+  duration: 0,
+};
+
+const subtitleVideo: AnimeVideo = {
+  video_id: 2,
+  iframe_url: 'https://player.example.com/embed/2',
+  data: { dubbing: 'Субтитры', player: 'Kodik', player_id: 1 },
+  number: '1',
+  date: 0,
+  index: 1,
+  views: 0,
+  duration: 0,
+};
+
+const anidubVideo2: AnimeVideo = {
+  ...anidubVideo,
+  video_id: 3,
+  iframe_url: 'https://player.example.com/embed/3',
+  number: '2',
+  index: 2,
+};
+
+const anidubAllohaVideo: AnimeVideo = {
+  ...anidubVideo,
+  video_id: 4,
+  iframe_url: 'https://player.example.com/embed/4',
+  data: { dubbing: 'AniDub', player: 'Alloha', player_id: 2 },
+};
+
+const anidubAllohaVideo2: AnimeVideo = {
+  ...anidubAllohaVideo,
+  video_id: 5,
+  iframe_url: 'https://player.example.com/embed/5',
+  number: '2',
+  index: 2,
+};
+
+const translates: AnimeTranslate[] = [
+  { title: 'AniDub', href: 'anidub', value: 1 },
+  { title: 'Субтитры', href: 'subs', value: 2 },
+];
+
+async function selectTranslate(user: ReturnType<typeof userEvent.setup>, currentLabel: string, targetName: string) {
+  await user.click(screen.getByRole('button', { name: new RegExp(currentLabel) }));
+  await user.click(screen.getByRole('option', { name: targetName }));
+}
+
+beforeEach(() => {
+  Element.prototype.scrollIntoView = vi.fn();
+});
+
+describe('EpisodeViewer', () => {
+  it('renders nothing when videos is empty', () => {
+    const { container } = render(
+      <EpisodeViewer videos={[]} translates={translates} title="t" />
+    );
+    expect(container).toBeEmptyDOMElement();
+  });
+
+  it('renders player with the first video by default', () => {
+    render(<EpisodeViewer videos={[anidubVideo, anidubVideo2]} title="Test" />);
+    const iframe = screen.getByTitle('Test - Серия 1') as HTMLIFrameElement;
+    expect(iframe.src).toBe('https://player.example.com/embed/1');
+  });
+
+  it('shows episode list when there are multiple videos', () => {
+    render(<EpisodeViewer videos={[anidubVideo, anidubVideo2]} title="t" />);
+    expect(screen.getByRole('tab', { name: 'Серия 1' })).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Серия 2' })).toBeInTheDocument();
+  });
+
+  it('hides episode list when there is only one video', () => {
+    render(<EpisodeViewer videos={[anidubVideo]} title="t" />);
+    expect(screen.queryByRole('tablist', { name: 'Список серий' })).not.toBeInTheDocument();
+  });
+
+  it('clicking an episode tab changes the active video', () => {
+    render(<EpisodeViewer videos={[anidubVideo, anidubVideo2]} title="t" />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Серия 2' }));
+    const iframe = screen.getByTitle('t - Серия 2') as HTMLIFrameElement;
+    expect(iframe.src).toBe('https://player.example.com/embed/3');
+  });
+
+  it('ArrowRight advances the active episode', () => {
+    render(<EpisodeViewer videos={[anidubVideo, anidubVideo2]} title="t" />);
+    fireEvent.keyDown(window, { key: 'ArrowRight' });
+    expect(screen.getByTitle('t - Серия 2')).toBeInTheDocument();
+  });
+
+  it('ArrowLeft goes back to the previous episode', () => {
+    render(<EpisodeViewer videos={[anidubVideo, anidubVideo2]} title="t" />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Серия 2' }));
+    fireEvent.keyDown(window, { key: 'ArrowLeft' });
+    expect(screen.getByTitle('t - Серия 1')).toBeInTheDocument();
+  });
+
+  it('does not switch episode via keyboard when focus is in an input', () => {
+    render(
+      <div>
+        <input data-testid="trap" />
+        <EpisodeViewer videos={[anidubVideo, anidubVideo2]} title="t" />
+      </div>
+    );
+    const input = screen.getByTestId('trap');
+    input.focus();
+    fireEvent.keyDown(input, { key: 'ArrowRight' });
+    expect(screen.getByTitle('t - Серия 1')).toBeInTheDocument();
+  });
+
+  it('filters videos by selected translate', async () => {
+    const user = userEvent.setup();
+    const videos = [anidubVideo, subtitleVideo, anidubVideo2];
+    render(<EpisodeViewer videos={videos} translates={translates} title="t" />);
+    expect(screen.getByTitle('t - Серия 1')).toBeInTheDocument();
+
+    await selectTranslate(user, 'AniDub', 'Субтитры');
+
+    const iframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
+    expect(iframe.src).toBe('https://player.example.com/embed/2');
+  });
+
+  it('resets selected index to 0 when translate changes', async () => {
+    const user = userEvent.setup();
+    const videos = [anidubVideo, anidubVideo2, subtitleVideo];
+    render(<EpisodeViewer videos={videos} translates={translates} title="t" />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Серия 2' }));
+
+    await selectTranslate(user, 'AniDub', 'Субтитры');
+
+    expect(screen.getByTitle('t - Серия 1')).toBeInTheDocument();
+  });
+
+  it('disables prev/next at boundaries', () => {
+    const { rerender } = render(
+      <EpisodeViewer videos={[anidubVideo]} title="t" />
+    );
+    expect(screen.getByLabelText('Предыдущая серия')).toBeDisabled();
+    expect(screen.getByLabelText('Следующая серия')).toBeDisabled();
+
+    rerender(<EpisodeViewer videos={[anidubVideo, anidubVideo2]} title="t" />);
+    expect(screen.getByLabelText('Предыдущая серия')).toBeDisabled();
+    expect(screen.getByLabelText('Следующая серия')).not.toBeDisabled();
+  });
+
+  it('synthesizes translates from videos when API provides none', async () => {
+    const user = userEvent.setup();
+    const videos = [anidubVideo, subtitleVideo];
+    render(<EpisodeViewer videos={videos} translates={[]} title="t" />);
+
+    const trigger = screen.getByRole('button', { name: /AniDub/ });
+    expect(trigger).toBeInTheDocument();
+    await user.click(trigger);
+
+    expect(screen.getByRole('option', { name: 'AniDub' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Субтитры' })).toBeInTheDocument();
+  });
+
+  it('filters synthesized translates by dubbing', async () => {
+    const user = userEvent.setup();
+    const videos = [anidubVideo, subtitleVideo, anidubVideo2];
+    render(<EpisodeViewer videos={videos} translates={[]} title="t" />);
+
+    expect(screen.getByTitle('t - Серия 1')).toBeInTheDocument();
+
+    await selectTranslate(user, 'AniDub', 'Субтитры');
+
+    const iframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
+    expect(iframe.src).toBe('https://player.example.com/embed/2');
+  });
+
+  it('selects Kodik over Alloha by default when both are available', () => {
+    const videos = [anidubVideo, anidubAllohaVideo, anidubVideo2];
+    render(<EpisodeViewer videos={videos} title="t" />);
+
+    const iframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
+    expect(iframe.src).toBe('https://player.example.com/embed/1');
+  });
+
+  it('shows player buttons when multiple players are available for a dubbing', () => {
+    const videos = [anidubVideo, anidubAllohaVideo, anidubVideo2, anidubAllohaVideo2];
+    render(<EpisodeViewer videos={videos} title="t" />);
+
+    const radiogroup = screen.getByRole('radiogroup', { name: 'Выбор плеера' });
+    expect(within(radiogroup).getByText('Kodik')).toBeInTheDocument();
+    expect(within(radiogroup).getByText('Alloha')).toBeInTheDocument();
+  });
+
+  it('does not show player buttons when only one player is available', () => {
+    render(<EpisodeViewer videos={[anidubVideo, anidubVideo2]} title="t" />);
+    expect(screen.queryByRole('radiogroup', { name: 'Выбор плеера' })).not.toBeInTheDocument();
+  });
+
+  it('switches iframe when player is changed', () => {
+    const videos = [anidubVideo, anidubAllohaVideo, anidubVideo2, anidubAllohaVideo2];
+    render(<EpisodeViewer videos={videos} title="t" />);
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Alloha' }));
+
+    const iframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
+    expect(iframe.src).toBe('https://player.example.com/embed/4');
+  });
+
+  it('resets selected index to 0 when player changes', () => {
+    const videos = [anidubVideo, anidubAllohaVideo, anidubVideo2, anidubAllohaVideo2];
+    render(<EpisodeViewer videos={videos} title="t" />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Серия 2' }));
+
+    fireEvent.click(screen.getByRole('radio', { name: 'Alloha' }));
+
+    const iframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
+    expect(iframe.src).toBe('https://player.example.com/embed/4');
+  });
+
+  it('renders player selector before translate selector', () => {
+    const videos = [anidubVideo, anidubAllohaVideo, subtitleVideo, anidubAllohaVideo2];
+    render(
+      <EpisodeViewer
+        videos={videos}
+        translates={[
+          { title: 'AniDub', href: 'anidub', value: 1 },
+          { title: 'Субтитры', href: 'subs', value: 2 },
+        ]}
+        title="t"
+      />
+    );
+
+    const translateTrigger = screen.getByRole('button', { name: /AniDub/ });
+    const playerKodik = screen.getByRole('radio', { name: 'Kodik' });
+
+    const position = playerKodik.compareDocumentPosition(translateTrigger);
+    expect(position & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it('resets translateValue when navigating to a different anime with different translates', () => {
+    const anidub3: AnimeVideo = {
+      ...anidubVideo,
+      video_id: 100,
+      iframe_url: 'https://player.example.com/embed/100',
+      data: { dubbing: 'AniDub', player: 'Kodik', player_id: 1 },
+    };
+    const otherDubVideo: AnimeVideo = {
+      ...anidubVideo,
+      video_id: 101,
+      iframe_url: 'https://player.example.com/embed/101',
+      data: { dubbing: 'AniLibria', player: 'Kodik', player_id: 1 },
+    };
+
+    const translatesA: AnimeTranslate[] = [
+      { title: 'AniDub', href: 'anidub', value: 1 },
+      { title: 'Субтитры', href: 'subs', value: 2 },
+    ];
+    const translatesB: AnimeTranslate[] = [
+      { title: 'Многоголосый', href: 'multivoice', value: 4 },
+      { title: 'Субтитры', href: 'subtitles', value: 7 },
+    ];
+
+    const { rerender } = render(
+      <EpisodeViewer videos={[anidubVideo, anidubVideo2]} translates={translatesA} title="A" />
+    );
+    expect(screen.getByRole('button', { name: /AniDub/ })).toBeInTheDocument();
+
+    rerender(
+      <EpisodeViewer
+        videos={[otherDubVideo, anidub3]}
+        translates={translatesB}
+        title="B"
+      />
+    );
+
+    const triggerB = screen.getByRole('button', { name: /Многоголосый/ });
+    expect(triggerB).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /AniDub/ })).not.toBeInTheDocument();
+  });
+});

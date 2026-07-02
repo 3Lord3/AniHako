@@ -74,7 +74,7 @@ export function useAnimeSearch(query: string, limit: number = 30) {
 export function useAnimeDetail(idOrUrl: string | number) {
   return useQuery({
     queryKey: ['anime', 'detail', idOrUrl],
-    queryFn: () => animeApi.getByUrl(String(idOrUrl)),
+    queryFn: () => animeApi.getByUrl(String(idOrUrl), { needVideos: true }),
     enabled: !!idOrUrl,
   });
 }
