@@ -35,6 +35,16 @@ export function AnimeDetailPageSkeleton() {
         <Skeleton className="h-6 w-32" />
         <Skeleton className="h-20 w-full" />
       </div>
+      <div className="space-y-4">
+        <Skeleton className="h-6 w-24" />
+        <Skeleton className="w-full aspect-video rounded-lg" />
+        <div className="flex gap-2">
+          <Skeleton className="size-7 rounded-md" />
+          <Skeleton className="size-7 rounded-md" />
+          <Skeleton className="size-7 rounded-md" />
+          <Skeleton className="size-7 rounded-md" />
+        </div>
+      </div>
     </div>
   );
 }

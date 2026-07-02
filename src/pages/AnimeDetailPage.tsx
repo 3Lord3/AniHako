@@ -8,6 +8,7 @@ import { getImageUrl } from '@/lib/imageUrl';
 import { mapStatusToListId } from '@/types';
 import { AnimeDetailPageSkeleton } from '@/components/loaders/PageSkeletons';
 import { AnimeCharacteristics } from './AnimeDetailPage/components/AnimeCharacteristics';
+import { EpisodeViewer } from './AnimeDetailPage/components/EpisodeViewer';
 import { StatusButtonGroup } from '@/components/detail/StatusButtonGroup';
 import type { AnimeStatus, YummyUserAnimeRate } from '@/types';
 
@@ -138,6 +139,14 @@ export function AnimeDetailPage() {
             <p className="whitespace-pre-wrap select-text">{anime.description}</p>
           </CardContent>
         </Card>
+      )}
+
+      {anime.videos && anime.videos.length > 0 && (
+        <EpisodeViewer
+          videos={anime.videos}
+          translates={anime.translates}
+          title={displayTitle}
+        />
       )}
     </div>
   );
