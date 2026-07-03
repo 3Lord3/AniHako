@@ -9,6 +9,7 @@ import { mapStatusToListId } from '@/types';
 import { AnimeDetailPageSkeleton } from '@/components/loaders/PageSkeletons';
 import { AnimeCharacteristics } from './AnimeDetailPage/components/AnimeCharacteristics';
 import { EpisodeViewer } from './AnimeDetailPage/components/EpisodeViewer';
+import { ViewingOrder } from './AnimeDetailPage/components/ViewingOrder';
 import { StatusButtonGroup } from '@/components/detail/StatusButtonGroup';
 import type { AnimeStatus, YummyUserAnimeRate } from '@/types';
 
@@ -139,6 +140,13 @@ export function AnimeDetailPage() {
             <p className="whitespace-pre-wrap select-text">{anime.description}</p>
           </CardContent>
         </Card>
+      )}
+
+      {anime.viewing_order && anime.viewing_order.length > 0 && (
+        <ViewingOrder
+          items={anime.viewing_order}
+          currentAnimeId={anime.anime_id}
+        />
       )}
 
       {anime.videos && anime.videos.length > 0 && (
