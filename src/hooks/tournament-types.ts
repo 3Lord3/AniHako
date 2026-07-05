@@ -1,7 +1,7 @@
 import type { AnimeListItem } from '@/types';
 
 /**
- * Участник турнира
+ * Участник турнира.
  */
 export interface TournamentParticipant {
   id: string;
@@ -12,12 +12,12 @@ export interface TournamentParticipant {
 }
 
 /**
- * Статус пары участников
+ * Статус пары участников.
  */
 export type PairStatus = 'pending' | 'bye' | 'playing' | 'completed';
 
 /**
- * Пара участников в матче
+ * Пара участников в матче.
  */
 export interface Pair {
   id: string;
@@ -29,12 +29,12 @@ export interface Pair {
 }
 
 /**
- * Compatibility alias for TournamentMatch (used by TournamentMatch component)
+ * Compatibility alias for TournamentMatch (used by TournamentMatch component).
  */
 export type TournamentMatch = Pair;
 
 /**
- * Раунд турнира
+ * Раунд турнира.
  */
 export interface Round {
   index: number;
@@ -43,7 +43,7 @@ export interface Round {
 }
 
 /**
- * Состояние турнира
+ * Состояние турнира.
  */
 export interface TournamentState {
   allParticipants: TournamentParticipant[];
@@ -55,13 +55,6 @@ export interface TournamentState {
 }
 
 /**
- * Результат участника в турнире
+ * Результат участника в турнире с присвоенной итоговой позицией.
  */
-export interface TournamentResult {
-  position: number;
-  id: string;
-  anime: AnimeListItem;
-  seed: number;
-  eliminated: boolean;
-  finalPosition: number | null;
-}
+export type TournamentResult = TournamentParticipant & { position: number };

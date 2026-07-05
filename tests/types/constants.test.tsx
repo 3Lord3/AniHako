@@ -33,7 +33,7 @@ describe('constants', () => {
       expect(STATUS_COLORS.watching).toBe('bg-blue-500 text-white dark:bg-blue-600');
       expect(STATUS_COLORS.completed).toBe('bg-green-500 text-white dark:bg-green-600');
       expect(STATUS_COLORS.dropped).toBe('bg-red-500 text-white dark:bg-red-600');
-      expect(STATUS_COLORS.planned).toBe('bg-yellow-600 text-gray-900 dark:bg-yellow-700 dark:text-gray-900');
+      expect(STATUS_COLORS.planned).toBe('bg-yellow-600 text-white dark:bg-yellow-700');
       expect(STATUS_COLORS.paused).toBe('bg-yellow-500 text-gray-900 dark:bg-yellow-600 dark:text-gray-900');
       expect(STATUS_COLORS.favourite).toBe('bg-pink-500 text-white dark:bg-pink-600');
     });
@@ -51,12 +51,15 @@ describe('constants', () => {
   });
 
   describe('ALL_STATUSES', () => {
-    it('contains all status types', () => {
+    it('only includes statuses that map to a YummyAnime list', () => {
+      // `favourite` is UI-only and intentionally excluded here.
+      // See `UserAnimeListPage` which toggles `?favorites=true` instead.
       expect(ALL_STATUSES).toContain('watching');
       expect(ALL_STATUSES).toContain('completed');
       expect(ALL_STATUSES).toContain('dropped');
       expect(ALL_STATUSES).toContain('planned');
       expect(ALL_STATUSES).toContain('paused');
+      expect(ALL_STATUSES).not.toContain('favourite');
       expect(ALL_STATUSES.length).toBe(5);
     });
   });

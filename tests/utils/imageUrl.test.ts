@@ -63,7 +63,7 @@ describe('getImageUrl', () => {
   });
 
   it('returns placeholder for non-string input', () => {
-    const result = getImageUrl(undefined as any, '/fallback.png');
+    const result = getImageUrl(undefined as unknown as string, '/fallback.png');
     expect(result).toBe('/fallback.png');
   });
 });

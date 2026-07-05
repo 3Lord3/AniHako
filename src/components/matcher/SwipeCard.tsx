@@ -77,6 +77,9 @@ export function SwipeCard({ anime, onSwipe, isActive }: SwipeCardProps) {
 
   const swipeDirection = translateX > 50 ? 'right' : translateX < -50 ? 'left' : null;
   const swipeOpacity = Math.min(Math.abs(translateX) / SWIPE_THRESHOLD, 1);
+  const isAnnouncement = anime.anime_status?.alias === 'announcement';
+  const hasRating = !isAnnouncement && anime.rating?.average != null && anime.rating.average > 0;
+  const hasYear = !isAnnouncement && anime.year != null && anime.year > 0;
 
   return (
     <div
@@ -144,13 +147,13 @@ export function SwipeCard({ anime, onSwipe, isActive }: SwipeCardProps) {
         <div className="absolute bottom-0 left-0 right-0 p-4 text-white select-text">
           <h2 className="text-2xl font-bold mb-1">{anime.title}</h2>
           <div className="flex items-center gap-4 text-sm">
-            {anime.rating?.average && (
+            {hasRating && (
               <div className="flex items-center gap-1">
                 <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
                 <span className="font-medium">{anime.rating.average.toFixed(1)}</span>
               </div>
             )}
-            {anime.year && (
+            {hasYear && (
               <div className="flex items-center gap-1">
                 <Calendar className="w-4 h-4" />
                 <span>{anime.year}</span>

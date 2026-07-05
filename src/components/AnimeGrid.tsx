@@ -5,7 +5,8 @@ import { TooltipWrap } from '@/components/ui/tooltip';
 import type { AnimeCatalogItem, YummyUserAnimeRate } from '@/types';
 import { mapListIdToStatus } from '@/types';
 import { getImageUrl, getPosterUrl } from '@/lib/imageUrl';
-import { STATUS_ICONS, STATUS_COLORS, FAVORITE_ICON, getRatingColor } from '@/types/constants';
+import { buildAnimeUrl } from '@/lib/animeUrl';
+import { STATUS_ICONS, STATUS_COLORS, STATUS_LABELS, FAVORITE_ICON, getRatingColor } from '@/types/constants';
 
 interface AnimeGridProps {
   anime: AnimeCatalogItem[];
@@ -16,14 +17,8 @@ interface AnimeGridProps {
 }
 
 function getStatusLabel(status: string | undefined): string {
-  switch (status) {
-    case 'watching': return 'Смотрю';
-    case 'completed': return 'Просмотрено';
-    case 'dropped': return 'Брошено';
-    case 'planned': return 'Запланировано';
-    case 'paused': return 'На паузе';
-    default: return '';
-  }
+  if (!status) return '';
+  return STATUS_LABELS[status as keyof typeof STATUS_LABELS] || '';
 }
 
 function AnimeListItem({ anime, userAnime }: { anime: AnimeCatalogItem; userAnime?: YummyUserAnimeRate }) {
@@ -34,9 +29,7 @@ function AnimeListItem({ anime, userAnime }: { anime: AnimeCatalogItem; userAnim
   const userStatus = userAnime ? mapListIdToStatus(userAnime.user?.list?.list?.id) : undefined;
   const isFavorite = userAnime?.user?.list?.is_fav || false;
 
-  const url = anime.anime_url?.startsWith('/anime/')
-    ? anime.anime_url
-    : `/anime/${anime.anime_url || anime.anime_id}`;
+  const url = buildAnimeUrl(anime);
 
   return (
     <Link to={url} className="group flex gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors">
@@ -76,7 +69,7 @@ function AnimeListItem({ anime, userAnime }: { anime: AnimeCatalogItem; userAnim
             </span>
           </TooltipWrap>
         )}
-        {isFavorite && userStatus !== 'favourite' && (
+        {isFavorite && (
           <TooltipWrap content="Любимое">
             <span
               aria-label="Любимое"

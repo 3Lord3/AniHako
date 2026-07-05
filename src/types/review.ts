@@ -45,7 +45,6 @@ export interface ReviewResponse {
   comments_count?: number;
   text_preview?: string;
   text_html?: string;
-  [key: string]: any;
 }
 
 export interface YummyAnimeReview {

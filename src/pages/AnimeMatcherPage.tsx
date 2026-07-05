@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useRandomAnime, useAddToList, useUser } from '@/hooks';
+import { useRandomAnime, useAddToList } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -13,23 +13,17 @@ import { Loader2 } from 'lucide-react';
 import { SwipeCard } from '@/components/matcher/SwipeCard';
 import { ActionButtons, AddButton, ExternalLinkButton } from '@/components/matcher/ActionButtons';
 import { DescriptionPanel } from '@/components/matcher/DescriptionView';
+import { buildAnimeUrl } from '@/lib/animeUrl';
 
 export function AnimeMatcherPage() {
   const navigate = useNavigate();
-  const { data: user } = useUser();
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
-  
+
   const { data: anime, isLoading, refetch } = useRandomAnime();
   const { mutate: addToList, isPending: isAdding } = useAddToList();
 
   const currentAnime = anime ?? null;
-
-  useEffect(() => {
-    if (!user && !isLoading) {
-      navigate('/login');
-    }
-  }, [user, isLoading, navigate]);
 
   const loadNextAnime = () => {
     setIsTransitioning(true);
@@ -42,7 +36,7 @@ export function AnimeMatcherPage() {
     if (isTransitioning) return;
     setIsTransitioning(true);
     setShowDescriptionModal(false);
-    
+
     if (direction === 'right' && currentAnime) {
       addToList(
         { animeId: currentAnime.anime_id, status: 'planned' },
@@ -96,7 +90,7 @@ export function AnimeMatcherPage() {
         </p>
       </div>
 
-      <div className="md:hidden text-center">
+      <div className="md:hidden text-center mb-3">
         <p className="text-sm text-muted-foreground select-text">
           Свайпайте влево чтобы пропустить, вправо чтобы добавить в запланированное
         </p>
@@ -131,7 +125,7 @@ export function AnimeMatcherPage() {
           />
           {currentAnime && (
             <ExternalLinkButton
-              onClick={() => navigate(`/anime/${currentAnime.anime_url?.startsWith('/anime/') ? currentAnime.anime_url.slice(7) : currentAnime.anime_url || currentAnime.anime_id}`)}
+              onClick={() => navigate(buildAnimeUrl(currentAnime))}
             />
           )}
         </div>
@@ -139,7 +133,7 @@ export function AnimeMatcherPage() {
 
       {/* Mobile layout */}
       <div className="md:hidden flex flex-col h-[calc(100vh-150px)]">
-        <div className="relative flex-grow flex items-center justify-center">
+        <div className="relative flex-grow flex items-center justify-center py-2">
           {currentAnime && (
             <SwipeCard
               key={currentAnime.anime_id}
@@ -157,7 +151,7 @@ export function AnimeMatcherPage() {
           onSkip={handleSkip}
           onAdd={handleAdd}
           onHome={() => navigate('/')}
-          onExternalLink={currentAnime ? () => navigate(`/anime/${currentAnime.anime_url?.startsWith('/anime/') ? currentAnime.anime_url.slice(7) : currentAnime.anime_url || currentAnime.anime_id}`) : undefined}
+          onExternalLink={currentAnime ? () => navigate(buildAnimeUrl(currentAnime)) : undefined}
           onInfo={() => setShowDescriptionModal(true)}
         />
       </div>

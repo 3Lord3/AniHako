@@ -19,7 +19,7 @@ describe('animeApi', () => {
       const mockResponse = { data: { response: [{ anime_id: 1 }] } };
       vi.mocked(api.get).mockResolvedValueOnce(mockResponse);
 
-      const result = await animeApi.getCatalog();
+      await animeApi.getCatalog();
 
       expect(api.get).toHaveBeenCalledWith('/anime', expect.objectContaining({ params: expect.any(Object) }));
     });
@@ -56,6 +56,57 @@ describe('animeApi', () => {
         params: expect.objectContaining({ q: 'attack on titan' }),
       }));
     });
+
+    it('keeps sort_forward as a boolean (not coerced to 1/0)', async () => {
+      const mockResponse = { data: { response: [] } };
+      vi.mocked(api.get).mockResolvedValueOnce(mockResponse);
+
+      await animeApi.getCatalog({ sort_forward: true });
+
+      expect(api.get).toHaveBeenCalledWith('/anime', expect.objectContaining({
+        params: expect.objectContaining({ sort_forward: true }),
+      }));
+    });
+
+    it('unwraps the standard { response, page, total_pages, total } envelope', async () => {
+      vi.mocked(api.get).mockResolvedValueOnce({
+        data: {
+          response: [{ anime_id: 1 }, { anime_id: 2 }],
+          page: 2,
+          total_pages: 5,
+          total: 50,
+        },
+      });
+
+      const result = await animeApi.getCatalog();
+
+      expect(result.data).toEqual([{ anime_id: 1 }, { anime_id: 2 }]);
+      expect(result.page).toBe(2);
+      expect(result.totalPages).toBe(5);
+      expect(result.total).toBe(50);
+    });
+
+    it('accepts a bare array as the response body', async () => {
+      vi.mocked(api.get).mockResolvedValueOnce({
+        data: [{ anime_id: 1 }, { anime_id: 2 }, { anime_id: 3 }],
+      });
+
+      const result = await animeApi.getCatalog();
+
+      expect(result.data).toHaveLength(3);
+      expect(result.total).toBe(3);
+      expect(result.page).toBe(1);
+      expect(result.totalPages).toBe(1);
+    });
+
+    it('returns an empty result on a null response body', async () => {
+      vi.mocked(api.get).mockResolvedValueOnce({ data: null });
+
+      const result = await animeApi.getCatalog();
+
+      expect(result.data).toEqual([]);
+      expect(result.total).toBe(0);
+    });
   });
 
   describe('search', () => {
@@ -82,18 +133,6 @@ describe('animeApi', () => {
     });
   });
 
-  describe('getById', () => {
-    it('fetches anime by id', async () => {
-      const mockResponse = { data: { response: { anime_id: 123 } } };
-      vi.mocked(api.get).mockResolvedValueOnce(mockResponse);
-
-      const result = await animeApi.getById(123);
-
-      expect(api.get).toHaveBeenCalledWith('/anime/123');
-      expect(result).toEqual({ anime_id: 123 });
-    });
-  });
-
   describe('getByUrl', () => {
     it('fetches anime by url', async () => {
       const mockResponse = { data: { response: { anime_id: 456, anime_url: 'anime-slug' } } };
@@ -101,8 +140,19 @@ describe('animeApi', () => {
 
       const result = await animeApi.getByUrl('anime-slug');
 
-      expect(api.get).toHaveBeenCalledWith('/anime/anime-slug');
+      expect(api.get).toHaveBeenCalledWith('/anime/anime-slug', { params: {} });
       expect(result).toEqual({ anime_id: 456, anime_url: 'anime-slug' });
+    });
+
+    it('passes need_videos param when needVideos option is true', async () => {
+      const mockResponse = { data: { response: { anime_id: 1, anime_url: 'a' } } };
+      vi.mocked(api.get).mockResolvedValueOnce(mockResponse);
+
+      await animeApi.getByUrl('a', { needVideos: true });
+
+      expect(api.get).toHaveBeenCalledWith('/anime/a', {
+        params: { need_videos: true },
+      });
     });
   });
 
@@ -117,7 +167,7 @@ describe('animeApi', () => {
         params: expect.objectContaining({
           sort: 'random',
           limit: 1,
-          exclude_list: ['0', '1', '2', '3', '4', '5'],
+          exclude_list: [0, 1, 2, 3, 5],
         }),
       }));
     });

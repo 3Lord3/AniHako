@@ -1,9 +1,10 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { animeApi, userListApi } from '@/lib/api';
+import { animeApi } from '@/api/anime';
+import { userListApi } from '@/api/list';
 import { useUser } from './useAuth';
-import type { UserAnimeUpdate, AnimeStatus } from '@/types';
+import type { UserAnimeUpdate, AnimeStatus, YummyAnimeDetailResponse } from '@/types';
 import { mapStatusToListId } from '@/types';
-import { normalizeAnimeResponse, formatAnimeListResponse } from '@/lib/animeNormalizer';
+import { normalizeAnimeResponse, formatAnimeListResponse } from '@/api/normalizers/anime';
 import type { YummyUserAnimeRate } from '@/types/list';
 
 // =============================================================================
@@ -16,7 +17,7 @@ export function useAnimeList(
     limit?: number;
     q?: string;
     search?: string;
-    genres?: string | string[];
+    genre?: string | string[];
     from_year?: number;
     to_year?: number;
     min_rating?: number;
@@ -33,9 +34,13 @@ export function useAnimeList(
   return useQuery({
     queryKey: ['anime', 'catalog', params],
     queryFn: async () => {
-      const response = await animeApi.getCatalog(params);
-      const normalizedData = normalizeAnimeResponse(response);
-      return formatAnimeListResponse(normalizedData);
+      const result = await animeApi.getCatalog(params);
+      const normalizedData = normalizeAnimeResponse(result.data);
+      return formatAnimeListResponse(normalizedData, {
+        page: result.page,
+        totalPages: result.totalPages,
+        total: result.total,
+      });
     },
     enabled: options?.enabled ?? true,
   });
@@ -49,10 +54,14 @@ export function useAnimeSearch(query: string, limit: number = 30) {
   return useQuery({
     queryKey: ['anime', 'search', query, limit],
     queryFn: async () => {
-      if (!query.trim()) return [];
-      const response = await animeApi.search(query, limit);
-      const normalizedData = normalizeAnimeResponse(response);
-      return formatAnimeListResponse(normalizedData);
+      if (!query.trim()) return formatAnimeListResponse([]);
+      const result = await animeApi.search(query, limit);
+      const normalizedData = normalizeAnimeResponse(result.data);
+      return formatAnimeListResponse(normalizedData, {
+        page: result.page,
+        totalPages: result.totalPages,
+        total: result.total,
+      });
     },
     enabled: !!query.trim(),
   });
@@ -65,18 +74,7 @@ export function useAnimeSearch(query: string, limit: number = 30) {
 export function useAnimeDetail(idOrUrl: string | number) {
   return useQuery({
     queryKey: ['anime', 'detail', idOrUrl],
-    queryFn: async () => {
-      const response = await animeApi.getByUrl(String(idOrUrl));
-      
-      if (response && typeof response === 'object' && !Array.isArray(response)) {
-        const keys = Object.keys(response);
-        if (keys.length === 1 && !isNaN(Number(keys[0]))) {
-          return response[keys[0]];
-        }
-      }
-      
-      return response;
-    },
+    queryFn: () => animeApi.getByUrl(String(idOrUrl), { needVideos: true }),
     enabled: !!idOrUrl,
   });
 }
@@ -86,7 +84,7 @@ export function useAnimeDetail(idOrUrl: string | number) {
 // =============================================================================
 
 export function useRandomAnime() {
-  return useQuery({
+  return useQuery<YummyAnimeDetailResponse | null>({
     queryKey: ['anime', 'random'],
     queryFn: async () => {
       const randomAnime = await animeApi.getRandom();
@@ -98,20 +96,6 @@ export function useRandomAnime() {
   });
 }
 
-// =============================================================================
-// ANIME SCREENSHOTS (from detail)
-// =============================================================================
-
-export function useAnimeScreenshots(id: number) {
-  return useQuery({
-    queryKey: ['anime', 'screenshots', id],
-    queryFn: async () => {
-      const { data } = await animeApi.getById(id);
-      return data.screenshots || [];
-    },
-    enabled: !!id,
-  });
-}
 
 // =============================================================================
 // GENRES
@@ -127,43 +111,33 @@ export function useGenres() {
   });
 }
 
-export function useGenreSearch() {
-  return useQuery({
-    queryKey: ['genre', 'search'],
-    queryFn: async () => {
-      const result = await animeApi.getGenres();
-      return result ?? { genres: [] };
-    },
-  });
-}
-
 // =============================================================================
 // USER ANIME LIST
 // =============================================================================
 
 export function useUserAnimeList(status?: AnimeStatus, favorites?: boolean) {
   const { data: user } = useUser();
-  
+
   return useQuery({
     queryKey: ['user', 'anime', status, favorites],
     queryFn: async () => {
       if (!user) return [];
-      
+
       try {
         if (status) {
           const listId = mapStatusToListId(status);
           const rates = await userListApi.getUserList(user.id, listId) || [];
-          return favorites 
+          return favorites
             ? rates.filter((rate: YummyUserAnimeRate) => rate.user?.list?.is_fav === true)
             : rates;
         }
-        
+
         const rates = await userListApi.getUserLists(user.id) || [];
-        
+
         if (favorites) {
           return rates.filter((rate: YummyUserAnimeRate) => rate.user?.list?.is_fav === true);
         }
-        
+
         return rates;
       } catch (error: unknown) {
         if (error && typeof error === 'object' && 'response' in error) {
@@ -176,25 +150,6 @@ export function useUserAnimeList(status?: AnimeStatus, favorites?: boolean) {
       }
     },
     enabled: !!user,
-  });
-}
-
-// =============================================================================
-// USER ANIME RATE FOR SPECIFIC ANIME
-// =============================================================================
-
-export function useUserAnimeRate(animeId: number) {
-  return useQuery({
-    queryKey: ['user', 'anime', 'rate', animeId],
-    queryFn: async () => {
-      try {
-        const { data } = await userListApi.getAnimeList(animeId);
-        return data;
-      } catch {
-        return null;
-      }
-    },
-    enabled: !!animeId,
   });
 }
 
@@ -279,34 +234,5 @@ export function useSchedule() {
       const response = await animeApi.getSchedule();
       return response || [];
     },
-  });
-}
-
-// =============================================================================
-// FAVORITES
-// =============================================================================
-
-export function useFavorites() {
-  const { data: user } = useUser();
-  
-  return useQuery({
-    queryKey: ['user', 'favorites'],
-    queryFn: async () => {
-      if (!user) return [];
-      
-      try {
-        const rates = await userListApi.getUserLists(user.id);
-        return (rates || []).filter((rate: YummyUserAnimeRate) => rate.user?.list?.is_fav === true);
-      } catch (error: unknown) {
-        if (error && typeof error === 'object' && 'response' in error) {
-          const err = error as { response?: { status?: number } };
-          if (err.response?.status === 401) {
-            return [];
-          }
-        }
-        throw error;
-      }
-    },
-    enabled: !!user,
   });
 }

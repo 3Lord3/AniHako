@@ -109,7 +109,7 @@ export interface AnimeViewingOrder {
   description?: string;
   poster: AnimePoster;
   user?: {
-    list?: { list: AnimeUserList; is_fav: boolean };
+    list?: { list?: AnimeUserList; is_fav: boolean };
     rating?: number;
   };
   year: number;
@@ -175,49 +175,21 @@ export interface AnimeCatalogItem {
   random_screenshots?: AnimeScreenshot[];
   posts_count?: number;
   partner_videos_count?: number;
-  [key: string]: any;
 }
 
 export type AnimeListItem = AnimeCatalogItem;
 
-export interface AnimeDetailResponse extends AnimeCatalogItem {}
+export type AnimeDetailResponse = AnimeCatalogItem;
 
 export type AnimeDetail = AnimeDetailResponse;
 
 export type YummyAnimeDetailResponse = AnimeCatalogItem;
-
-export function getDisplayTitle(anime: { title: string; other_titles?: string[] }): string {
-  return anime.title || 'Unknown';
-}
-
-export function getSeasonName(season: 1 | 2 | 3 | 4 | undefined): string {
-  switch (season) {
-    case 1: return 'Зима';
-    case 2: return 'Весна';
-    case 3: return 'Лето';
-    case 4: return 'Осень';
-    default: return '';
-  }
-}
 
 export function formatEpisodeCount(episodes: AnimeEpisodes | undefined): string {
   if (!episodes) return '';
   if (episodes.count === 0) return '?';
   if (episodes.aired === episodes.count) return `${episodes.count}`;
   return `${episodes.aired} / ${episodes.count}`;
-}
-
-export function isAnimeAiring(anime: AnimeCatalogItem): boolean {
-  return anime.anime_status?.alias === 'ongoing';
-}
-
-export function getPosterUrl(anime: AnimeCatalogItem, size: keyof AnimePoster = 'huge'): string {
-  return anime.poster?.[size] || anime.poster?.medium || anime.poster?.big || '';
-}
-
-export function getRatingDisplay(rating: { average: number; counters?: number } | undefined): string {
-  if (!rating) return '0.00';
-  return rating.average.toFixed(2);
 }
 
 export interface AnimeScheduleItem {

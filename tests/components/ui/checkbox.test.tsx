@@ -15,9 +15,7 @@ describe('Checkbox', () => {
   });
 
   it('handles onChange', () => {
-    const handleChange = (_checked: boolean) => {
-      // callback is called
-    };
+    const handleChange = () => {};
     render(<Checkbox onCheckedChange={handleChange} />);
     const checkbox = document.querySelector('[data-slot="checkbox"]');
     expect(checkbox).toBeInTheDocument();

@@ -5,6 +5,7 @@ import { TooltipWrap } from '@/components/ui/tooltip';
 import { AnimeTitle } from '@/components/anime/AnimeTitle';
 import type { AnimeCatalogItem } from '@/types';
 import { getImageUrl, getPosterUrl } from '@/lib/imageUrl';
+import { buildAnimeUrl } from '@/lib/animeUrl';
 import { STATUS_ICONS, STATUS_COLORS, STATUS_LABELS, FAVORITE_ICON, getRatingColor, type StatusType } from '@/types/constants';
 
 interface AnimeCardProps {
@@ -21,9 +22,7 @@ export function AnimeCard({ anime, showRating = true, userStatus, isFavorite }: 
   const isAnnouncement = anime.anime_status?.alias === 'announcement';
   const validRating = rating !== null && !isNaN(rating) && !isAnnouncement;
 
-  const url = anime.anime_url?.startsWith('/anime/')
-    ? anime.anime_url
-    : `/anime/${anime.anime_url || anime.anime_id}`;
+  const url = buildAnimeUrl(anime);
 
   const statusLabel = userStatus ? STATUS_LABELS[userStatus] : '';
   const ratingLabel = validRating ? `Рейтинг: ${rating.toFixed(1)}` : '';

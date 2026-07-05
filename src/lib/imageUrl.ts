@@ -1,61 +1,64 @@
 /**
- * Image URL utilities for YummyAnime API
- * 
+ * Image URL utilities for YummyAnime API.
+ *
  * The API returns image URLs as-is (poster, cover, screenshots).
  * This file provides utilities for image optimization and fallbacks.
  */
 
 export function getImageUrl(url: string | null | undefined, fallback?: string): string {
-  // Handle non-string values
   if (!url || typeof url !== 'string') return fallback || '/placeholder-anime.png';
-  
-  // Handle protocol-relative URLs (//example.com)
+
   if (url.startsWith('//')) {
     return 'https:' + url;
   }
-  
-  // If it's already an absolute URL, return as-is
+
   if (url.startsWith('http://') || url.startsWith('https://')) {
     return url;
   }
-  
-  // For relative URLs, return as-is
+
   return url;
 }
 
-// YummyAnime API returns poster as an object with different sizes
-interface PosterSizes {
-  small?: string;
-  medium?: string;
-  big?: string;
-  huge?: string;
-  fullsize?: string;
-  mega?: string;
+export type PosterSize = 'mega' | 'huge' | 'fullsize' | 'big' | 'medium' | 'small';
+
+type PosterObject = Partial<Record<PosterSize, string>>;
+
+interface PosterSource {
+  poster?: PosterObject | string | null;
+  cover?: string | null;
 }
 
-export function getPosterUrl(anime: { poster?: PosterSizes | string | null; cover?: string | null }): string {
+export function getPosterUrl(anime: PosterSource, size: PosterSize = 'mega'): string {
   const poster = anime.poster;
 
-  // Handle case where poster is an object with size variants
-  if (poster && typeof poster === 'object') {
-    const sizes = poster as PosterSizes;
-    return getImageUrl(sizes.mega || sizes.huge || sizes.fullsize || sizes.big || sizes.medium || sizes.small, '/placeholder-anime.png');
+  if (typeof poster === 'string') {
+    return getImageUrl(poster, '/placeholder-anime.png');
   }
 
-  // Handle case where poster is a string
-  return getImageUrl(poster || anime.cover, '/placeholder-anime.png');
+  if (poster && typeof poster === 'object') {
+    const order: PosterSize[] = [size, 'mega', 'huge', 'fullsize', 'big', 'medium', 'small'];
+    for (const s of order) {
+      const url = poster[s];
+      if (url) return getImageUrl(url, '/placeholder-anime.png');
+    }
+  }
+
+  return getImageUrl(anime.cover, '/placeholder-anime.png');
 }
 
 export function getCoverUrl(anime: { cover?: string | null; poster?: string | null }): string {
   return getImageUrl(anime.cover || anime.poster, '/placeholder-anime.png');
 }
 
-export function getHeroPosterUrl(anime: { poster?: PosterSizes | string | null }, fallback = '/placeholder-anime.png'): string {
+export function getHeroPosterUrl(anime: { poster?: PosterObject | string | null }, fallback = '/placeholder-anime.png'): string {
   const poster = anime.poster;
 
   if (poster && typeof poster === 'object') {
-    const sizes = poster as PosterSizes;
-    return getImageUrl(sizes.mega || sizes.huge || sizes.fullsize || sizes.big || fallback);
+    const order: PosterSize[] = ['mega', 'huge', 'fullsize', 'big'];
+    for (const s of order) {
+      const url = poster[s];
+      if (url) return getImageUrl(url, fallback);
+    }
   }
 
   return fallback;
@@ -66,7 +69,6 @@ export function getScreenshotUrl(screenshot: string): string {
 }
 
 export function buildImageProxyUrl(url: string): string {
-  // YummyAnime images should be served directly without proxy
   return url;
 }
 
