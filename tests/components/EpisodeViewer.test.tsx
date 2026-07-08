@@ -18,7 +18,7 @@ const anidubVideo: AnimeVideo = {
 const subtitleVideo: AnimeVideo = {
   video_id: 2,
   iframe_url: 'https://player.example.com/embed/2',
-  data: { dubbing: 'Субтитры', player: 'Kodik', player_id: 1 },
+  data: { dubbing: 'Озвучка SubStudio', player: 'Kodik', player_id: 1 },
   number: '1',
   date: 0,
   index: 1,
@@ -51,7 +51,7 @@ const anidubAllohaVideo2: AnimeVideo = {
 
 const translates: AnimeTranslate[] = [
   { title: 'AniDub', href: 'anidub', value: 1 },
-  { title: 'Субтитры', href: 'subs', value: 2 },
+  { title: 'Озвучка SubStudio', href: 'subs', value: 2 },
 ];
 
 async function selectTranslate(user: ReturnType<typeof userEvent.setup>, currentLabel: string, targetName: string) {
@@ -127,7 +127,7 @@ describe('EpisodeViewer', () => {
     render(<EpisodeViewer videos={videos} translates={translates} title="t" />);
     expect(screen.getByTitle('t - Серия 1')).toBeInTheDocument();
 
-    await selectTranslate(user, 'AniDub', 'Субтитры');
+    await selectTranslate(user, 'AniDub', 'Озвучка SubStudio');
 
     const iframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
     expect(iframe.src).toBe('https://player.example.com/embed/2');
@@ -139,7 +139,7 @@ describe('EpisodeViewer', () => {
     render(<EpisodeViewer videos={videos} translates={translates} title="t" />);
     fireEvent.click(screen.getByRole('tab', { name: 'Серия 2' }));
 
-    await selectTranslate(user, 'AniDub', 'Субтитры');
+    await selectTranslate(user, 'AniDub', 'Озвучка SubStudio');
 
     expect(screen.getByTitle('t - Серия 1')).toBeInTheDocument();
   });
@@ -166,7 +166,7 @@ describe('EpisodeViewer', () => {
     await user.click(trigger);
 
     expect(screen.getByRole('option', { name: 'AniDub' })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: 'Субтитры' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Озвучка SubStudio' })).toBeInTheDocument();
   });
 
   it('filters synthesized translates by dubbing', async () => {
@@ -176,7 +176,7 @@ describe('EpisodeViewer', () => {
 
     expect(screen.getByTitle('t - Серия 1')).toBeInTheDocument();
 
-    await selectTranslate(user, 'AniDub', 'Субтитры');
+    await selectTranslate(user, 'AniDub', 'Озвучка SubStudio');
 
     const iframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
     expect(iframe.src).toBe('https://player.example.com/embed/2');
@@ -232,7 +232,7 @@ describe('EpisodeViewer', () => {
         videos={videos}
         translates={[
           { title: 'AniDub', href: 'anidub', value: 1 },
-          { title: 'Субтитры', href: 'subs', value: 2 },
+          { title: 'Озвучка SubStudio', href: 'subs', value: 2 },
         ]}
         title="t"
       />
@@ -258,31 +258,87 @@ describe('EpisodeViewer', () => {
       iframe_url: 'https://player.example.com/embed/101',
       data: { dubbing: 'AniLibria', player: 'Kodik', player_id: 1 },
     };
-
-    const translatesA: AnimeTranslate[] = [
-      { title: 'AniDub', href: 'anidub', value: 1 },
-      { title: 'Субтитры', href: 'subs', value: 2 },
-    ];
-    const translatesB: AnimeTranslate[] = [
-      { title: 'Многоголосый', href: 'multivoice', value: 4 },
-      { title: 'Субтитры', href: 'subtitles', value: 7 },
-    ];
+    const subtitleForB: AnimeVideo = {
+      ...subtitleVideo,
+      video_id: 102,
+      iframe_url: 'https://player.example.com/embed/102',
+    };
 
     const { rerender } = render(
-      <EpisodeViewer videos={[anidubVideo, anidubVideo2]} translates={translatesA} title="A" />
+      <EpisodeViewer videos={[anidubVideo, anidubVideo2, subtitleVideo]} title="A" />
     );
     expect(screen.getByRole('button', { name: /AniDub/ })).toBeInTheDocument();
 
     rerender(
       <EpisodeViewer
-        videos={[otherDubVideo, anidub3]}
-        translates={translatesB}
+        videos={[otherDubVideo, anidub3, subtitleForB]}
         title="B"
       />
     );
 
-    const triggerB = screen.getByRole('button', { name: /Многоголосый/ });
+    const triggerB = screen.getByRole('button', { name: /AniLibria/ });
     expect(triggerB).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /AniDub/ })).not.toBeInTheDocument();
+  });
+
+  it('ignores generic translates from API and synthesizes from videos dubbing', async () => {
+    const user = userEvent.setup();
+    const genericTranslates: AnimeTranslate[] = [
+      { title: 'Многоголосый', href: 'multivoice', value: 4 },
+      { title: 'Одноголосый', href: 'single', value: 5 },
+      { title: 'Двухголосый', href: 'duet', value: 6 },
+      { title: 'Субтитры', href: 'subtitles', value: 7 },
+    ];
+    const videos = [anidubVideo, anidubAllohaVideo, subtitleVideo, anidubVideo2];
+    render(<EpisodeViewer videos={videos} translates={genericTranslates} title="t" />);
+
+    const trigger = screen.getByRole('button', { name: /AniDub/ });
+    expect(trigger).toBeInTheDocument();
+
+    await user.click(trigger);
+    expect(screen.getByRole('option', { name: 'AniDub' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Озвучка SubStudio' })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Многоголосый' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Одноголосый' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Двухголосый' })).not.toBeInTheDocument();
+  });
+
+  it('strips generic titles from the API fallback when videos have no dubbing data', () => {
+    const genericTranslates: AnimeTranslate[] = [
+      { title: 'Многоголосый', href: 'multivoice', value: 4 },
+      { title: 'Одноголосый', href: 'single', value: 5 },
+      { title: 'Двухголосый', href: 'duet', value: 6 },
+      { title: 'Субтитры', href: 'subtitles', value: 7 },
+    ];
+    const stubDubbing: AnimeVideo[] = [
+      { ...anidubVideo, data: { ...anidubVideo.data, dubbing: '' } },
+      { ...anidubVideo2, data: { ...anidubVideo2.data, dubbing: '' } },
+    ];
+    render(<EpisodeViewer videos={stubDubbing} translates={genericTranslates} title="t" />);
+
+    // No videos contribute a dubbing -> synthesized list is empty -> API fallback is used.
+    // The generic filter must strip every generic entry, leaving an empty list and
+    // hiding the translate selector entirely.
+    expect(screen.queryByRole('button', { name: /Многоголосый/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Одноголосый/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Двухголосый/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Субтитры/ })).not.toBeInTheDocument();
+  });
+
+  it('strips generic titles from the synthesized branch when a video row stores a generic dubbing', async () => {
+    const user = userEvent.setup();
+    const mixed: AnimeVideo[] = [
+      { ...anidubVideo, data: { ...anidubVideo.data, dubbing: 'Многоголосый' } },
+      subtitleVideo,
+      anidubVideo2,
+    ];
+    render(<EpisodeViewer videos={mixed} title="t" />);
+
+    const trigger = screen.getByRole('button', { name: /Озвучка SubStudio/ });
+    expect(trigger).toBeInTheDocument();
+
+    await user.click(trigger);
+    expect(screen.getByRole('option', { name: 'Озвучка SubStudio' })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Многоголосый' })).not.toBeInTheDocument();
   });
 });

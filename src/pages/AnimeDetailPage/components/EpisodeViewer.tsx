@@ -14,6 +14,8 @@ interface EpisodeViewerProps {
 
 const PLAYER_PRIORITY = ['Kodik', 'CVH', 'Alloha'];
 
+const GENERIC_TRANSLATE_TITLES = new Set(['Многоголосый', 'Одноголосый', 'Двухголосый', 'Субтитры']);
+
 function filterVideosByTranslate(videos: AnimeVideo[], translate: AnimeTranslate | undefined): AnimeVideo[] {
   if (!translate) return videos;
   const filtered = videos.filter((v) => v.data?.dubbing === translate.title);
@@ -30,6 +32,14 @@ function synthesizeTranslatesFromVideos(videos: AnimeVideo[]): AnimeTranslate[] 
     result.push({ title: dubbing, href: dubbing.toLowerCase().replace(/\s+/g, '-'), value: result.length + 1 });
   }
   return result;
+}
+
+function isGenericTranslateTitle(title: string): boolean {
+  return GENERIC_TRANSLATE_TITLES.has(title);
+}
+
+function filterGenericTranslates(translates: AnimeTranslate[]): AnimeTranslate[] {
+  return translates.filter((t) => !isGenericTranslateTitle(t.title));
 }
 
 function comparePlayersByPriority(a: string, b: string): number {
@@ -55,8 +65,9 @@ function getUniquePlayers(videos: AnimeVideo[]): string[] {
 
 export function EpisodeViewer({ videos, translates, title }: EpisodeViewerProps) {
   const translatesList = useMemo(() => {
-    if (translates && translates.length > 0) return translates;
-    return synthesizeTranslatesFromVideos(videos);
+    const synthesized = filterGenericTranslates(synthesizeTranslatesFromVideos(videos));
+    if (synthesized.length > 0) return synthesized;
+    return filterGenericTranslates(translates ?? []);
   }, [translates, videos]);
   const [translateValue, setTranslateValue] = useState<number | null>(
     translatesList[0]?.value ?? null
