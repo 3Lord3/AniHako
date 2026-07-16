@@ -1,5 +1,15 @@
+import { useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAnimeDetail, useAddToList, useUserAnimeList, useToggleFavorite, useUpdateListEntry, useRemoveFromList } from '@/hooks';
+import {
+  useAnimeDetail,
+  useAddToList,
+  useUserAnimeList,
+  useToggleFavorite,
+  useUpdateListEntry,
+  useRemoveFromList,
+  useVideoViews,
+  useToggleVideoViewed,
+} from '@/hooks';
 import { useUser } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -26,12 +36,29 @@ export function AnimeDetailPage() {
   const { mutate: toggleFavorite } = useToggleFavorite();
   const { mutate: updateListEntry } = useUpdateListEntry();
   const { mutate: removeFromList } = useRemoveFromList();
+  const { data: viewedVideoIds = [] } = useVideoViews(animeId || null, anime?.videos);
+  const { mutate: toggleVideoViewed } = useToggleVideoViewed(animeId || null, anime?.videos);
 
-  const userAnime = userAnimeList && Array.isArray(userAnimeList)
-    ? userAnimeList.find((rate: YummyUserAnimeRate) => rate.anime_id === animeId)
-    : undefined;
+  const viewedVideoSet = useMemo(() => new Set(viewedVideoIds), [viewedVideoIds]);
+
+  // Build a Map for O(1) lookup of the user's rate for this anime, instead
+  // of scanning the full user-anime list on every render.
+  const userAnimeById = useMemo(() => {
+    const map = new Map<number, YummyUserAnimeRate>();
+    if (Array.isArray(userAnimeList)) {
+      for (const rate of userAnimeList) {
+        if (typeof rate?.anime_id === 'number') {
+          map.set(rate.anime_id, rate);
+        }
+      }
+    }
+    return map;
+  }, [userAnimeList]);
+
+  const userAnime = animeId > 0 ? userAnimeById.get(animeId) : undefined;
   const isFavorite = anime?.user?.list?.is_fav || false;
   const userListId: number | null = anime?.user?.list?.list?.id ?? userAnime?.user?.list?.list?.id ?? null;
+  const canMarkWatched = !!user && animeId > 0;
 
   const handleAddToList = (status: AnimeStatus) => {
     if (!user) {
@@ -61,6 +88,32 @@ export function AnimeDetailPage() {
     }
     toggleFavorite({ animeId, isFavorite });
   };
+
+  const handleToggleWatched = useCallback(
+    (videoId: number, isWatched: boolean) => {
+      if (!user) {
+        navigate('/login');
+        return;
+      }
+      toggleVideoViewed(
+        { videoId, currentlyViewed: isWatched },
+        { onError: () => {} }
+      );
+    },
+    [user, navigate, toggleVideoViewed]
+  );
+
+  const handleEpisodeComplete = useCallback(
+    (videoId: number) => {
+      if (!user) return;
+      if (viewedVideoSet.has(videoId)) return;
+      toggleVideoViewed(
+        { videoId, currentlyViewed: false },
+        { onError: () => {} }
+      );
+    },
+    [user, viewedVideoSet, toggleVideoViewed]
+  );
 
   if (isLoading) {
     return <AnimeDetailPageSkeleton />;
@@ -154,6 +207,10 @@ export function AnimeDetailPage() {
           videos={anime.videos}
           translates={anime.translates}
           title={displayTitle}
+          viewedVideoIds={viewedVideoSet}
+          canMarkWatched={canMarkWatched}
+          onToggleWatched={handleToggleWatched}
+          onEpisodeComplete={handleEpisodeComplete}
         />
       )}
     </div>
