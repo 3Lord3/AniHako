@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { AnimeTranslate, AnimeVideo } from '@/types';
 import { EpisodePlayer } from './EpisodePlayer';
@@ -133,6 +133,16 @@ export function EpisodeViewer({
     }
   }, [filteredVideos.length, selectedIndex]);
 
+  const handleEpisodeComplete = useCallback(
+    (videoId: number) => {
+      onEpisodeComplete?.(videoId);
+      setSelectedIndex((current) =>
+        current + 1 < filteredVideos.length ? current + 1 : current
+      );
+    },
+    [onEpisodeComplete, filteredVideos.length]
+  );
+
   if (videos.length === 0) return null;
 
   const currentVideo = filteredVideos[selectedIndex];
@@ -167,7 +177,7 @@ export function EpisodeViewer({
         <EpisodePlayer
           video={currentVideo}
           title={title}
-          onEpisodeComplete={onEpisodeComplete}
+          onEpisodeComplete={handleEpisodeComplete}
         />
       </CardContent>
     </Card>

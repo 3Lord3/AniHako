@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, within, fireEvent } from '@testing-library/react';
+import { act, render, screen, within, fireEvent } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { EpisodeViewer } from '@/pages/AnimeDetailPage/components/EpisodeViewer';
 import type { AnimeTranslate, AnimeVideo } from '@/types';
@@ -356,12 +356,116 @@ describe('EpisodeViewer', () => {
       />
     );
     const iframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
-    window.dispatchEvent(
-      new MessageEvent('message', {
-        data: { event: 'kdEnded' },
-        source: iframe.contentWindow,
-      })
-    );
+    act(() => {
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          data: { event: 'kdEnded' },
+          source: iframe.contentWindow,
+        })
+      );
+    });
     expect(onEpisodeComplete).toHaveBeenCalledWith(anidubVideo.video_id);
+  });
+
+  it('auto-advances to the next episode when the current one ends', () => {
+    render(<EpisodeViewer videos={[anidubVideo, anidubVideo2]} title="t" />);
+    expect(screen.getByTitle('t - Серия 1')).toBeInTheDocument();
+
+    const iframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
+    act(() => {
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          data: { event: 'kdEnded' },
+          source: iframe.contentWindow,
+        })
+      );
+    });
+
+    const nextIframe = screen.getByTitle('t - Серия 2') as HTMLIFrameElement;
+    expect(nextIframe.src).toBe('https://player.example.com/embed/3');
+  });
+
+  it('forwards the callback with the correct videoId for each consecutive episode end', () => {
+    const onEpisodeComplete = vi.fn();
+    render(
+      <EpisodeViewer
+        videos={[anidubVideo, anidubVideo2]}
+        title="t"
+        onEpisodeComplete={onEpisodeComplete}
+      />
+    );
+
+    const firstIframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
+    act(() => {
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          data: { event: 'kdEnded' },
+          source: firstIframe.contentWindow,
+        })
+      );
+    });
+    expect(onEpisodeComplete).toHaveBeenCalledTimes(1);
+    expect(onEpisodeComplete).toHaveBeenLastCalledWith(anidubVideo.video_id);
+
+    const secondIframe = screen.getByTitle('t - Серия 2') as HTMLIFrameElement;
+    act(() => {
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          data: { event: 'kdEnded' },
+          source: secondIframe.contentWindow,
+        })
+      );
+    });
+    expect(onEpisodeComplete).toHaveBeenCalledTimes(2);
+    expect(onEpisodeComplete).toHaveBeenLastCalledWith(anidubVideo2.video_id);
+  });
+
+  it('does not advance or re-fire the callback on duplicate ended signals from the same iframe', () => {
+    const onEpisodeComplete = vi.fn();
+    render(
+      <EpisodeViewer
+        videos={[anidubVideo, anidubVideo2]}
+        title="t"
+        onEpisodeComplete={onEpisodeComplete}
+      />
+    );
+
+    const iframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
+    const dispatchEnded = () =>
+      act(() => {
+        window.dispatchEvent(
+          new MessageEvent('message', {
+            data: { event: 'kdEnded' },
+            source: iframe.contentWindow,
+          })
+        );
+      });
+
+    dispatchEnded();
+    dispatchEnded();
+    dispatchEnded();
+
+    expect(onEpisodeComplete).toHaveBeenCalledTimes(1);
+    expect(onEpisodeComplete).toHaveBeenCalledWith(anidubVideo.video_id);
+    const nextIframe = screen.getByTitle('t - Серия 2') as HTMLIFrameElement;
+    expect(nextIframe.src).toBe('https://player.example.com/embed/3');
+  });
+
+  it('does not advance past the last episode when it ends', () => {
+    render(<EpisodeViewer videos={[anidubVideo, anidubVideo2]} title="t" />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Серия 2' }));
+
+    const iframe = screen.getByTitle('t - Серия 2') as HTMLIFrameElement;
+    act(() => {
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          data: { event: 'kdEnded' },
+          source: iframe.contentWindow,
+        })
+      );
+    });
+
+    const stillHere = screen.getByTitle('t - Серия 2') as HTMLIFrameElement;
+    expect(stillHere.src).toBe('https://player.example.com/embed/3');
   });
 });
