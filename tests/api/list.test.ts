@@ -5,6 +5,7 @@ vi.mock('@/api/index', () => ({
   api: {
     get: vi.fn(),
     put: vi.fn(),
+    post: vi.fn(),
     delete: vi.fn(),
   },
 }));
@@ -97,6 +98,87 @@ describe('userListApi', () => {
       await userListApi.removeFromFavorites(123);
 
       expect(api.delete).toHaveBeenCalledWith('/anime/123/list/fav');
+    });
+  });
+
+  describe('getVideoWatchHistoryPage', () => {
+    it('requests a single page with limit/offset', async () => {
+      vi.mocked(api.get).mockResolvedValueOnce({
+        data: { response: [{ video_id: 1, anime_id: 5 }] },
+      });
+
+      const result = await userListApi.getVideoWatchHistoryPage({ limit: 100, offset: 0 });
+
+      expect(api.get).toHaveBeenCalledWith('/video/watch-history', {
+        params: { limit: 100, offset: 0 },
+      });
+      expect(result).toEqual([{ video_id: 1, anime_id: 5 }]);
+    });
+
+    it('returns empty array when response is missing', async () => {
+      vi.mocked(api.get).mockResolvedValueOnce({ data: {} });
+
+      const result = await userListApi.getVideoWatchHistoryPage({ limit: 100, offset: 0 });
+
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('getVideoWatchHistory', () => {
+    it('walks through pages until a short page is returned', async () => {
+      vi.mocked(api.get)
+        .mockResolvedValueOnce({
+          data: {
+            response: Array.from({ length: 100 }, (_, i) => ({ video_id: i + 1, anime_id: 1 })),
+          },
+        })
+        .mockResolvedValueOnce({
+          data: {
+            response: [{ video_id: 101, anime_id: 1 }],
+          },
+        });
+
+      const result = await userListApi.getVideoWatchHistory();
+
+      expect(api.get).toHaveBeenCalledTimes(2);
+      expect(api.get).toHaveBeenNthCalledWith(1, '/video/watch-history', {
+        params: { limit: 100, offset: 0 },
+      });
+      expect(api.get).toHaveBeenNthCalledWith(2, '/video/watch-history', {
+        params: { limit: 100, offset: 100 },
+      });
+      expect(result).toHaveLength(101);
+      expect(result[0]).toEqual({ video_id: 1, anime_id: 1 });
+      expect(result[100]).toEqual({ video_id: 101, anime_id: 1 });
+    });
+
+    it('stops immediately when the first page is empty', async () => {
+      vi.mocked(api.get).mockResolvedValueOnce({ data: { response: [] } });
+
+      const result = await userListApi.getVideoWatchHistory();
+
+      expect(api.get).toHaveBeenCalledTimes(1);
+      expect(result).toEqual([]);
+    });
+  });
+
+  describe('markVideoViewed', () => {
+    it('puts to /video/:id', async () => {
+      vi.mocked(api.put).mockResolvedValueOnce({ data: {} });
+
+      await userListApi.markVideoViewed(7);
+
+      expect(api.put).toHaveBeenCalledWith('/video/7');
+    });
+  });
+
+  describe('unmarkVideoViewed', () => {
+    it('deletes /video/:id', async () => {
+      vi.mocked(api.delete).mockResolvedValueOnce({ data: {} });
+
+      await userListApi.unmarkVideoViewed(7);
+
+      expect(api.delete).toHaveBeenCalledWith('/video/7');
     });
   });
 });

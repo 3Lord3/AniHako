@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { AnimeTranslate, AnimeVideo } from '@/types';
 import { EpisodePlayer } from './EpisodePlayer';
@@ -10,6 +10,10 @@ interface EpisodeViewerProps {
   videos: AnimeVideo[];
   translates?: AnimeTranslate[];
   title: string;
+  viewedVideoIds?: Set<number>;
+  onToggleWatched?: (videoId: number, isWatched: boolean) => void;
+  onEpisodeComplete?: (videoId: number) => void;
+  canMarkWatched?: boolean;
 }
 
 const PLAYER_PRIORITY = ['Kodik', 'CVH', 'Alloha'];
@@ -63,7 +67,15 @@ function getUniquePlayers(videos: AnimeVideo[]): string[] {
   return result.sort(comparePlayersByPriority);
 }
 
-export function EpisodeViewer({ videos, translates, title }: EpisodeViewerProps) {
+export function EpisodeViewer({
+  videos,
+  translates,
+  title,
+  viewedVideoIds,
+  onToggleWatched,
+  onEpisodeComplete,
+  canMarkWatched = false,
+}: EpisodeViewerProps) {
   const translatesList = useMemo(() => {
     const synthesized = filterGenericTranslates(synthesizeTranslatesFromVideos(videos));
     if (synthesized.length > 0) return synthesized;
@@ -121,26 +133,15 @@ export function EpisodeViewer({ videos, translates, title }: EpisodeViewerProps)
     }
   }, [filteredVideos.length, selectedIndex]);
 
-  const filteredVideosLengthRef = useRef(filteredVideos.length);
-  useEffect(() => {
-    filteredVideosLengthRef.current = filteredVideos.length;
-  }, [filteredVideos.length]);
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      const active = document.activeElement as HTMLElement | null;
-      if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) {
-        return;
-      }
-      if (e.key === 'ArrowLeft') {
-        setSelectedIndex((idx) => Math.max(0, idx - 1));
-      } else if (e.key === 'ArrowRight') {
-        setSelectedIndex((idx) => Math.min(filteredVideosLengthRef.current - 1, idx + 1));
-      }
-    };
-    window.addEventListener('keydown', handler);
-    return () => window.removeEventListener('keydown', handler);
-  }, []);
+  const handleEpisodeComplete = useCallback(
+    (videoId: number) => {
+      onEpisodeComplete?.(videoId);
+      setSelectedIndex((current) =>
+        current + 1 < filteredVideos.length ? current + 1 : current
+      );
+    },
+    [onEpisodeComplete, filteredVideos.length]
+  );
 
   if (videos.length === 0) return null;
 
@@ -168,15 +169,15 @@ export function EpisodeViewer({ videos, translates, title }: EpisodeViewerProps)
             videos={filteredVideos}
             selectedIndex={selectedIndex}
             onSelect={setSelectedIndex}
+            viewedVideoIds={viewedVideoIds}
+            onToggleWatched={onToggleWatched}
+            canMarkWatched={canMarkWatched}
           />
         )}
         <EpisodePlayer
           video={currentVideo}
           title={title}
-          hasPrev={selectedIndex > 0}
-          hasNext={selectedIndex < filteredVideos.length - 1}
-          onPrev={() => setSelectedIndex((idx) => Math.max(0, idx - 1))}
-          onNext={() => setSelectedIndex((idx) => Math.min(filteredVideos.length - 1, idx + 1))}
+          onEpisodeComplete={handleEpisodeComplete}
         />
       </CardContent>
     </Card>

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, within, fireEvent } from '@testing-library/react';
+import { act, render, screen, within, fireEvent } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { EpisodeViewer } from '@/pages/AnimeDetailPage/components/EpisodeViewer';
 import type { AnimeTranslate, AnimeVideo } from '@/types';
@@ -95,32 +95,6 @@ describe('EpisodeViewer', () => {
     expect(iframe.src).toBe('https://player.example.com/embed/3');
   });
 
-  it('ArrowRight advances the active episode', () => {
-    render(<EpisodeViewer videos={[anidubVideo, anidubVideo2]} title="t" />);
-    fireEvent.keyDown(window, { key: 'ArrowRight' });
-    expect(screen.getByTitle('t - Серия 2')).toBeInTheDocument();
-  });
-
-  it('ArrowLeft goes back to the previous episode', () => {
-    render(<EpisodeViewer videos={[anidubVideo, anidubVideo2]} title="t" />);
-    fireEvent.click(screen.getByRole('tab', { name: 'Серия 2' }));
-    fireEvent.keyDown(window, { key: 'ArrowLeft' });
-    expect(screen.getByTitle('t - Серия 1')).toBeInTheDocument();
-  });
-
-  it('does not switch episode via keyboard when focus is in an input', () => {
-    render(
-      <div>
-        <input data-testid="trap" />
-        <EpisodeViewer videos={[anidubVideo, anidubVideo2]} title="t" />
-      </div>
-    );
-    const input = screen.getByTestId('trap');
-    input.focus();
-    fireEvent.keyDown(input, { key: 'ArrowRight' });
-    expect(screen.getByTitle('t - Серия 1')).toBeInTheDocument();
-  });
-
   it('filters videos by selected translate', async () => {
     const user = userEvent.setup();
     const videos = [anidubVideo, subtitleVideo, anidubVideo2];
@@ -142,18 +116,6 @@ describe('EpisodeViewer', () => {
     await selectTranslate(user, 'AniDub', 'Озвучка SubStudio');
 
     expect(screen.getByTitle('t - Серия 1')).toBeInTheDocument();
-  });
-
-  it('disables prev/next at boundaries', () => {
-    const { rerender } = render(
-      <EpisodeViewer videos={[anidubVideo]} title="t" />
-    );
-    expect(screen.getByLabelText('Предыдущая серия')).toBeDisabled();
-    expect(screen.getByLabelText('Следующая серия')).toBeDisabled();
-
-    rerender(<EpisodeViewer videos={[anidubVideo, anidubVideo2]} title="t" />);
-    expect(screen.getByLabelText('Предыдущая серия')).toBeDisabled();
-    expect(screen.getByLabelText('Следующая серия')).not.toBeDisabled();
   });
 
   it('synthesizes translates from videos when API provides none', async () => {
@@ -340,5 +302,170 @@ describe('EpisodeViewer', () => {
     await user.click(trigger);
     expect(screen.getByRole('option', { name: 'Озвучка SubStudio' })).toBeInTheDocument();
     expect(screen.queryByRole('option', { name: 'Многоголосый' })).not.toBeInTheDocument();
+  });
+
+  it('renders watched toggles only when canMarkWatched is true', () => {
+    render(
+      <EpisodeViewer
+        videos={[anidubVideo, anidubVideo2]}
+        title="t"
+        viewedVideoIds={new Set([1])}
+        canMarkWatched
+        onToggleWatched={vi.fn()}
+      />
+    );
+    expect(screen.getByTestId('episode-watched-toggle-1')).toBeInTheDocument();
+    expect(screen.getByTestId('episode-watched-toggle-3')).toBeInTheDocument();
+  });
+
+  it('hides watched toggles when canMarkWatched is false', () => {
+    render(
+      <EpisodeViewer
+        videos={[anidubVideo, anidubVideo2]}
+        title="t"
+        viewedVideoIds={new Set([1])}
+        canMarkWatched={false}
+        onToggleWatched={vi.fn()}
+      />
+    );
+    expect(screen.queryByTestId('episode-watched-toggle-1')).not.toBeInTheDocument();
+  });
+
+  it('forwards onToggleWatched with videoId and isWatched flag', () => {
+    const onToggleWatched = vi.fn();
+    render(
+      <EpisodeViewer
+        videos={[anidubVideo, anidubVideo2]}
+        title="t"
+        viewedVideoIds={new Set([1])}
+        canMarkWatched
+        onToggleWatched={onToggleWatched}
+      />
+    );
+    fireEvent.click(screen.getByTestId('episode-watched-toggle-3'));
+    expect(onToggleWatched).toHaveBeenCalledWith(3, false);
+  });
+
+  it('forwards onEpisodeComplete with videoId from iframe ended message', () => {
+    const onEpisodeComplete = vi.fn();
+    render(
+      <EpisodeViewer
+        videos={[anidubVideo, anidubVideo2]}
+        title="t"
+        onEpisodeComplete={onEpisodeComplete}
+      />
+    );
+    const iframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
+    act(() => {
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          data: { event: 'kdEnded' },
+          source: iframe.contentWindow,
+        })
+      );
+    });
+    expect(onEpisodeComplete).toHaveBeenCalledWith(anidubVideo.video_id);
+  });
+
+  it('auto-advances to the next episode when the current one ends', () => {
+    render(<EpisodeViewer videos={[anidubVideo, anidubVideo2]} title="t" />);
+    expect(screen.getByTitle('t - Серия 1')).toBeInTheDocument();
+
+    const iframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
+    act(() => {
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          data: { event: 'kdEnded' },
+          source: iframe.contentWindow,
+        })
+      );
+    });
+
+    const nextIframe = screen.getByTitle('t - Серия 2') as HTMLIFrameElement;
+    expect(nextIframe.src).toBe('https://player.example.com/embed/3');
+  });
+
+  it('forwards the callback with the correct videoId for each consecutive episode end', () => {
+    const onEpisodeComplete = vi.fn();
+    render(
+      <EpisodeViewer
+        videos={[anidubVideo, anidubVideo2]}
+        title="t"
+        onEpisodeComplete={onEpisodeComplete}
+      />
+    );
+
+    const firstIframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
+    act(() => {
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          data: { event: 'kdEnded' },
+          source: firstIframe.contentWindow,
+        })
+      );
+    });
+    expect(onEpisodeComplete).toHaveBeenCalledTimes(1);
+    expect(onEpisodeComplete).toHaveBeenLastCalledWith(anidubVideo.video_id);
+
+    const secondIframe = screen.getByTitle('t - Серия 2') as HTMLIFrameElement;
+    act(() => {
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          data: { event: 'kdEnded' },
+          source: secondIframe.contentWindow,
+        })
+      );
+    });
+    expect(onEpisodeComplete).toHaveBeenCalledTimes(2);
+    expect(onEpisodeComplete).toHaveBeenLastCalledWith(anidubVideo2.video_id);
+  });
+
+  it('does not advance or re-fire the callback on duplicate ended signals from the same iframe', () => {
+    const onEpisodeComplete = vi.fn();
+    render(
+      <EpisodeViewer
+        videos={[anidubVideo, anidubVideo2]}
+        title="t"
+        onEpisodeComplete={onEpisodeComplete}
+      />
+    );
+
+    const iframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
+    const dispatchEnded = () =>
+      act(() => {
+        window.dispatchEvent(
+          new MessageEvent('message', {
+            data: { event: 'kdEnded' },
+            source: iframe.contentWindow,
+          })
+        );
+      });
+
+    dispatchEnded();
+    dispatchEnded();
+    dispatchEnded();
+
+    expect(onEpisodeComplete).toHaveBeenCalledTimes(1);
+    expect(onEpisodeComplete).toHaveBeenCalledWith(anidubVideo.video_id);
+    const nextIframe = screen.getByTitle('t - Серия 2') as HTMLIFrameElement;
+    expect(nextIframe.src).toBe('https://player.example.com/embed/3');
+  });
+
+  it('does not advance past the last episode when it ends', () => {
+    render(<EpisodeViewer videos={[anidubVideo, anidubVideo2]} title="t" />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Серия 2' }));
+
+    const iframe = screen.getByTitle('t - Серия 2') as HTMLIFrameElement;
+    act(() => {
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          data: { event: 'kdEnded' },
+          source: iframe.contentWindow,
+        })
+      );
+    });
+
+    const stillHere = screen.getByTitle('t - Серия 2') as HTMLIFrameElement;
+    expect(stillHere.src).toBe('https://player.example.com/embed/3');
   });
 });
