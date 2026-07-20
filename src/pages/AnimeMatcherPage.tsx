@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useRandomAnime, useAddToList } from '@/hooks';
+import { useRandomAnime, useAddToList, useFullscreen } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -19,6 +19,8 @@ export function AnimeMatcherPage() {
   const navigate = useNavigate();
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
+  const { enter: enterFullscreen, exit: exitFullscreen, isFullscreen } = useFullscreen();
+  const hasEnteredFullscreen = useRef(false);
 
   const { data: anime, isLoading, refetch } = useRandomAnime();
   const { mutate: addToList, isPending: isAdding } = useAddToList();
@@ -32,8 +34,16 @@ export function AnimeMatcherPage() {
     });
   };
 
+  const requestFullscreenOnce = () => {
+    if (!hasEnteredFullscreen.current) {
+      hasEnteredFullscreen.current = true;
+      void enterFullscreen();
+    }
+  };
+
   const handleSwipe = (direction: 'left' | 'right') => {
     if (isTransitioning) return;
+    requestFullscreenOnce();
     setIsTransitioning(true);
     setShowDescriptionModal(false);
 
@@ -63,6 +73,20 @@ export function AnimeMatcherPage() {
     if (isTransitioning || isAdding) return;
     handleSwipe('right');
   };
+
+  const handleGoHome = () => {
+    void exitFullscreen();
+    navigate('/');
+  };
+
+  useEffect(() => {
+    return () => {
+      if (isFullscreen) {
+        void exitFullscreen();
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   if (isLoading && !currentAnime) {
     return (
@@ -103,7 +127,7 @@ export function AnimeMatcherPage() {
           isAdding={isAdding}
           onSkip={handleSkip}
           onAdd={handleAdd}
-          onHome={() => navigate('/')}
+          onHome={handleGoHome}
         />
 
         <div className="w-[360px]">
@@ -132,7 +156,7 @@ export function AnimeMatcherPage() {
       </div>
 
       {/* Mobile layout */}
-      <div className="md:hidden flex flex-col h-[calc(100vh-150px)]">
+      <div className="md:hidden flex flex-col h-[calc(100dvh-150px)]">
         <div className="relative flex-grow flex items-center justify-center py-2">
           {currentAnime && (
             <SwipeCard
@@ -150,7 +174,7 @@ export function AnimeMatcherPage() {
           isAdding={isAdding}
           onSkip={handleSkip}
           onAdd={handleAdd}
-          onHome={() => navigate('/')}
+          onHome={handleGoHome}
           onExternalLink={currentAnime ? () => navigate(buildAnimeUrl(currentAnime)) : undefined}
           onInfo={() => setShowDescriptionModal(true)}
         />

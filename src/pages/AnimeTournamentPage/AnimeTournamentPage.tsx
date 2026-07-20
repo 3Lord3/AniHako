@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useUserAnimeList } from '@/hooks';
+import { useUserAnimeList, useFullscreen } from '@/hooks';
 import { useTournament, getRoundName, type Pair } from '@/hooks/useTournament';
 import type { AnimeCatalogItem, YummyUserAnimeRate } from '@/types';
 import type { AnimeReleaseStatus } from '@/types';
@@ -19,6 +19,7 @@ export function AnimeTournamentPage() {
   const [pairQueue, setPairQueue] = useState<Pair[]>([]);
   const [showExitDialog, setShowExitDialog] = useState(false);
   const navigate = useNavigate();
+  const { enter: enterFullscreen, exit: exitFullscreen, isFullscreen } = useFullscreen();
   const { data: completedList, isLoading } = useUserAnimeList('completed');
   const {
     tournament,
@@ -53,6 +54,7 @@ export function AnimeTournamentPage() {
         season: 1 as const,
         episodes: { aired: 0, count: 0 },
       }));
+      void enterFullscreen();
       initializeTournament(animeItems);
       setIsStarted(true);
       setPairQueue([]);
@@ -80,10 +82,12 @@ export function AnimeTournamentPage() {
 
   const handleStartRound = () => {
     if (!tournament) return;
+    void enterFullscreen();
     startRound();
   };
 
   const handleExitConfirm = () => {
+    void exitFullscreen();
     resetTournament();
     setIsStarted(false);
     setActivePair(null);
@@ -91,6 +95,7 @@ export function AnimeTournamentPage() {
   };
 
   const handleIntroBack = () => {
+    void exitFullscreen();
     navigate('/');
   };
 
@@ -107,6 +112,21 @@ export function AnimeTournamentPage() {
       setActivePair(playablePairs[0]);
     }
   }, [tournament, tournament?.roundStarted, tournament?.currentRoundIndex]);
+
+  useEffect(() => {
+    return () => {
+      if (isFullscreen) {
+        void exitFullscreen();
+      }
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (tournament?.isComplete && isFullscreen) {
+      void exitFullscreen();
+    }
+  }, [tournament?.isComplete, isFullscreen, exitFullscreen]);
 
   if (isLoading) {
     return <SuspenseFallback message="Загрузка списка аниме..." />;
