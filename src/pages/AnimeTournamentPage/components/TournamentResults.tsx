@@ -14,6 +14,19 @@ interface TournamentResultsProps {
 export function TournamentResults({ participants, champion, onRestart }: TournamentResultsProps) {
   const sortedResults = [...participants].sort((a, b) => a.position - b.position);
 
+  const grouped = sortedResults.slice(0, 16).reduce<Array<{ position: number; items: typeof sortedResults }>>(
+    (acc, p) => {
+      const last = acc[acc.length - 1];
+      if (last && last.position === p.position) {
+        last.items.push(p);
+      } else {
+        acc.push({ position: p.position, items: [p] });
+      }
+      return acc;
+    },
+    []
+  );
+
   return (
     <div className="space-y-8 py-8">
       {/* Champion highlight */}
@@ -43,57 +56,85 @@ export function TournamentResults({ participants, champion, onRestart }: Tournam
       <div className="max-w-xs sm:max-w-sm md:max-w-2xl mx-auto">
         <h3 className="text-base sm:text-xl font-bold mb-3 sm:mb-4 text-center text-foreground">Итоговая таблица</h3>
         <div className="space-y-2">
-          {sortedResults.slice(0, 16).map((participant) => (
-            <div
-              key={participant.id}
-              className={cn(
-                "flex items-center gap-2 sm:gap-4 p-2 sm:p-3 rounded-lg transition-colors border",
-                participant.position <= 3
-                  ? "bg-gradient-to-r from-yellow-500/10 via-orange-500/10 to-transparent border-yellow-500/20"
-                  : "bg-card border-border"
-              )}
-            >
-              {/* Position */}
-              <div className={cn(
-                "w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center font-bold text-sm sm:text-base md:text-lg",
-                participant.position === 1 && "bg-yellow-500 text-black",
-                participant.position === 2 && "bg-gray-400 text-white",
-                participant.position === 3 && "bg-amber-600 text-white",
-                participant.position > 3 && "bg-muted text-muted-foreground"
-              )}>
-                {participant.position <= 3 ? (
-                  participant.position === 1 ? '🥇' : participant.position === 2 ? '🥈' : '🥉'
-                ) : (
-                  participant.position
+          {grouped.map((group, groupIdx) => {
+            const prev = grouped[groupIdx - 1];
+            const hasGap = prev !== undefined && group.position > prev.position + 1;
+            const lastPositionInGroup = group.position + group.items.length - 1;
+            const placeLabel = group.items.length > 1
+              ? `${group.position}–${lastPositionInGroup} место`
+              : `${group.position} место`;
+
+            return (
+              <div key={group.position} className="space-y-2">
+                {hasGap && (
+                  <div
+                    className="flex items-center gap-2 px-2 py-1 text-[10px] sm:text-xs text-muted-foreground/70"
+                    aria-hidden="true"
+                  >
+                    <div className="flex-1 border-t border-dashed border-muted-foreground/30" />
+                    <span className="font-medium tracking-widest">···</span>
+                    <div className="flex-1 border-t border-dashed border-muted-foreground/30" />
+                  </div>
                 )}
-              </div>
+                {group.items.length > 1 && (
+                  <div className="text-[10px] sm:text-xs text-muted-foreground text-center -mb-1">
+                    {placeLabel}
+                  </div>
+                )}
+                {group.items.map((participant) => (
+                  <div
+                    key={participant.id}
+                    className={cn(
+                      "flex items-center gap-2 sm:gap-4 p-2 sm:p-3 rounded-lg transition-colors border",
+                      participant.position <= 3
+                        ? "bg-gradient-to-r from-yellow-500/10 via-orange-500/10 to-transparent border-yellow-500/20"
+                        : "bg-card border-border"
+                    )}
+                  >
+                    {/* Position */}
+                    <div className={cn(
+                      "w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center font-bold text-sm sm:text-base md:text-lg",
+                      participant.position === 1 && "bg-yellow-500 text-black",
+                      participant.position === 2 && "bg-gray-400 text-white",
+                      participant.position === 3 && "bg-amber-600 text-white",
+                      participant.position > 3 && "bg-muted text-muted-foreground"
+                    )}>
+                      {participant.position <= 3 ? (
+                        participant.position === 1 ? '🥇' : participant.position === 2 ? '🥈' : '🥉'
+                      ) : (
+                        participant.position
+                      )}
+                    </div>
 
-              {/* Card preview */}
-              <div className="w-10 h-12 sm:w-12 sm:h-16 md:w-16 md:h-20 rounded overflow-hidden bg-muted flex-shrink-0 border border-border">
-                <img
-                  src={getImageUrl(getHeroPosterUrl(participant.anime))}
-                  alt={participant.anime.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
+                    {/* Card preview */}
+                    <div className="w-10 h-12 sm:w-12 sm:h-16 md:w-16 md:h-20 rounded overflow-hidden bg-muted flex-shrink-0 border border-border">
+                      <img
+                        src={getImageUrl(getHeroPosterUrl(participant.anime))}
+                        alt={participant.anime.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
 
-              {/* Info */}
-              <div className="flex-1 min-w-0">
-                <p className="font-semibold truncate text-foreground text-xs sm:text-sm">{participant.anime.title}</p>
-                <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
-                  {participant.anime.year ? `${participant.anime.year} • ` : ''}
-                  {participant.anime.genres?.slice(0, 2).map((g) => g.title).join(', ')}
-                </p>
-              </div>
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold truncate text-foreground text-xs sm:text-sm">{participant.anime.title}</p>
+                      <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
+                        {participant.anime.year ? `${participant.anime.year} • ` : ''}
+                        {participant.anime.genres?.slice(0, 2).map((g) => g.title).join(', ')}
+                      </p>
+                    </div>
 
-              {/* Rating */}
-              {participant.anime.rating?.average ? (
-                <div className="text-xs sm:text-sm font-medium text-muted-foreground">
-                  ★ {Number(participant.anime.rating.average).toFixed(1)}
-                </div>
-              ) : null}
-            </div>
-          ))}
+                    {/* Rating */}
+                    {participant.anime.rating?.average ? (
+                      <div className="text-xs sm:text-sm font-medium text-muted-foreground">
+                        ★ {Number(participant.anime.rating.average).toFixed(1)}
+                      </div>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+            );
+          })}
         </div>
       </div>
 
