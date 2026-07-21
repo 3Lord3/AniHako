@@ -40,7 +40,7 @@ export function TournamentCard({
         isWinner && "ring-4 ring-yellow-400 ring-offset-2 ring-offset-background",
         isSelected && !isWinner && "relative z-20",
         isEliminated && "opacity-50 grayscale",
-        compact ? "w-[58%] sm:w-4/5 lg:w-3/4 aspect-[2/3] max-h-full" : "aspect-[2/3]",
+        compact ? "h-full max-h-full aspect-[2/3] w-auto" : "aspect-[2/3]",
         className
       )}
     >

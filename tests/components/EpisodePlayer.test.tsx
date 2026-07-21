@@ -24,132 +24,27 @@ const mockVideo2: AnimeVideo = {
 
 describe('EpisodePlayer', () => {
   it('renders iframe with video iframe_url', () => {
-    render(
-      <EpisodePlayer
-        video={mockVideo}
-        title="Test Anime"
-        hasPrev={false}
-        hasNext
-        onPrev={vi.fn()}
-        onNext={vi.fn()}
-      />
-    );
+    render(<EpisodePlayer video={mockVideo} title="Test Anime" />);
     const iframe = screen.getByTitle('Test Anime - Серия 1') as HTMLIFrameElement;
     expect(iframe).toBeInTheDocument();
     expect(iframe.src).toBe('https://player.example.com/embed/42');
   });
 
   it('renders iframe with accessible title containing anime and episode', () => {
-    render(
-      <EpisodePlayer
-        video={mockVideo}
-        title="My Anime"
-        hasPrev
-        hasNext
-        onPrev={vi.fn()}
-        onNext={vi.fn()}
-      />
-    );
+    render(<EpisodePlayer video={mockVideo} title="My Anime" />);
     expect(screen.getByTitle('My Anime - Серия 1')).toBeInTheDocument();
   });
 
-  it('disables prev button when hasPrev is false', () => {
-    render(
-      <EpisodePlayer
-        video={mockVideo}
-        title="t"
-        hasPrev={false}
-        hasNext
-        onPrev={vi.fn()}
-        onNext={vi.fn()}
-      />
-    );
-    expect(screen.getByLabelText('Предыдущая серия')).toBeDisabled();
-  });
-
-  it('disables next button when hasNext is false', () => {
-    render(
-      <EpisodePlayer
-        video={mockVideo}
-        title="t"
-        hasPrev
-        hasNext={false}
-        onPrev={vi.fn()}
-        onNext={vi.fn()}
-      />
-    );
-    expect(screen.getByLabelText('Следующая серия')).toBeDisabled();
-  });
-
-  it('calls onPrev when prev button clicked', () => {
-    const onPrev = vi.fn();
-    render(
-      <EpisodePlayer
-        video={mockVideo}
-        title="t"
-        hasPrev
-        hasNext
-        onPrev={onPrev}
-        onNext={vi.fn()}
-      />
-    );
-    fireEvent.click(screen.getByLabelText('Предыдущая серия'));
-    expect(onPrev).toHaveBeenCalledTimes(1);
-  });
-
-  it('calls onNext when next button clicked', () => {
-    const onNext = vi.fn();
-    render(
-      <EpisodePlayer
-        video={mockVideo}
-        title="t"
-        hasPrev
-        hasNext
-        onPrev={vi.fn()}
-        onNext={onNext}
-      />
-    );
-    fireEvent.click(screen.getByLabelText('Следующая серия'));
-    expect(onNext).toHaveBeenCalledTimes(1);
-  });
-
   it('uses video.number when present, falls back to index', () => {
-    const { rerender } = render(
-      <EpisodePlayer
-        video={mockVideo}
-        title="t"
-        hasPrev
-        hasNext
-        onPrev={vi.fn()}
-        onNext={vi.fn()}
-      />
-    );
+    const { rerender } = render(<EpisodePlayer video={mockVideo} title="t" />);
     expect(screen.getByTitle('t - Серия 1')).toBeInTheDocument();
 
-    rerender(
-      <EpisodePlayer
-        video={{ ...mockVideo, number: '' }}
-        title="t"
-        hasPrev
-        hasNext
-        onPrev={vi.fn()}
-        onNext={vi.fn()}
-      />
-    );
+    rerender(<EpisodePlayer video={{ ...mockVideo, number: '' }} title="t" />);
     expect(screen.getByTitle('t - Серия 1')).toBeInTheDocument();
   });
 
   it('hides iframe until onLoad fires', () => {
-    render(
-      <EpisodePlayer
-        video={mockVideo}
-        title="t"
-        hasPrev
-        hasNext
-        onPrev={vi.fn()}
-        onNext={vi.fn()}
-      />
-    );
+    render(<EpisodePlayer video={mockVideo} title="t" />);
     const iframe = screen.getByTitle('t - Серия 1');
     expect(iframe).toHaveClass('opacity-0');
 
@@ -158,46 +53,108 @@ describe('EpisodePlayer', () => {
   });
 
   it('remounts iframe (key change) when video_id changes', () => {
-    const { rerender } = render(
-      <EpisodePlayer
-        video={mockVideo}
-        title="t"
-        hasPrev
-        hasNext
-        onPrev={vi.fn()}
-        onNext={vi.fn()}
-      />
-    );
+    const { rerender } = render(<EpisodePlayer video={mockVideo} title="t" />);
     const firstIframe = screen.getByTitle('t - Серия 1');
     fireEvent.load(firstIframe);
 
-    rerender(
-      <EpisodePlayer
-        video={mockVideo2}
-        title="t"
-        hasPrev
-        hasNext
-        onPrev={vi.fn()}
-        onNext={vi.fn()}
-      />
-    );
+    rerender(<EpisodePlayer video={mockVideo2} title="t" />);
     const newIframe = screen.getByTitle('t - Серия 2') as HTMLIFrameElement;
     expect(newIframe.src).toBe('https://player.example.com/embed/43');
     expect(newIframe).toHaveClass('opacity-0');
   });
 
   it('sends origin in Referer (not no-referrer) so Alloha-like players do not 404', () => {
+    render(<EpisodePlayer video={mockVideo} title="t" />);
+    const iframe = screen.getByTitle('t - Серия 1');
+    expect(iframe).toHaveAttribute('referrerpolicy', 'origin');
+  });
+
+  it('does not call onEpisodeComplete if not provided and iframe fires ended message', () => {
+    render(<EpisodePlayer video={mockVideo} title="t" />);
+    const iframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
+    expect(() =>
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          data: { event: 'kdEnded' },
+          source: iframe.contentWindow,
+        })
+      )
+    ).not.toThrow();
+  });
+
+  it('invokes onEpisodeComplete when iframe posts a kdEnded message', () => {
+    const onEpisodeComplete = vi.fn();
     render(
       <EpisodePlayer
         video={mockVideo}
         title="t"
-        hasPrev
-        hasNext
-        onPrev={vi.fn()}
-        onNext={vi.fn()}
+        onEpisodeComplete={onEpisodeComplete}
       />
     );
-    const iframe = screen.getByTitle('t - Серия 1');
-    expect(iframe).toHaveAttribute('referrerpolicy', 'origin');
+    const iframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
+    window.dispatchEvent(
+      new MessageEvent('message', {
+        data: { event: 'kdEnded' },
+        source: iframe.contentWindow,
+      })
+    );
+    expect(onEpisodeComplete).toHaveBeenCalledWith(mockVideo.video_id);
+  });
+
+  it('ignores ended messages that do not originate from the iframe', () => {
+    const onEpisodeComplete = vi.fn();
+    render(
+      <EpisodePlayer
+        video={mockVideo}
+        title="t"
+        onEpisodeComplete={onEpisodeComplete}
+      />
+    );
+    window.dispatchEvent(new MessageEvent('message', { data: { event: 'kdEnded' } }));
+    expect(onEpisodeComplete).not.toHaveBeenCalled();
+  });
+
+  it('ignores postMessage events whose payload is not an ended event', () => {
+    const onEpisodeComplete = vi.fn();
+    render(
+      <EpisodePlayer
+        video={mockVideo}
+        title="t"
+        onEpisodeComplete={onEpisodeComplete}
+      />
+    );
+    const iframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
+    window.dispatchEvent(
+      new MessageEvent('message', {
+        data: { event: 'kdPlay' },
+        source: iframe.contentWindow,
+      })
+    );
+    expect(onEpisodeComplete).not.toHaveBeenCalled();
+  });
+
+  it('invokes onEpisodeComplete only once per video even if multiple ended signals arrive', () => {
+    const onEpisodeComplete = vi.fn();
+    render(
+      <EpisodePlayer
+        video={mockVideo}
+        title="t"
+        onEpisodeComplete={onEpisodeComplete}
+      />
+    );
+    const iframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
+    window.dispatchEvent(
+      new MessageEvent('message', {
+        data: { event: 'kdEnded' },
+        source: iframe.contentWindow,
+      })
+    );
+    window.dispatchEvent(
+      new MessageEvent('message', {
+        data: { type: 'player_end' },
+        source: iframe.contentWindow,
+      })
+    );
+    expect(onEpisodeComplete).toHaveBeenCalledTimes(1);
   });
 });

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, within, fireEvent } from '@testing-library/react';
+import { act, render, screen, within, fireEvent } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { EpisodeViewer } from '@/pages/AnimeDetailPage/components/EpisodeViewer';
 import type { AnimeTranslate, AnimeVideo } from '@/types';
@@ -18,7 +18,7 @@ const anidubVideo: AnimeVideo = {
 const subtitleVideo: AnimeVideo = {
   video_id: 2,
   iframe_url: 'https://player.example.com/embed/2',
-  data: { dubbing: 'Субтитры', player: 'Kodik', player_id: 1 },
+  data: { dubbing: 'Озвучка SubStudio', player: 'Kodik', player_id: 1 },
   number: '1',
   date: 0,
   index: 1,
@@ -51,7 +51,7 @@ const anidubAllohaVideo2: AnimeVideo = {
 
 const translates: AnimeTranslate[] = [
   { title: 'AniDub', href: 'anidub', value: 1 },
-  { title: 'Субтитры', href: 'subs', value: 2 },
+  { title: 'Озвучка SubStudio', href: 'subs', value: 2 },
 ];
 
 async function selectTranslate(user: ReturnType<typeof userEvent.setup>, currentLabel: string, targetName: string) {
@@ -95,39 +95,13 @@ describe('EpisodeViewer', () => {
     expect(iframe.src).toBe('https://player.example.com/embed/3');
   });
 
-  it('ArrowRight advances the active episode', () => {
-    render(<EpisodeViewer videos={[anidubVideo, anidubVideo2]} title="t" />);
-    fireEvent.keyDown(window, { key: 'ArrowRight' });
-    expect(screen.getByTitle('t - Серия 2')).toBeInTheDocument();
-  });
-
-  it('ArrowLeft goes back to the previous episode', () => {
-    render(<EpisodeViewer videos={[anidubVideo, anidubVideo2]} title="t" />);
-    fireEvent.click(screen.getByRole('tab', { name: 'Серия 2' }));
-    fireEvent.keyDown(window, { key: 'ArrowLeft' });
-    expect(screen.getByTitle('t - Серия 1')).toBeInTheDocument();
-  });
-
-  it('does not switch episode via keyboard when focus is in an input', () => {
-    render(
-      <div>
-        <input data-testid="trap" />
-        <EpisodeViewer videos={[anidubVideo, anidubVideo2]} title="t" />
-      </div>
-    );
-    const input = screen.getByTestId('trap');
-    input.focus();
-    fireEvent.keyDown(input, { key: 'ArrowRight' });
-    expect(screen.getByTitle('t - Серия 1')).toBeInTheDocument();
-  });
-
   it('filters videos by selected translate', async () => {
     const user = userEvent.setup();
     const videos = [anidubVideo, subtitleVideo, anidubVideo2];
     render(<EpisodeViewer videos={videos} translates={translates} title="t" />);
     expect(screen.getByTitle('t - Серия 1')).toBeInTheDocument();
 
-    await selectTranslate(user, 'AniDub', 'Субтитры');
+    await selectTranslate(user, 'AniDub', 'Озвучка SubStudio');
 
     const iframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
     expect(iframe.src).toBe('https://player.example.com/embed/2');
@@ -139,21 +113,9 @@ describe('EpisodeViewer', () => {
     render(<EpisodeViewer videos={videos} translates={translates} title="t" />);
     fireEvent.click(screen.getByRole('tab', { name: 'Серия 2' }));
 
-    await selectTranslate(user, 'AniDub', 'Субтитры');
+    await selectTranslate(user, 'AniDub', 'Озвучка SubStudio');
 
     expect(screen.getByTitle('t - Серия 1')).toBeInTheDocument();
-  });
-
-  it('disables prev/next at boundaries', () => {
-    const { rerender } = render(
-      <EpisodeViewer videos={[anidubVideo]} title="t" />
-    );
-    expect(screen.getByLabelText('Предыдущая серия')).toBeDisabled();
-    expect(screen.getByLabelText('Следующая серия')).toBeDisabled();
-
-    rerender(<EpisodeViewer videos={[anidubVideo, anidubVideo2]} title="t" />);
-    expect(screen.getByLabelText('Предыдущая серия')).toBeDisabled();
-    expect(screen.getByLabelText('Следующая серия')).not.toBeDisabled();
   });
 
   it('synthesizes translates from videos when API provides none', async () => {
@@ -166,7 +128,7 @@ describe('EpisodeViewer', () => {
     await user.click(trigger);
 
     expect(screen.getByRole('option', { name: 'AniDub' })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: 'Субтитры' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Озвучка SubStudio' })).toBeInTheDocument();
   });
 
   it('filters synthesized translates by dubbing', async () => {
@@ -176,7 +138,7 @@ describe('EpisodeViewer', () => {
 
     expect(screen.getByTitle('t - Серия 1')).toBeInTheDocument();
 
-    await selectTranslate(user, 'AniDub', 'Субтитры');
+    await selectTranslate(user, 'AniDub', 'Озвучка SubStudio');
 
     const iframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
     expect(iframe.src).toBe('https://player.example.com/embed/2');
@@ -232,7 +194,7 @@ describe('EpisodeViewer', () => {
         videos={videos}
         translates={[
           { title: 'AniDub', href: 'anidub', value: 1 },
-          { title: 'Субтитры', href: 'subs', value: 2 },
+          { title: 'Озвучка SubStudio', href: 'subs', value: 2 },
         ]}
         title="t"
       />
@@ -258,31 +220,252 @@ describe('EpisodeViewer', () => {
       iframe_url: 'https://player.example.com/embed/101',
       data: { dubbing: 'AniLibria', player: 'Kodik', player_id: 1 },
     };
-
-    const translatesA: AnimeTranslate[] = [
-      { title: 'AniDub', href: 'anidub', value: 1 },
-      { title: 'Субтитры', href: 'subs', value: 2 },
-    ];
-    const translatesB: AnimeTranslate[] = [
-      { title: 'Многоголосый', href: 'multivoice', value: 4 },
-      { title: 'Субтитры', href: 'subtitles', value: 7 },
-    ];
+    const subtitleForB: AnimeVideo = {
+      ...subtitleVideo,
+      video_id: 102,
+      iframe_url: 'https://player.example.com/embed/102',
+    };
 
     const { rerender } = render(
-      <EpisodeViewer videos={[anidubVideo, anidubVideo2]} translates={translatesA} title="A" />
+      <EpisodeViewer videos={[anidubVideo, anidubVideo2, subtitleVideo]} title="A" />
     );
     expect(screen.getByRole('button', { name: /AniDub/ })).toBeInTheDocument();
 
     rerender(
       <EpisodeViewer
-        videos={[otherDubVideo, anidub3]}
-        translates={translatesB}
+        videos={[otherDubVideo, anidub3, subtitleForB]}
         title="B"
       />
     );
 
-    const triggerB = screen.getByRole('button', { name: /Многоголосый/ });
+    const triggerB = screen.getByRole('button', { name: /AniLibria/ });
     expect(triggerB).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /AniDub/ })).not.toBeInTheDocument();
+  });
+
+  it('ignores generic translates from API and synthesizes from videos dubbing', async () => {
+    const user = userEvent.setup();
+    const genericTranslates: AnimeTranslate[] = [
+      { title: 'Многоголосый', href: 'multivoice', value: 4 },
+      { title: 'Одноголосый', href: 'single', value: 5 },
+      { title: 'Двухголосый', href: 'duet', value: 6 },
+      { title: 'Субтитры', href: 'subtitles', value: 7 },
+    ];
+    const videos = [anidubVideo, anidubAllohaVideo, subtitleVideo, anidubVideo2];
+    render(<EpisodeViewer videos={videos} translates={genericTranslates} title="t" />);
+
+    const trigger = screen.getByRole('button', { name: /AniDub/ });
+    expect(trigger).toBeInTheDocument();
+
+    await user.click(trigger);
+    expect(screen.getByRole('option', { name: 'AniDub' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Озвучка SubStudio' })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Многоголосый' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Одноголосый' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Двухголосый' })).not.toBeInTheDocument();
+  });
+
+  it('strips generic titles from the API fallback when videos have no dubbing data', () => {
+    const genericTranslates: AnimeTranslate[] = [
+      { title: 'Многоголосый', href: 'multivoice', value: 4 },
+      { title: 'Одноголосый', href: 'single', value: 5 },
+      { title: 'Двухголосый', href: 'duet', value: 6 },
+      { title: 'Субтитры', href: 'subtitles', value: 7 },
+    ];
+    const stubDubbing: AnimeVideo[] = [
+      { ...anidubVideo, data: { ...anidubVideo.data, dubbing: '' } },
+      { ...anidubVideo2, data: { ...anidubVideo2.data, dubbing: '' } },
+    ];
+    render(<EpisodeViewer videos={stubDubbing} translates={genericTranslates} title="t" />);
+
+    // No videos contribute a dubbing -> synthesized list is empty -> API fallback is used.
+    // The generic filter must strip every generic entry, leaving an empty list and
+    // hiding the translate selector entirely.
+    expect(screen.queryByRole('button', { name: /Многоголосый/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Одноголосый/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Двухголосый/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Субтитры/ })).not.toBeInTheDocument();
+  });
+
+  it('strips generic titles from the synthesized branch when a video row stores a generic dubbing', async () => {
+    const user = userEvent.setup();
+    const mixed: AnimeVideo[] = [
+      { ...anidubVideo, data: { ...anidubVideo.data, dubbing: 'Многоголосый' } },
+      subtitleVideo,
+      anidubVideo2,
+    ];
+    render(<EpisodeViewer videos={mixed} title="t" />);
+
+    const trigger = screen.getByRole('button', { name: /Озвучка SubStudio/ });
+    expect(trigger).toBeInTheDocument();
+
+    await user.click(trigger);
+    expect(screen.getByRole('option', { name: 'Озвучка SubStudio' })).toBeInTheDocument();
+    expect(screen.queryByRole('option', { name: 'Многоголосый' })).not.toBeInTheDocument();
+  });
+
+  it('renders watched toggles only when canMarkWatched is true', () => {
+    render(
+      <EpisodeViewer
+        videos={[anidubVideo, anidubVideo2]}
+        title="t"
+        viewedVideoIds={new Set([1])}
+        canMarkWatched
+        onToggleWatched={vi.fn()}
+      />
+    );
+    expect(screen.getByTestId('episode-watched-toggle-1')).toBeInTheDocument();
+    expect(screen.getByTestId('episode-watched-toggle-3')).toBeInTheDocument();
+  });
+
+  it('hides watched toggles when canMarkWatched is false', () => {
+    render(
+      <EpisodeViewer
+        videos={[anidubVideo, anidubVideo2]}
+        title="t"
+        viewedVideoIds={new Set([1])}
+        canMarkWatched={false}
+        onToggleWatched={vi.fn()}
+      />
+    );
+    expect(screen.queryByTestId('episode-watched-toggle-1')).not.toBeInTheDocument();
+  });
+
+  it('forwards onToggleWatched with videoId and isWatched flag', () => {
+    const onToggleWatched = vi.fn();
+    render(
+      <EpisodeViewer
+        videos={[anidubVideo, anidubVideo2]}
+        title="t"
+        viewedVideoIds={new Set([1])}
+        canMarkWatched
+        onToggleWatched={onToggleWatched}
+      />
+    );
+    fireEvent.click(screen.getByTestId('episode-watched-toggle-3'));
+    expect(onToggleWatched).toHaveBeenCalledWith(3, false);
+  });
+
+  it('forwards onEpisodeComplete with videoId from iframe ended message', () => {
+    const onEpisodeComplete = vi.fn();
+    render(
+      <EpisodeViewer
+        videos={[anidubVideo, anidubVideo2]}
+        title="t"
+        onEpisodeComplete={onEpisodeComplete}
+      />
+    );
+    const iframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
+    act(() => {
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          data: { event: 'kdEnded' },
+          source: iframe.contentWindow,
+        })
+      );
+    });
+    expect(onEpisodeComplete).toHaveBeenCalledWith(anidubVideo.video_id);
+  });
+
+  it('auto-advances to the next episode when the current one ends', () => {
+    render(<EpisodeViewer videos={[anidubVideo, anidubVideo2]} title="t" />);
+    expect(screen.getByTitle('t - Серия 1')).toBeInTheDocument();
+
+    const iframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
+    act(() => {
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          data: { event: 'kdEnded' },
+          source: iframe.contentWindow,
+        })
+      );
+    });
+
+    const nextIframe = screen.getByTitle('t - Серия 2') as HTMLIFrameElement;
+    expect(nextIframe.src).toBe('https://player.example.com/embed/3');
+  });
+
+  it('forwards the callback with the correct videoId for each consecutive episode end', () => {
+    const onEpisodeComplete = vi.fn();
+    render(
+      <EpisodeViewer
+        videos={[anidubVideo, anidubVideo2]}
+        title="t"
+        onEpisodeComplete={onEpisodeComplete}
+      />
+    );
+
+    const firstIframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
+    act(() => {
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          data: { event: 'kdEnded' },
+          source: firstIframe.contentWindow,
+        })
+      );
+    });
+    expect(onEpisodeComplete).toHaveBeenCalledTimes(1);
+    expect(onEpisodeComplete).toHaveBeenLastCalledWith(anidubVideo.video_id);
+
+    const secondIframe = screen.getByTitle('t - Серия 2') as HTMLIFrameElement;
+    act(() => {
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          data: { event: 'kdEnded' },
+          source: secondIframe.contentWindow,
+        })
+      );
+    });
+    expect(onEpisodeComplete).toHaveBeenCalledTimes(2);
+    expect(onEpisodeComplete).toHaveBeenLastCalledWith(anidubVideo2.video_id);
+  });
+
+  it('does not advance or re-fire the callback on duplicate ended signals from the same iframe', () => {
+    const onEpisodeComplete = vi.fn();
+    render(
+      <EpisodeViewer
+        videos={[anidubVideo, anidubVideo2]}
+        title="t"
+        onEpisodeComplete={onEpisodeComplete}
+      />
+    );
+
+    const iframe = screen.getByTitle('t - Серия 1') as HTMLIFrameElement;
+    const dispatchEnded = () =>
+      act(() => {
+        window.dispatchEvent(
+          new MessageEvent('message', {
+            data: { event: 'kdEnded' },
+            source: iframe.contentWindow,
+          })
+        );
+      });
+
+    dispatchEnded();
+    dispatchEnded();
+    dispatchEnded();
+
+    expect(onEpisodeComplete).toHaveBeenCalledTimes(1);
+    expect(onEpisodeComplete).toHaveBeenCalledWith(anidubVideo.video_id);
+    const nextIframe = screen.getByTitle('t - Серия 2') as HTMLIFrameElement;
+    expect(nextIframe.src).toBe('https://player.example.com/embed/3');
+  });
+
+  it('does not advance past the last episode when it ends', () => {
+    render(<EpisodeViewer videos={[anidubVideo, anidubVideo2]} title="t" />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Серия 2' }));
+
+    const iframe = screen.getByTitle('t - Серия 2') as HTMLIFrameElement;
+    act(() => {
+      window.dispatchEvent(
+        new MessageEvent('message', {
+          data: { event: 'kdEnded' },
+          source: iframe.contentWindow,
+        })
+      );
+    });
+
+    const stillHere = screen.getByTitle('t - Серия 2') as HTMLIFrameElement;
+    expect(stillHere.src).toBe('https://player.example.com/embed/3');
   });
 });

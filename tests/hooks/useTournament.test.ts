@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
-import { useTournament } from '@/hooks/useTournament';
+import { useTournament, type Pair } from '@/hooks/useTournament';
 import type { AnimeCatalogItem } from '@/types';
 
 const createMockAnime = (id: number, title: string): AnimeCatalogItem => ({
@@ -333,6 +333,92 @@ describe('useTournament', () => {
       if (hasSecondRound) {
         expect(result.current.tournament!.rounds.length).toBeGreaterThanOrEqual(2);
       }
+    });
+  });
+
+  describe('getResults positions', () => {
+    const playEntireTournament = (chooseWinnerForPair: (pair: Pair) => string) => {
+      const { result } = renderHook(() => useTournament());
+
+      act(() => {
+        result.current.initializeTournament(mockAnime5);
+      });
+
+      let safety = 0;
+      while (!result.current.tournament?.isComplete && safety < 50) {
+        const round = result.current.tournament!.rounds[result.current.tournament!.currentRoundIndex];
+        if (!result.current.tournament!.roundStarted) {
+          act(() => {
+            result.current.startRound();
+          });
+        }
+        for (const pair of round.pairs) {
+          if (pair.status === 'pending' || pair.status === 'playing') {
+            const winnerId = chooseWinnerForPair(pair);
+            act(() => {
+              result.current.selectWinner(pair.id, winnerId);
+            });
+          }
+        }
+        safety++;
+      }
+
+      return result;
+    };
+
+    it('should return empty array before tournament is complete', () => {
+      const { result } = renderHook(() => useTournament());
+
+      act(() => {
+        result.current.initializeTournament(mockAnime5);
+      });
+
+      expect(result.current.getResults()).toEqual([]);
+    });
+
+    it('should rank the champion at position 1', () => {
+      const result = playEntireTournament((pair) => pair.participants[0].id);
+
+      const results = result.current.getResults();
+      expect(results).toHaveLength(5);
+
+      const sortedByPosition = [...results].sort((a, b) => a.position - b.position);
+      expect(sortedByPosition[0].position).toBe(1);
+      expect(sortedByPosition[0].id).toBe(result.current.tournament!.champion!.id);
+    });
+
+    it('should rank the finalist at position 2', () => {
+      const result = playEntireTournament((pair) => pair.participants[0].id);
+
+      const results = result.current.getResults();
+      const finalists = results.filter((p) => p.position === 2);
+      expect(finalists).toHaveLength(1);
+    });
+
+    it('should give the round-1 loser position 3 (only one real match in round 1 with 5 participants)', () => {
+      const result = playEntireTournament((pair) => pair.participants[0].id);
+
+      const results = result.current.getResults();
+      const thirdPlace = results.filter((p) => p.position === 3);
+      expect(thirdPlace).toHaveLength(1);
+    });
+
+    it('should give round 0 losers tied at position 5', () => {
+      const result = playEntireTournament((pair) => pair.participants[0].id);
+
+      const results = result.current.getResults();
+      const fifthPlace = results.filter((p) => p.position === 5);
+      expect(fifthPlace).toHaveLength(2);
+    });
+
+    it('should reflect actual tournament results, not seed order', () => {
+      const result = playEntireTournament((pair) => pair.participants[0].id);
+
+      const results = result.current.getResults();
+      const sortedByPosition = [...results].sort((a, b) => a.position - b.position);
+
+      expect(sortedByPosition.map((p) => p.position)).toEqual([1, 2, 3, 5, 5]);
+      expect(sortedByPosition[0].anime.anime_id).toBe(result.current.tournament!.champion!.anime.anime_id);
     });
   });
 });
