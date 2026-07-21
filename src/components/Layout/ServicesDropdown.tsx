@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Wand2 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -7,7 +8,6 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
 import type { NavItem } from './navConfig';
-import { FullscreenNavLink } from './FullscreenNavLink';
 
 interface ServicesDropdownProps {
   items: readonly NavItem[];
@@ -31,10 +31,10 @@ export function ServicesDropdown({ items, active }: ServicesDropdownProps) {
           const Icon = item.icon;
           return (
             <DropdownMenuItem key={item.to} className="cursor-pointer">
-              <FullscreenNavLink to={item.to} className="flex items-center w-full">
+              <Link to={item.to} className="flex items-center w-full">
                 <Icon className="w-4 h-4 mr-2" />
                 {item.label}
-              </FullscreenNavLink>
+              </Link>
             </DropdownMenuItem>
           );
         })}

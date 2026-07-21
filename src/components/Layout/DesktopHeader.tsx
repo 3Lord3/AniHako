@@ -1,14 +1,11 @@
 import { Link } from 'react-router-dom';
 import { LogoButton } from './LogoButton';
 import { ProfileDropdown } from './ProfileDropdown';
-import { FullscreenNavLink } from './FullscreenNavLink';
 import { mainNavItems, servicesItems, isPathActive, type NavItem } from './navConfig';
 
 interface DesktopHeaderProps {
   pathname: string;
 }
-
-const FULLSCREEN_ROUTES = new Set(['/tournament', '/matcher']);
 
 export function DesktopHeader({ pathname }: DesktopHeaderProps) {
   return (
@@ -30,19 +27,14 @@ function renderNavLinks(items: readonly NavItem[], pathname: string) {
   return items.map((item) => {
     const Icon = item.icon;
     const active = isPathActive(pathname, item.to);
-    const className = `flex items-center gap-2 hover:text-primary transition-colors ${
-      active ? 'text-primary font-medium' : ''
-    }`;
-    if (FULLSCREEN_ROUTES.has(item.to)) {
-      return (
-        <FullscreenNavLink key={item.to} to={item.to} className={className}>
-          <Icon className="w-4 h-4" />
-          {item.label}
-        </FullscreenNavLink>
-      );
-    }
     return (
-      <Link key={item.to} to={item.to} className={className}>
+      <Link
+        key={item.to}
+        to={item.to}
+        className={`flex items-center gap-2 hover:text-primary transition-colors ${
+          active ? 'text-primary font-medium' : ''
+        }`}
+      >
         <Icon className="w-4 h-4" />
         {item.label}
       </Link>
