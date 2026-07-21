@@ -27,7 +27,7 @@ export function MatchHeader({
   const backLabel = 'Вернуться к турнирной сетке (изменения не сохранятся)';
 
   return (
-    <div className="flex items-center justify-between p-2 sm:p-3 md:p-4 border-b border-border bg-card shrink-0">
+    <div className="flex items-center justify-between p-1.5 sm:p-3 md:p-4 border-b border-border bg-card shrink-0">
       {onBack && (
         <button
           onClick={onBack}

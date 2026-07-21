@@ -82,7 +82,7 @@ export function AnimeMatcherPage() {
   }
 
   return (
-    <div className="md:space-y-6">
+    <div className="md:space-y-6 flex flex-col min-h-[calc(100svh-64px)] md:min-h-0">
       <div className="hidden md:block text-center md:space-y-2">
         <h1 className="text-4xl font-bold select-text">AniMatch</h1>
         <p className="text-muted-foreground select-text">
@@ -90,8 +90,8 @@ export function AnimeMatcherPage() {
         </p>
       </div>
 
-      <div className="md:hidden text-center mb-3">
-        <p className="text-sm text-muted-foreground select-text">
+      <div className="md:hidden text-center mb-2">
+        <p className="text-xs text-muted-foreground select-text">
           Свайпайте влево чтобы пропустить, вправо чтобы добавить в запланированное
         </p>
       </div>
@@ -132,8 +132,8 @@ export function AnimeMatcherPage() {
       </div>
 
       {/* Mobile layout */}
-      <div className="md:hidden flex flex-col h-[calc(100dvh-150px)]">
-        <div className="relative flex-grow flex items-center justify-center py-2">
+      <div className="md:hidden flex flex-col flex-1">
+        <div className="flex-1 flex items-center justify-center py-1 min-h-0">
           {currentAnime && (
             <SwipeCard
               key={currentAnime.anime_id}

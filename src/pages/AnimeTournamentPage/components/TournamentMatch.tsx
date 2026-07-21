@@ -81,7 +81,7 @@ export function TournamentMatch({
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             transition={{ duration: 0.3 }}
-            className="relative w-full h-full flex flex-col sm:flex-row sm:items-center sm:justify-center gap-3 sm:gap-6 md:grid md:grid-cols-2 md:gap-6 md:relative"
+            className="relative w-full h-full flex flex-col sm:flex-row sm:items-center sm:justify-center gap-2 sm:gap-6 md:grid md:grid-cols-2 md:gap-6 md:relative"
           >
             <ParticipantCard
               participant={participant1}
@@ -110,9 +110,9 @@ export function TournamentMatch({
         </AnimatePresence>
       </div>
 
-      <div className="md:hidden flex justify-center py-2 sm:py-4 shrink-0">
-        <div className="bg-muted rounded-full px-4 sm:px-8 py-2 sm:py-3">
-          <span className="text-lg sm:text-2xl font-black text-primary">VS</span>
+      <div className="md:hidden flex justify-center py-1 sm:py-4 shrink-0">
+        <div className="bg-muted rounded-full px-3 sm:px-8 py-1 sm:py-3">
+          <span className="text-sm sm:text-2xl font-black text-primary">VS</span>
         </div>
       </div>
 
@@ -151,7 +151,7 @@ function ParticipantCard({
   return (
     <motion.div
       animate={isSelected ? { scale: 1.02 } : { scale: 1 }}
-      className="relative flex items-center justify-center w-full sm:w-auto sm:flex-1 h-auto sm:h-full"
+      className="relative flex items-center justify-center w-full sm:w-auto sm:flex-1 flex-1 min-h-0 sm:h-full"
     >
       <div className="w-full sm:w-auto sm:flex-1 h-full flex items-center justify-center">
         <TournamentCard
