@@ -142,18 +142,44 @@ export function useTournament() {
   }, []);
 
   const getResults = useCallback((): TournamentResult[] => {
-    if (!tournament) return [];
+    if (!tournament || !tournament.isComplete) return [];
 
-    const sorted = [...tournament.allParticipants].sort((a, b) => {
-      if (tournament.champion && a.id === tournament.champion.id) return -1;
-      if (tournament.champion && b.id === tournament.champion.id) return 1;
-      return a.seed - b.seed;
+    const totalRounds = tournament.rounds.length;
+    const eliminationRound = new Map<string, number>();
+
+    tournament.rounds.forEach((round) => {
+      if (!round.isComplete) return;
+      round.pairs.forEach((pair) => {
+        if (pair.status === 'completed' && pair.winner) {
+          const winnerId = pair.winner.id;
+          pair.participants.forEach((p) => {
+            if (p.id !== winnerId && !eliminationRound.has(p.id)) {
+              eliminationRound.set(p.id, round.index);
+            }
+          });
+        }
+      });
     });
 
-    return sorted.map((p, index) => ({
-      ...p,
-      position: index + 1,
-    }));
+    return tournament.allParticipants
+      .map((p) => {
+        let position: number;
+        if (tournament.champion && p.id === tournament.champion.id) {
+          position = 1;
+        } else {
+          const elimRound = eliminationRound.get(p.id);
+          if (elimRound === undefined) {
+            position = tournament.allParticipants.length;
+          } else {
+            position = (1 << (totalRounds - 1 - elimRound)) + 1;
+          }
+        }
+        return { ...p, position };
+      })
+      .sort((a, b) => {
+        if (a.position !== b.position) return a.position - b.position;
+        return a.seed - b.seed;
+      });
   }, [tournament]);
 
   const resetRound = useCallback(() => {

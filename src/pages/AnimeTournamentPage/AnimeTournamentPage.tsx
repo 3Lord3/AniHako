@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useUserAnimeList } from '@/hooks';
 import { useTournament, getRoundName, type Pair } from '@/hooks/useTournament';
 import type { AnimeCatalogItem, YummyUserAnimeRate } from '@/types';
@@ -7,14 +8,17 @@ import { TournamentIntro } from './components/TournamentIntro';
 import { TournamentMatch } from './components/TournamentMatch';
 import { TournamentResults } from './components/TournamentResults';
 import { TournamentBracket } from './components/TournamentBracket';
+import { ConfirmationDialog } from './components/ConfirmationDialog';
 import { SuspenseFallback } from '@/components/SuspenseFallback';
-import { Swords, Target, Play } from 'lucide-react';
+import { Swords, Target, Play, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function AnimeTournamentPage() {
   const [isStarted, setIsStarted] = useState(false);
   const [activePair, setActivePair] = useState<Pair | null>(null);
   const [pairQueue, setPairQueue] = useState<Pair[]>([]);
+  const [showExitDialog, setShowExitDialog] = useState(false);
+  const navigate = useNavigate();
   const { data: completedList, isLoading } = useUserAnimeList('completed');
   const {
     tournament,
@@ -79,6 +83,17 @@ export function AnimeTournamentPage() {
     startRound();
   };
 
+  const handleExitConfirm = () => {
+    resetTournament();
+    setIsStarted(false);
+    setActivePair(null);
+    setPairQueue([]);
+  };
+
+  const handleIntroBack = () => {
+    navigate('/');
+  };
+
   useEffect(() => {
     if (!tournament || !tournament.roundStarted) return;
 
@@ -99,7 +114,15 @@ export function AnimeTournamentPage() {
 
   if (!isStarted) {
     return (
-      <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
+      <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8 relative">
+        <button
+          onClick={handleIntroBack}
+          className="absolute left-2 top-2 sm:left-4 sm:top-4 z-10 flex items-center gap-1 sm:gap-2 text-muted-foreground hover:text-foreground transition-colors text-xs sm:text-sm"
+          aria-label="На главную"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span className="hidden sm:inline">Назад</span>
+        </button>
         <TournamentIntro
           completedAnime={completedAnime}
           onStart={handleStart}
@@ -165,7 +188,16 @@ export function AnimeTournamentPage() {
   }
 
   return (
-    <div className="container mx-auto py-4 sm:py-8">
+    <div className="container mx-auto py-4 sm:py-8 relative">
+      <button
+        onClick={() => setShowExitDialog(true)}
+        className="absolute left-2 top-2 sm:left-4 sm:top-4 z-10 flex items-center gap-1 sm:gap-2 text-muted-foreground hover:text-foreground transition-colors text-xs sm:text-sm"
+        aria-label="Выйти из турнира"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        <span className="hidden sm:inline">Назад</span>
+      </button>
+
       <div className="text-center mb-6 sm:mb-8">
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 flex items-center justify-center gap-2 text-foreground">
           <Swords className="w-6 h-6 sm:w-8 sm:h-8" />
@@ -205,6 +237,16 @@ export function AnimeTournamentPage() {
           )}
         </>
       )}
+
+      <ConfirmationDialog
+        open={showExitDialog}
+        onOpenChange={setShowExitDialog}
+        onConfirm={handleExitConfirm}
+        title="Выйти из турнира?"
+        description="Прогресс текущего турнира будет потерян."
+        confirmText="Выйти"
+        cancelText="Продолжить"
+      />
     </div>
   );
 }
