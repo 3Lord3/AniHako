@@ -39,7 +39,7 @@ export function LoginPage() {
           <CardDescription>Войдите в свой аккаунт</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 pb-6">
             {error && (
               <div className="bg-destructive/10 text-destructive p-3 rounded-md text-sm">
                 {error}
