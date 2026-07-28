@@ -45,6 +45,7 @@ export function AnimeTournamentPage() {
         anime_url: rate.anime_url,
         poster: rate.poster,
         rating: { average: rate.rating, counters: 0 },
+        user: rate.user,
         title: rate.title,
         type: rate.type,
         year: rate.year || 0,
@@ -97,7 +98,11 @@ export function AnimeTournamentPage() {
   useEffect(() => {
     if (!tournament || !tournament.roundStarted) return;
 
-    const currentRound = tournament.rounds[tournament.currentRoundIndex];
+    const currentRound = tournament.rounds.find(
+      r => r.bracket === tournament.currentBracket && r.roundInBracket === tournament.currentRoundInBracket
+    );
+    if (!currentRound) return;
+
     const playablePairs = currentRound.pairs.filter(
       p => p.status === 'playing' && !p.winner && p.participants.length === 2
     );
@@ -106,7 +111,7 @@ export function AnimeTournamentPage() {
       setPairQueue(playablePairs.slice(1));
       setActivePair(playablePairs[0]);
     }
-  }, [tournament, tournament?.roundStarted, tournament?.currentRoundIndex]);
+  }, [tournament, tournament?.roundStarted, tournament?.currentBracket, tournament?.currentRoundInBracket]);
 
   if (isLoading) {
     return <SuspenseFallback message="Загрузка списка аниме..." />;
@@ -148,16 +153,21 @@ export function AnimeTournamentPage() {
     );
   }
 
-  if (activePair) {
-    const currentRound = tournament?.rounds[tournament.currentRoundIndex];
+  if (activePair && tournament) {
+    const currentRound = tournament.rounds.find(
+      r => r.bracket === tournament.currentBracket && r.roundInBracket === tournament.currentRoundInBracket
+    );
     const currentPairIdx = currentRound?.pairs.findIndex(p => p.id === activePair.id) ?? 0;
-    const totalInRound = currentRound?.pairs.filter(p => p.participants.length === 2).length ?? 0;
-    const totalRounds = tournament?.rounds.length ?? 1;
-    const currentRoundDisplay = tournament?.currentRoundIndex ?? 0;
+    const totalInRound = currentRound?.pairs.filter(p => p.participants.length === 2 && p.status !== 'bye').length ?? 0;
+    // pairQueue holds matches still waiting after this one, so subtracting it
+    // from the real-match total gives the 1-based position of the match the
+    // user is looking at right now.
+    const currentMatchNumber = totalInRound - pairQueue.length;
+    const totalWbRounds = tournament.meta.winnersRounds;
 
     const match = {
       id: activePair.id,
-      round: currentRoundDisplay + 1,
+      round: tournament.currentRoundInBracket + 1,
       matchNumber: currentPairIdx + 1,
       participant1: activePair.participants[0] || null,
       participant2: activePair.participants[1] || null,
@@ -175,17 +185,31 @@ export function AnimeTournamentPage() {
       <div className="fixed inset-0 z-50 bg-background">
         <TournamentMatch
           match={match}
-          roundNumber={currentRoundDisplay + 1}
-          totalRounds={totalRounds}
+          roundNumber={tournament.currentRoundInBracket + 1}
+          totalRounds={totalWbRounds}
+          bracket={tournament.currentBracket}
+          totalLbRounds={tournament.meta.losersRounds}
           onSelectWinner={handleSelectWinner}
           onBack={undefined}
           onBackToBracket={handleBackToBracket}
           isActive={true}
           totalMatchesInRound={totalInRound}
+          currentMatchNumber={currentMatchNumber}
         />
       </div>
     );
   }
+
+  if (!tournament) {
+    return null;
+  }
+
+  const currentRoundName = getRoundName(
+    tournament.currentBracket,
+    tournament.currentRoundInBracket,
+    tournament.meta.winnersRounds,
+    tournament.meta.losersRounds
+  );
 
   return (
     <div className="container mx-auto py-4 sm:py-8 relative">
@@ -206,12 +230,10 @@ export function AnimeTournamentPage() {
         <div className="flex items-center justify-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
           <span className="flex items-center gap-1">
             <Target className="w-3 h-3 sm:w-4 sm:h-4" />
-            <span className="font-semibold">
-              {getRoundName(tournament?.currentRoundIndex || 0, tournament?.rounds.length || 1)}
-            </span>
+            <span className="font-semibold">{currentRoundName}</span>
           </span>
           <span>•</span>
-          <span>{completedAnime.length} участников</span>
+          <span>{tournament.allParticipants.length} участников</span>
         </div>
       </div>
 
@@ -219,8 +241,11 @@ export function AnimeTournamentPage() {
         <>
           <TournamentBracket
             rounds={tournament.rounds}
-            currentRoundIndex={tournament.currentRoundIndex}
+            currentBracket={tournament.currentBracket}
+            currentRoundInBracket={tournament.currentRoundInBracket}
             roundStarted={tournament.roundStarted}
+            winnersRounds={tournament.meta.winnersRounds}
+            losersRounds={tournament.meta.losersRounds}
           />
 
           {!tournament.roundStarted && (
@@ -231,7 +256,7 @@ export function AnimeTournamentPage() {
                 className="gap-2 text-base sm:text-lg px-6 py-4 sm:px-8 sm:py-6 bg-gradient-to-r from-primary to-yellow-500 hover:from-primary/90 hover:to-yellow-500/90 text-white font-semibold"
               >
                 <Play className="w-4 h-4 sm:w-5 sm:h-5" />
-                Начать {getRoundName(tournament.currentRoundIndex, tournament.rounds.length).toLowerCase()}
+                Начать {currentRoundName.toLowerCase()}
               </Button>
             </div>
           )}
