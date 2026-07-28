@@ -2,11 +2,13 @@ import { describe, it, expect } from 'vitest';
 import {
   shuffleArray,
   generatePairId,
-  createPairsForRound,
   buildTournamentRounds,
   getRoundName,
+  winnersRoundsFor,
+  losersRoundsFor,
+  lbRoundForWbLoss,
+  computeLbPairCounts,
 } from '@/hooks/tournament-utils';
-import type { TournamentParticipant } from '@/hooks/tournament-types';
 import type { AnimeCatalogItem } from '@/types';
 
 const createMockAnime = (id: number, title: string): AnimeCatalogItem => ({
@@ -22,14 +24,6 @@ const createMockAnime = (id: number, title: string): AnimeCatalogItem => ({
   views: 0,
   season: 1 as const,
   episodes: { aired: 12, count: 12 },
-});
-
-const createParticipant = (id: string, anime: AnimeCatalogItem, seed: number): TournamentParticipant => ({
-  id,
-  anime,
-  seed,
-  eliminated: false,
-  finalPosition: null,
 });
 
 describe('tournament-utils', () => {
@@ -57,75 +51,105 @@ describe('tournament-utils', () => {
 
   describe('generatePairId', () => {
     it('generates correct pair id format', () => {
-      expect(generatePairId(0, 0)).toBe('round-0-pair-0');
-      expect(generatePairId(1, 2)).toBe('round-1-pair-2');
-      expect(generatePairId(3, 5)).toBe('round-3-pair-5');
+      expect(generatePairId('winners', 0, 0)).toBe('winners-r0-p0');
+      expect(generatePairId('losers', 1, 2)).toBe('losers-r1-p2');
+      expect(generatePairId('final', 0, 0)).toBe('final-r0-p0');
     });
   });
 
-  describe('createPairsForRound', () => {
-    it('pairs up participants correctly', () => {
-      const anime = [1, 2, 3, 4].map(id => createMockAnime(id, `Anime ${id}`));
-      const participants = anime.map((a, i) => createParticipant(`p-${i}`, a, i + 1));
-
-      const pairs = createPairsForRound(participants, 0);
-
-      expect(pairs).toHaveLength(2);
-      expect(pairs[0].participants).toHaveLength(2);
-      expect(pairs[1].participants).toHaveLength(2);
+  describe('winnersRoundsFor', () => {
+    it('returns correct number of rounds for power of 2', () => {
+      expect(winnersRoundsFor(8)).toBe(3);
+      expect(winnersRoundsFor(16)).toBe(4);
+      expect(winnersRoundsFor(4)).toBe(2);
     });
 
-    it('handles odd number of participants with bye', () => {
-      const anime = [1, 2, 3].map(id => createMockAnime(id, `Anime ${id}`));
-      const participants = anime.map((a, i) => createParticipant(`p-${i}`, a, i + 1));
-
-      const pairs = createPairsForRound(participants, 0);
-
-      expect(pairs).toHaveLength(2);
-      const byePair = pairs.find(p => p.status === 'bye');
-      const regularPair = pairs.find(p => p.status !== 'bye');
-
-      expect(byePair).toBeDefined();
-      expect(byePair!.participants).toHaveLength(1);
-      expect(byePair!.winner).toBe(byePair!.participants[0]);
-      expect(regularPair!.participants).toHaveLength(2);
+    it('returns correct number of rounds for non-power of 2', () => {
+      expect(winnersRoundsFor(5)).toBe(3);
+      expect(winnersRoundsFor(9)).toBe(4);
     });
 
-    it('sets correct round and pair indices', () => {
-      const anime = [1, 2, 3, 4].map(id => createMockAnime(id, `Anime ${id}`));
-      const participants = anime.map((a, i) => createParticipant(`p-${i}`, a, i + 1));
+    it('returns 0 for less than 2 participants', () => {
+      expect(winnersRoundsFor(1)).toBe(0);
+      expect(winnersRoundsFor(0)).toBe(0);
+    });
+  });
 
-      const pairs = createPairsForRound(participants, 2);
+  describe('losersRoundsFor', () => {
+    it('returns correct number of LB rounds', () => {
+      expect(losersRoundsFor(4)).toBe(6);
+      expect(losersRoundsFor(3)).toBe(4);
+      expect(losersRoundsFor(2)).toBe(2);
+      expect(losersRoundsFor(1)).toBe(0);
+      expect(losersRoundsFor(0)).toBe(0);
+    });
+  });
 
-      pairs.forEach((pair, index) => {
-        expect(pair.roundIndex).toBe(2);
-        expect(pair.pairIndex).toBe(index);
-        expect(pair.id).toBe(`round-2-pair-${index}`);
-      });
+  describe('lbRoundForWbLoss', () => {
+    it('routes WB losers to correct LB rounds', () => {
+      expect(lbRoundForWbLoss(0)).toBe(0);
+      expect(lbRoundForWbLoss(1)).toBe(1);
+      expect(lbRoundForWbLoss(2)).toBe(3);
+      expect(lbRoundForWbLoss(3)).toBe(5);
+    });
+  });
+
+  describe('computeLbPairCounts', () => {
+    it('returns correct pair counts for N=8', () => {
+      const counts = computeLbPairCounts(8, 3);
+      expect(counts).toHaveLength(4);
+      expect(counts[0]).toBe(2);
+      expect(counts[1]).toBe(2);
+      expect(counts[2]).toBe(1);
+      expect(counts[3]).toBe(1);
+    });
+
+    it('returns correct pair counts for N=4', () => {
+      const counts = computeLbPairCounts(4, 2);
+      expect(counts).toHaveLength(2);
+      expect(counts[0]).toBe(1);
+      expect(counts[1]).toBe(1);
+    });
+
+    it('returns empty array for wbRounds=1', () => {
+      const counts = computeLbPairCounts(2, 1);
+      expect(counts).toHaveLength(0);
+    });
+
+    it('accounts for odd-round byes instead of assuming a clean power-of-2 shape', () => {
+      // N=17 winners bracket sizes: 17,9,5,3,2,1 -> real WB losers per round: 8,4,2,1,1.
+      // A formula that assumes a clean ceil(N/4) halving pattern (ignoring the
+      // byes those odd sizes produce) would under- or over-size these rounds,
+      // causing real participants to be routed past the end of a round's pairs
+      // and silently dropped during advancement.
+      const counts = computeLbPairCounts(17, 5);
+      expect(counts).toEqual([4, 4, 2, 2, 1, 1, 1, 1]);
     });
   });
 
   describe('buildTournamentRounds', () => {
-    it('creates correct number of rounds for power of 2', () => {
+    it('creates correct structure for 8 participants', () => {
       const anime = Array.from({ length: 8 }, (_, i) => createMockAnime(i + 1, `Anime ${i + 1}`));
-      const rounds = buildTournamentRounds(anime);
+      const { rounds, winnersRounds, losersRounds } = buildTournamentRounds(anime);
 
-      expect(rounds).toHaveLength(3);
-    });
+      expect(winnersRounds).toBe(3);
+      expect(losersRounds).toBe(4);
 
-    it('creates correct number of rounds for non-power of 2', () => {
-      const anime = Array.from({ length: 5 }, (_, i) => createMockAnime(i + 1, `Anime ${i + 1}`));
-      const rounds = buildTournamentRounds(anime);
+      const wbRounds = rounds.filter(r => r.bracket === 'winners');
+      const lbRounds = rounds.filter(r => r.bracket === 'losers');
+      const finalRounds = rounds.filter(r => r.bracket === 'final');
 
-      expect(rounds.length).toBeGreaterThanOrEqual(1);
+      expect(wbRounds).toHaveLength(3);
+      expect(lbRounds).toHaveLength(4);
+      expect(finalRounds).toHaveLength(1);
     });
 
     it('assigns seeds starting from 1', () => {
       const anime = Array.from({ length: 4 }, (_, i) => createMockAnime(i + 1, `Anime ${i + 1}`));
-      const rounds = buildTournamentRounds(anime);
+      const { rounds } = buildTournamentRounds(anime);
 
-      const firstRound = rounds[0];
-      const seeds = firstRound.pairs.flatMap(p => p.participants.map(p => p.seed));
+      const firstRound = rounds.find(r => r.bracket === 'winners' && r.roundInBracket === 0);
+      const seeds = firstRound!.pairs.flatMap(p => p.participants.map(p => p.seed));
       expect(seeds).toContain(1);
       expect(seeds).toContain(2);
       expect(seeds).toContain(3);
@@ -141,29 +165,20 @@ describe('tournament-utils', () => {
   });
 
   describe('getRoundName', () => {
-    it('returns Финал for last round', () => {
-      expect(getRoundName(2, 3)).toBe('Финал');
-      expect(getRoundName(0, 1)).toBe('Финал');
+    it('returns Гранд-финал for final bracket', () => {
+      expect(getRoundName('final', 0, 3, 5)).toBe('Гранд-финал');
     });
 
-    it('returns Полуфинал for 2 round tournament first round', () => {
-      expect(getRoundName(0, 2)).toBe('Полуфинал');
+    it('returns correct names for winners bracket', () => {
+      expect(getRoundName('winners', 2, 3, 5)).toBe('Финал');
+      expect(getRoundName('winners', 1, 3, 5)).toBe('Полуфинал');
+      expect(getRoundName('winners', 0, 3, 5)).toBe('Четвертьфинал');
     });
 
-    it('returns Полуфинал for totalRounds 3 and roundIndex totalRounds-1', () => {
-      expect(getRoundName(2, 3)).toBe('Финал');
-      expect(getRoundName(1, 3)).toBe('Полуфинал');
-    });
-
-    it('returns Четвертьфинал for correct round', () => {
-      expect(getRoundName(1, 3)).toBe('Полуфинал');
-      expect(getRoundName(0, 3)).toBe('Четвертьфинал');
-    });
-
-    it('returns numbered round for regular rounds', () => {
-      expect(getRoundName(0, 5)).toBe('1 раунд');
-      expect(getRoundName(1, 5)).toBe('2 раунд');
-      expect(getRoundName(3, 5)).toBe('Полуфинал');
+    it('returns correct names for losers bracket', () => {
+      expect(getRoundName('losers', 4, 3, 5)).toBe('Финал');
+      expect(getRoundName('losers', 0, 3, 5)).toBe('1 раунд');
+      expect(getRoundName('losers', 1, 3, 5)).toBe('2 раунд');
     });
   });
 });

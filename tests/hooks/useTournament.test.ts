@@ -18,69 +18,44 @@ const createMockAnime = (id: number, title: string): AnimeCatalogItem => ({
   episodes: { aired: 12, count: 12 },
 });
 
-const mockAnime5: AnimeCatalogItem[] = [
+const mockAnime4: AnimeCatalogItem[] = [
   createMockAnime(1, 'Anime A'),
   createMockAnime(2, 'Anime B'),
   createMockAnime(3, 'Anime C'),
   createMockAnime(4, 'Anime D'),
-  createMockAnime(5, 'Anime E'),
 ];
 
-const mockAnime9: AnimeCatalogItem[] = [
-  createMockAnime(1, 'Anime 1'),
-  createMockAnime(2, 'Anime 2'),
-  createMockAnime(3, 'Anime 3'),
-  createMockAnime(4, 'Anime 4'),
-  createMockAnime(5, 'Anime 5'),
-  createMockAnime(6, 'Anime 6'),
-  createMockAnime(7, 'Anime 7'),
-  createMockAnime(8, 'Anime 8'),
-  createMockAnime(9, 'Anime 9'),
-];
+const mockAnime8: AnimeCatalogItem[] = Array.from({ length: 8 }, (_, i) =>
+  createMockAnime(i + 1, `Anime ${i + 1}`)
+);
 
 describe('useTournament', () => {
   describe('initialization', () => {
-    it('should initialize tournament with 5 participants', () => {
+    it('should initialize tournament with 4 participants', () => {
       const { result } = renderHook(() => useTournament());
 
       act(() => {
-        result.current.initializeTournament(mockAnime5);
+        result.current.initializeTournament(mockAnime4);
       });
 
       expect(result.current.tournament).toBeDefined();
-      expect(result.current.tournament!.rounds.length).toBeGreaterThanOrEqual(1);
+      expect(result.current.tournament!.meta.winnersRounds).toBe(2);
+      expect(result.current.tournament!.meta.losersRounds).toBe(2);
 
-      const firstRound = result.current.tournament!.rounds[0];
-      expect(firstRound.pairs.length).toBe(3);
+      const wbRounds = result.current.tournament!.rounds.filter(r => r.bracket === 'winners');
+      expect(wbRounds).toHaveLength(2);
     });
 
-    it('should initialize tournament with 9 participants', () => {
+    it('should initialize tournament with 8 participants', () => {
       const { result } = renderHook(() => useTournament());
 
       act(() => {
-        result.current.initializeTournament(mockAnime9);
+        result.current.initializeTournament(mockAnime8);
       });
 
       expect(result.current.tournament).toBeDefined();
-
-      expect(result.current.tournament!.rounds.length).toBeGreaterThanOrEqual(1);
-    });
-
-    it('should have one bye pair when odd number of participants', () => {
-      const { result } = renderHook(() => useTournament());
-
-      act(() => {
-        result.current.initializeTournament(mockAnime5);
-      });
-
-      const firstRound = result.current.tournament!.rounds[0];
-      const byePairs = firstRound.pairs.filter(p => p.status === 'bye');
-      const regularPairs = firstRound.pairs.filter(p => p.status !== 'bye');
-
-      expect(byePairs.length).toBe(1);
-      expect(regularPairs.length).toBe(2);
-      expect(regularPairs.every(p => p.participants.length === 2)).toBe(true);
-      expect(byePairs[0].participants.length).toBe(1);
+      expect(result.current.tournament!.meta.winnersRounds).toBe(3);
+      expect(result.current.tournament!.meta.losersRounds).toBe(4);
     });
   });
 
@@ -89,7 +64,7 @@ describe('useTournament', () => {
       const { result } = renderHook(() => useTournament());
 
       act(() => {
-        result.current.initializeTournament(mockAnime5);
+        result.current.initializeTournament(mockAnime4);
       });
 
       act(() => {
@@ -98,11 +73,10 @@ describe('useTournament', () => {
 
       expect(result.current.tournament!.roundStarted).toBe(true);
 
-      const firstRound = result.current.tournament!.rounds[0];
-      const playingPairs = firstRound.pairs.filter(p => p.status === 'playing');
-      const byePairs = firstRound.pairs.filter(p => p.status === 'bye');
-
-      expect(byePairs.length).toBe(1);
+      const wbRound0 = result.current.tournament!.rounds.find(
+        r => r.bracket === 'winners' && r.roundInBracket === 0
+      );
+      const playingPairs = wbRound0!.pairs.filter(p => p.status === 'playing');
       expect(playingPairs.length).toBe(2);
     });
   });
@@ -112,15 +86,17 @@ describe('useTournament', () => {
       const { result } = renderHook(() => useTournament());
 
       act(() => {
-        result.current.initializeTournament(mockAnime5);
+        result.current.initializeTournament(mockAnime4);
       });
 
       act(() => {
         result.current.startRound();
       });
 
-      const firstRound = result.current.tournament!.rounds[0];
-      const firstPair = firstRound.pairs.find(p => p.participants.length === 2);
+      const wbRound0 = result.current.tournament!.rounds.find(
+        r => r.bracket === 'winners' && r.roundInBracket === 0
+      );
+      const firstPair = wbRound0!.pairs.find(p => p.participants.length === 2);
       expect(firstPair).toBeDefined();
 
       const winnerId = firstPair!.participants[0].id;
@@ -129,106 +105,12 @@ describe('useTournament', () => {
         result.current.selectWinner(firstPair!.id, winnerId);
       });
 
-      const updatedPair = result.current.tournament!.rounds[0].pairs.find(p => p.id === firstPair!.id);
+      const updatedPair = result.current.tournament!.rounds
+        .find(r => r.bracket === 'winners' && r.roundInBracket === 0)!
+        .pairs.find(p => p.id === firstPair!.id);
       expect(updatedPair!.winner).toBeDefined();
       expect(updatedPair!.winner!.id).toBe(winnerId);
       expect(updatedPair!.status).toBe('completed');
-    });
-
-    it('should auto-advance bye participant to next round', () => {
-      const { result } = renderHook(() => useTournament());
-
-      act(() => {
-        result.current.initializeTournament(mockAnime5);
-      });
-
-      const firstRound = result.current.tournament!.rounds[0];
-      const byePair = firstRound.pairs.find(p => p.status === 'bye');
-      expect(byePair).toBeDefined();
-      expect(byePair!.winner).toBeDefined();
-      expect(byePair!.winner!.id).toBe(byePair!.participants[0].id);
-    });
-
-    it('should create next round after all pairs in current round are decided', () => {
-      const { result } = renderHook(() => useTournament());
-
-      act(() => {
-        result.current.initializeTournament(mockAnime5);
-      });
-
-      act(() => {
-        result.current.startRound();
-      });
-
-      const firstRound = result.current.tournament!.rounds[0];
-
-      const regularPairs = firstRound.pairs.filter(p => p.status !== 'bye');
-      for (const pair of regularPairs) {
-        const winnerId = pair.participants[0].id;
-        act(() => {
-          result.current.selectWinner(pair.id, winnerId);
-        });
-      }
-
-      const updatedTournament = result.current.tournament;
-      expect(
-        updatedTournament!.rounds[0].isComplete ||
-        updatedTournament!.isComplete ||
-        updatedTournament!.rounds.length > 1
-      ).toBe(true);
-    });
-  });
-
-  describe('tournament flow with 9 participants', () => {
-    it('should correctly handle bye in first round with 9 participants', () => {
-      const { result } = renderHook(() => useTournament());
-
-      act(() => {
-        result.current.initializeTournament(mockAnime9);
-      });
-
-      const firstRound = result.current.tournament!.rounds[0];
-
-      expect(firstRound.pairs.length).toBe(5);
-
-      const byePairs = firstRound.pairs.filter(p => p.status === 'bye');
-      const regularPairs = firstRound.pairs.filter(p => p.status !== 'bye');
-
-      expect(byePairs.length).toBe(1);
-      expect(regularPairs.length).toBe(4);
-
-      expect(regularPairs.every(p => p.participants.length === 2)).toBe(true);
-
-      expect(byePairs[0].participants.length).toBe(1);
-      expect(byePairs[0].winner).toBeDefined();
-    });
-
-    it('should progress all 9 participants through tournament', () => {
-      const { result } = renderHook(() => useTournament());
-
-      act(() => {
-        result.current.initializeTournament(mockAnime9);
-      });
-
-      act(() => {
-        result.current.startRound();
-      });
-
-      const round0 = result.current.tournament!.rounds[0];
-      for (const pair of round0.pairs) {
-        if (pair.status !== 'bye' && !pair.winner) {
-          act(() => {
-            result.current.selectWinner(pair.id, pair.participants[0].id);
-          });
-        }
-      }
-
-      const updatedTournament = result.current.tournament!;
-      expect(
-        updatedTournament.rounds[0].isComplete ||
-        updatedTournament.isComplete ||
-        updatedTournament.rounds.length > 1
-      ).toBe(true);
     });
   });
 
@@ -237,7 +119,7 @@ describe('useTournament', () => {
       const { result } = renderHook(() => useTournament());
 
       act(() => {
-        result.current.initializeTournament(mockAnime5);
+        result.current.initializeTournament(mockAnime4);
       });
 
       expect(result.current.tournament).toBeDefined();
@@ -255,22 +137,26 @@ describe('useTournament', () => {
       const { result } = renderHook(() => useTournament());
 
       act(() => {
-        result.current.initializeTournament(mockAnime5);
+        result.current.initializeTournament(mockAnime4);
       });
 
       act(() => {
         result.current.startRound();
       });
 
-      const firstRound = result.current.tournament!.rounds[0];
-      const firstPair = firstRound.pairs.find(p => p.participants.length === 2);
+      const wbRound0 = result.current.tournament!.rounds.find(
+        r => r.bracket === 'winners' && r.roundInBracket === 0
+      );
+      const firstPair = wbRound0!.pairs.find(p => p.participants.length === 2);
       const winnerId = firstPair!.participants[0].id;
 
       act(() => {
         result.current.selectWinner(firstPair!.id, winnerId);
       });
 
-      const updatedPair = result.current.tournament!.rounds[0].pairs.find(p => p.id === firstPair!.id);
+      const updatedPair = result.current.tournament!.rounds
+        .find(r => r.bracket === 'winners' && r.roundInBracket === 0)!
+        .pairs.find(p => p.id === firstPair!.id);
       expect(updatedPair!.winner).toBeDefined();
       expect(updatedPair!.status).toBe('completed');
 
@@ -278,7 +164,9 @@ describe('useTournament', () => {
         result.current.resetRound();
       });
 
-      const resetPair = result.current.tournament!.rounds[0].pairs.find(p => p.id === firstPair!.id);
+      const resetPair = result.current.tournament!.rounds
+        .find(r => r.bracket === 'winners' && r.roundInBracket === 0)!
+        .pairs.find(p => p.id === firstPair!.id);
       expect(resetPair!.winner).toBeNull();
       expect(resetPair!.status).toBe('pending');
     });
@@ -287,7 +175,7 @@ describe('useTournament', () => {
       const { result } = renderHook(() => useTournament());
 
       act(() => {
-        result.current.initializeTournament(mockAnime5);
+        result.current.initializeTournament(mockAnime4);
       });
 
       act(() => {
@@ -302,38 +190,6 @@ describe('useTournament', () => {
 
       expect(result.current.tournament!.roundStarted).toBe(false);
     });
-
-    it('should not affect other rounds', () => {
-      const { result } = renderHook(() => useTournament());
-
-      act(() => {
-        result.current.initializeTournament(mockAnime5);
-      });
-
-      act(() => {
-        result.current.startRound();
-      });
-
-      const firstRound = result.current.tournament!.rounds[0];
-      const pairs = firstRound.pairs.filter(p => p.participants.length === 2);
-
-      for (const pair of pairs) {
-        const winnerId = pair.participants[0].id;
-        act(() => {
-          result.current.selectWinner(pair.id, winnerId);
-        });
-      }
-
-      const hasSecondRound = result.current.tournament!.rounds.length > 1;
-
-      act(() => {
-        result.current.resetRound();
-      });
-
-      if (hasSecondRound) {
-        expect(result.current.tournament!.rounds.length).toBeGreaterThanOrEqual(2);
-      }
-    });
   });
 
   describe('getResults positions', () => {
@@ -341,23 +197,32 @@ describe('useTournament', () => {
       const { result } = renderHook(() => useTournament());
 
       act(() => {
-        result.current.initializeTournament(mockAnime5);
+        result.current.initializeTournament(mockAnime4);
       });
 
       let safety = 0;
-      while (!result.current.tournament?.isComplete && safety < 50) {
-        const round = result.current.tournament!.rounds[result.current.tournament!.currentRoundIndex];
+      while (!result.current.tournament?.isComplete && safety < 100) {
+        const currentRound = result.current.tournament!.rounds.find(
+          r => r.bracket === result.current.tournament!.currentBracket &&
+               r.roundInBracket === result.current.tournament!.currentRoundInBracket
+        );
+        
         if (!result.current.tournament!.roundStarted) {
           act(() => {
             result.current.startRound();
           });
         }
-        for (const pair of round.pairs) {
-          if (pair.status === 'pending' || pair.status === 'playing') {
-            const winnerId = chooseWinnerForPair(pair);
-            act(() => {
-              result.current.selectWinner(pair.id, winnerId);
-            });
+        
+        if (currentRound) {
+          for (const pair of currentRound.pairs) {
+            if (pair.status === 'pending' || pair.status === 'playing') {
+              if (pair.participants.length === 2 && pair.participants.every(p => p.id && !p.id.includes('TBD'))) {
+                const winnerId = chooseWinnerForPair(pair);
+                act(() => {
+                  result.current.selectWinner(pair.id, winnerId);
+                });
+              }
+            }
           }
         }
         safety++;
@@ -370,7 +235,7 @@ describe('useTournament', () => {
       const { result } = renderHook(() => useTournament());
 
       act(() => {
-        result.current.initializeTournament(mockAnime5);
+        result.current.initializeTournament(mockAnime4);
       });
 
       expect(result.current.getResults()).toEqual([]);
@@ -380,45 +245,214 @@ describe('useTournament', () => {
       const result = playEntireTournament((pair) => pair.participants[0].id);
 
       const results = result.current.getResults();
-      expect(results).toHaveLength(5);
+      expect(results).toHaveLength(4);
 
       const sortedByPosition = [...results].sort((a, b) => a.position - b.position);
       expect(sortedByPosition[0].position).toBe(1);
       expect(sortedByPosition[0].id).toBe(result.current.tournament!.champion!.id);
     });
 
-    it('should rank the finalist at position 2', () => {
+    it('should rank the runnerUp at position 2', () => {
       const result = playEntireTournament((pair) => pair.participants[0].id);
 
       const results = result.current.getResults();
-      const finalists = results.filter((p) => p.position === 2);
-      expect(finalists).toHaveLength(1);
+      const runnerUp = results.find((p) => p.position === 2);
+      expect(runnerUp).toBeDefined();
+      expect(runnerUp!.id).toBe(result.current.tournament!.runnerUp!.id);
     });
 
-    it('should give the round-1 loser position 3 (only one real match in round 1 with 5 participants)', () => {
+    it('should give all participants unique positions', () => {
       const result = playEntireTournament((pair) => pair.participants[0].id);
 
       const results = result.current.getResults();
-      const thirdPlace = results.filter((p) => p.position === 3);
-      expect(thirdPlace).toHaveLength(1);
+      const positions = results.map(r => r.position);
+      const uniquePositions = new Set(positions);
+      
+      expect(uniquePositions.size).toBe(positions.length);
     });
 
-    it('should give round 0 losers tied at position 5', () => {
+    it('should have positions from 1 to N', () => {
       const result = playEntireTournament((pair) => pair.participants[0].id);
 
       const results = result.current.getResults();
-      const fifthPlace = results.filter((p) => p.position === 5);
-      expect(fifthPlace).toHaveLength(2);
+      const positions = results.map(r => r.position).sort((a, b) => a - b);
+
+      expect(positions[0]).toBe(1);
+      expect(positions[1]).toBe(2);
+      expect(positions[2]).toBeGreaterThanOrEqual(3);
+      expect(positions[3]).toBeGreaterThan(positions[2]);
+    });
+  });
+
+  describe('full simulation for non-power-of-2 participant counts', () => {
+    const playToCompletion = (n: number) => {
+      const animeList: AnimeCatalogItem[] = Array.from({ length: n }, (_, i) =>
+        createMockAnime(i + 1, `Anime ${i + 1}`)
+      );
+      const { result } = renderHook(() => useTournament());
+
+      act(() => {
+        result.current.initializeTournament(animeList);
+      });
+
+      let safety = 0;
+      while (!result.current.tournament?.isComplete && safety < 200) {
+        if (!result.current.tournament!.roundStarted) {
+          act(() => {
+            result.current.startRound();
+          });
+        }
+
+        const currentRound = result.current.tournament!.rounds.find(
+          r => r.bracket === result.current.tournament!.currentBracket &&
+               r.roundInBracket === result.current.tournament!.currentRoundInBracket
+        );
+
+        if (currentRound) {
+          for (const pair of currentRound.pairs) {
+            if (pair.status === 'playing' && !pair.winner) {
+              const winnerId = pair.participants[0].id;
+              act(() => {
+                result.current.selectWinner(pair.id, winnerId);
+              });
+            }
+          }
+        }
+        safety++;
+      }
+
+      return result;
+    };
+
+    // Every one of these sizes forces at least one round in the winners or
+    // losers bracket to be entirely byes, or a bracket round built from
+    // placeholders with an odd leftover slot — the exact conditions that used
+    // to make matches play against an empty "TBD" opponent, hang forever
+    // waiting on a match with nothing playable, or silently lose a real
+    // participant so the final standings had gaps and duplicate positions.
+    it.each([3, 5, 6, 9, 10, 11, 12, 17, 18, 21, 22])(
+      'completes with every participant assigned a unique position for N=%i',
+      (n) => {
+        const result = playToCompletion(n);
+
+        expect(result.current.tournament?.isComplete).toBe(true);
+
+        const results = result.current.getResults();
+        expect(results).toHaveLength(n);
+
+        const positions = results.map(r => r.position).sort((a, b) => a - b);
+        expect(positions).toEqual(Array.from({ length: n }, (_, i) => i + 1));
+
+        const uniqueIds = new Set(results.map(r => r.id));
+        expect(uniqueIds.size).toBe(n);
+      }
+    );
+
+    it('never lets a placeholder "TBD" slot become part of a playable match', () => {
+      const result = playToCompletion(17);
+
+      for (const round of result.current.tournament!.rounds) {
+        for (const pair of round.pairs) {
+          if (pair.status === 'playing' || pair.status === 'completed') {
+            expect(pair.participants.every(p => !p.isPlaceholder)).toBe(true);
+          }
+        }
+      }
     });
 
-    it('should reflect actual tournament results, not seed order', () => {
-      const result = playEntireTournament((pair) => pair.participants[0].id);
+    it('interleaves LB survivors with fresh WB losers in a major LB round, instead of pairing each group against itself', () => {
+      // 8 participants: WB round0 has 4 losers (self-paired in LB round0, a
+      // minor round). LB round1 is a major round where LB round0's 2 winners
+      // should each face one of WB round1's 2 fresh losers — not the two LB
+      // survivors playing each other while the two fresh losers play each other.
+      const animeList: AnimeCatalogItem[] = Array.from({ length: 8 }, (_, i) =>
+        createMockAnime(i + 1, `Anime ${i + 1}`)
+      );
+      const { result } = renderHook(() => useTournament());
 
-      const results = result.current.getResults();
-      const sortedByPosition = [...results].sort((a, b) => a.position - b.position);
+      act(() => {
+        result.current.initializeTournament(animeList);
+      });
 
-      expect(sortedByPosition.map((p) => p.position)).toEqual([1, 2, 3, 5, 5]);
-      expect(sortedByPosition[0].anime.anime_id).toBe(result.current.tournament!.champion!.anime.anime_id);
+      let safety = 0;
+      while (!result.current.tournament?.isComplete && safety < 50) {
+        if (!result.current.tournament!.roundStarted) {
+          act(() => {
+            result.current.startRound();
+          });
+        }
+        const t = result.current.tournament!;
+        const round = t.rounds.find(
+          r => r.bracket === t.currentBracket && r.roundInBracket === t.currentRoundInBracket
+        );
+        if (round) {
+          for (const pair of round.pairs) {
+            if (pair.status === 'playing' && !pair.winner) {
+              const winnerId = pair.participants[0].id;
+              act(() => {
+                result.current.selectWinner(pair.id, winnerId);
+              });
+            }
+          }
+        }
+        safety++;
+      }
+
+      const t = result.current.tournament!;
+      const wb0Losers = new Set(
+        t.rounds
+          .find(r => r.bracket === 'winners' && r.roundInBracket === 0)!
+          .pairs.filter(p => p.status === 'completed')
+          .map(p => p.participants.find(x => x.id !== p.winner!.id)!.id)
+      );
+      const wb1Losers = new Set(
+        t.rounds
+          .find(r => r.bracket === 'winners' && r.roundInBracket === 1)!
+          .pairs.filter(p => p.status === 'completed')
+          .map(p => p.participants.find(x => x.id !== p.winner!.id)!.id)
+      );
+      const lb1 = t.rounds.find(r => r.bracket === 'losers' && r.roundInBracket === 1)!;
+
+      for (const pair of lb1.pairs) {
+        const ids = pair.participants.map(p => p.id);
+        expect(ids.filter(id => wb0Losers.has(id))).toHaveLength(1);
+        expect(ids.filter(id => wb1Losers.has(id))).toHaveLength(1);
+      }
+    });
+  });
+
+  describe('resetRound with a bye pair', () => {
+    it('leaves a single-slot bye pair untouched instead of nulling its winner without a way to replay it', () => {
+      // Odd participant count so WB round0 has a genuine single-slot bye pair.
+      const animeList: AnimeCatalogItem[] = Array.from({ length: 5 }, (_, i) =>
+        createMockAnime(i + 1, `Anime ${i + 1}`)
+      );
+      const { result } = renderHook(() => useTournament());
+
+      act(() => {
+        result.current.initializeTournament(animeList);
+      });
+      act(() => {
+        result.current.startRound();
+      });
+
+      const round0Before = result.current.tournament!.rounds.find(
+        r => r.bracket === 'winners' && r.roundInBracket === 0
+      )!;
+      const byePairBefore = round0Before.pairs.find(p => p.participants.length === 1)!;
+      expect(byePairBefore.status).toBe('bye');
+      expect(byePairBefore.winner).not.toBeNull();
+
+      act(() => {
+        result.current.resetRound();
+      });
+
+      const round0After = result.current.tournament!.rounds.find(
+        r => r.bracket === 'winners' && r.roundInBracket === 0
+      )!;
+      const byePairAfter = round0After.pairs.find(p => p.id === byePairBefore.id)!;
+      expect(byePairAfter.status).toBe('bye');
+      expect(byePairAfter.winner).toEqual(byePairBefore.winner);
     });
   });
 });
