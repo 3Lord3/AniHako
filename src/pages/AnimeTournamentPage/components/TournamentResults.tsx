@@ -90,13 +90,9 @@ export function TournamentResults({ participants, champion, onRestart }: Tournam
 
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold truncate text-foreground text-xs sm:text-sm">{participant.anime.title}</p>
-                    <p className="text-[10px] sm:text-xs text-muted-foreground truncate">
-                      {participant.anime.year ? `${participant.anime.year} • ` : ''}
-                      {participant.anime.genres?.slice(0, 2).map((g) => g.title).join(', ')}
-                    </p>
                   </div>
 
-                  <div className="flex flex-col items-end gap-1 shrink-0">
+                  <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                     {participant.anime.user?.rating ? (
                       <TooltipWrap content="Ваша оценка">
                         <div className="flex items-center gap-1 text-xs sm:text-sm font-medium text-primary bg-primary/10 px-1.5 py-0.5 rounded cursor-default">
