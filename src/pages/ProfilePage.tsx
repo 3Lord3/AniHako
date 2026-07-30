@@ -1,7 +1,6 @@
-import { Link } from 'react-router-dom';
 import { useUser, useUpdateProfile } from '@/hooks';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { LoginRequired } from '@/components/LoginRequired';
 import { ProfilePageSkeleton } from '@/components/loaders/PageSkeletons';
 import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
 import { RoleBadges } from '@/components/profile/RoleBadge';
@@ -18,14 +17,7 @@ export function ProfilePage() {
   }
 
   if (!user) {
-    return (
-      <div className="text-center py-12">
-        <p className="mb-4">Для просмотра профиля необходимо войти</p>
-        <Link to="/login">
-          <Button>Войти</Button>
-        </Link>
-      </div>
-    );
+    return <LoginRequired message="Для просмотра профиля необходимо войти" />;
   }
 
   const handleUpdateNickname = (nickname: string) => {
