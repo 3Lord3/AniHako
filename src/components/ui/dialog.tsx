@@ -23,6 +23,7 @@ function DialogClose({ ...props }: DialogPrimitive.Close.Props) {
 
 function DialogOverlay({
   className,
+  onClick,
   ...props
 }: DialogPrimitive.Backdrop.Props) {
   return (
@@ -32,6 +33,12 @@ function DialogOverlay({
         "fixed inset-0 isolate z-50 bg-black/10 duration-100 supports-backdrop-filter:backdrop-blur-xs data-open:animate-in data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0",
         className
       )}
+      onClick={(e) => {
+        // The portal keeps the overlay in React's component tree, so this click
+        // would otherwise bubble to click handlers on whatever rendered the Dialog.
+        e.stopPropagation()
+        onClick?.(e)
+      }}
       {...props}
     />
   )

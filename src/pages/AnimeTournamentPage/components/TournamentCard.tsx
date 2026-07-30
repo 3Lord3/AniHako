@@ -1,10 +1,19 @@
-import { Star, Calendar, Film } from 'lucide-react';
+import { useState } from 'react';
+import { Star, Calendar, Film, Info } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { AnimeTitle } from '@/components/anime/AnimeTitle';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { AnimatePresence, motion } from 'framer-motion';
 import type { AnimeCatalogItem } from '@/types';
 import { getImageUrl, getHeroPosterUrl } from '@/lib/imageUrl';
+import { getAnimeUrlSlug } from '@/lib/animeUrl';
 import { cn } from '@/lib/utils';
+import { useAnimeDetail } from '@/hooks';
 
 interface TournamentCardProps {
   anime: AnimeCatalogItem;
@@ -28,8 +37,19 @@ export function TournamentCard({
   className = ''
 }: TournamentCardProps) {
   const posterUrl = getHeroPosterUrl(anime);
-  const rating = anime.rating?.average ? Number(anime.rating.average) : null;
+  const [infoOpen, setInfoOpen] = useState(false);
+  // Tournament participants are built from the user's anime list, which
+  // doesn't include the description — fetch full details lazily once the
+  // info modal is actually opened.
+  const { data: animeDetail, isLoading: isDetailLoading, isError: isDetailError } = useAnimeDetail(
+    infoOpen ? getAnimeUrlSlug(anime) : ''
+  );
+  const description = animeDetail?.description || anime.description;
+  const genres = animeDetail?.genres?.length ? animeDetail.genres : anime.genres;
+  const ratingValue = animeDetail?.rating?.average ?? anime.rating?.average;
+  const rating = ratingValue != null ? Number(ratingValue) : null;
   const validRating = rating !== null && !isNaN(rating);
+  const year = animeDetail?.year || anime.year;
 
   return (
     <div
@@ -70,9 +90,9 @@ export function TournamentCard({
           </div>
         )}
 
-        {showDetails && anime.genres && anime.genres.length > 0 && (
-          <div className="absolute top-3 left-3 sm:top-4 sm:right-4 sm:left-auto right-3 flex flex-wrap gap-1 z-10 w-[calc(100%-1.5rem)] sm:w-auto sm:max-w-[60%] justify-start sm:justify-end">
-            {anime.genres.slice(0, 2).map((g) => (
+        {showDetails && genres && genres.length > 0 && (
+          <div className="absolute top-3 right-3 sm:top-4 sm:right-4 flex flex-wrap gap-1 z-10 max-w-[60%] justify-end">
+            {genres.slice(0, 2).map((g) => (
               <Badge
                 key={g.id}
                 className={cn(
@@ -94,24 +114,25 @@ export function TournamentCard({
               compact ? "text-sm sm:text-base md:text-lg" : "text-lg mb-1"
             )}
           />
-
-          {showDetails && (
-            <div className={cn("flex items-center gap-2 sm:gap-3", compact ? "text-xs sm:text-sm md:text-base" : "text-sm")}>
-              {validRating && (
-                <div className="flex items-center gap-0.5 sm:gap-1">
-                  <Star className={cn("text-yellow-400 fill-yellow-400", compact ? "w-3 h-3 sm:w-4 sm:h-4" : "w-4 h-4")} />
-                  <span className="font-medium">{rating.toFixed(1)}</span>
-                </div>
-              )}
-              {anime.year ? (
-                <div className="flex items-center gap-0.5 sm:gap-1">
-                  <Calendar className={compact ? "w-3 h-3 sm:w-4 sm:h-4" : "w-4 h-4"} />
-                  <span>{anime.year}</span>
-                </div>
-              ) : null}
-            </div>
-          )}
         </div>
+
+        {showDetails && !isWinner && (
+          <button
+            type="button"
+            onPointerDown={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              setInfoOpen(true);
+            }}
+            aria-label="Информация об аниме"
+            className={cn(
+              "absolute z-30 flex items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/80",
+              compact ? "top-2 left-2 w-9 h-9 sm:top-3 sm:left-3 sm:w-11 sm:h-11" : "top-3 left-3 w-10 h-10"
+            )}
+          >
+            <Info className={compact ? "w-5 h-5 sm:w-6 sm:h-6" : "w-5 h-5"} />
+          </button>
+        )}
       </div>
 
       <AnimatePresence>
@@ -139,6 +160,54 @@ export function TournamentCard({
           </div>
         </div>
       )}
+
+      <Dialog open={infoOpen} onOpenChange={setInfoOpen}>
+        <DialogContent className="max-w-lg sm:max-w-2xl" onClick={(e) => e.stopPropagation()}>
+          <DialogHeader>
+            <DialogTitle>{anime.title}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 max-h-[75vh] overflow-y-auto pr-1">
+            {(validRating || year) && (
+              <div className="flex items-center gap-4 text-sm">
+                {validRating && (
+                  <div className="flex items-center gap-1">
+                    <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+                    <span className="font-medium">{rating.toFixed(1)}</span>
+                  </div>
+                )}
+                {year ? (
+                  <div className="flex items-center gap-1 text-muted-foreground">
+                    <Calendar className="w-4 h-4" />
+                    <span>{year}</span>
+                  </div>
+                ) : null}
+              </div>
+            )}
+
+            {genres && genres.length > 0 && (
+              <div className="flex flex-wrap gap-1.5">
+                {genres.map((g) => (
+                  <Badge key={g.id} variant="outline" className="text-xs">
+                    {g.title}
+                  </Badge>
+                ))}
+              </div>
+            )}
+
+            {description ? (
+              <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
+                {description}
+              </p>
+            ) : isDetailLoading ? (
+              <p className="text-sm text-muted-foreground">Загрузка описания…</p>
+            ) : isDetailError ? (
+              <p className="text-sm text-muted-foreground">Не удалось загрузить описание</p>
+            ) : (
+              <p className="text-sm text-muted-foreground">Описание отсутствует</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -6,7 +6,11 @@
  * always want a path of the shape `/anime/{slug-or-id}`.
  */
 
+export function getAnimeUrlSlug(anime: { anime_url?: string; anime_id: number }): string {
+  if (anime.anime_url?.startsWith('/anime/')) return anime.anime_url.slice('/anime/'.length);
+  return anime.anime_url || String(anime.anime_id);
+}
+
 export function buildAnimeUrl(anime: { anime_url?: string; anime_id: number }): string {
-  if (anime.anime_url?.startsWith('/anime/')) return anime.anime_url;
-  return `/anime/${anime.anime_url || anime.anime_id}`;
+  return `/anime/${getAnimeUrlSlug(anime)}`;
 }
