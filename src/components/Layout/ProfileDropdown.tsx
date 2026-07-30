@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { User, List, LogOut } from 'lucide-react';
+import { User, List, Users, LogOut } from 'lucide-react';
 import { useUser, useAuth } from '@/hooks';
 import {
   DropdownMenu,
@@ -78,6 +78,12 @@ export function ProfileDropdown({ variant }: ProfileDropdownProps) {
               <Link to="/profile/anime" className="flex items-center w-full">
                 <List className="w-4 h-4 mr-2" />
                 Мой список
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem className="cursor-pointer">
+              <Link to="/profile/friends" className="flex items-center w-full">
+                <Users className="w-4 h-4 mr-2" />
+                Друзья
               </Link>
             </DropdownMenuItem>
             <ThemeSwitcher />

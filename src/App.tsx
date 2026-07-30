@@ -13,6 +13,7 @@ const CatalogPage = lazy(() => import('@/pages/CatalogPage').then(m => ({ defaul
 const AnimeDetailPage = lazy(() => import('@/pages/AnimeDetailPage').then(m => ({ default: m.AnimeDetailPage })));
 const ProfilePage = lazy(() => import('@/pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
 const UserAnimeListPage = lazy(() => import('@/pages/UserAnimeListPage').then(m => ({ default: m.UserAnimeListPage })));
+const FriendsPage = lazy(() => import('@/pages/FriendsPage').then(m => ({ default: m.FriendsPage })));
 const AnimeMatcherPage = lazy(() => import('@/pages/AnimeMatcherPage').then(m => ({ default: m.AnimeMatcherPage })));
 const AnimeTournamentPage = lazy(() => import('@/pages/AnimeTournamentPage').then(m => ({ default: m.AnimeTournamentPage })));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
@@ -46,6 +47,11 @@ export function App() {
             <Route path="profile/anime" element={
               <ProtectedRoute>
                 <UserAnimeListPage />
+              </ProtectedRoute>
+            } />
+            <Route path="profile/friends" element={
+              <ProtectedRoute>
+                <FriendsPage />
               </ProtectedRoute>
             } />
             <Route path="matcher" element={
