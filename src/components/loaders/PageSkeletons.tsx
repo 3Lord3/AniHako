@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { FriendsListSkeleton } from '@/components/friends/FriendsListSkeleton';
 
 export function ViewingOrderSkeleton({ rows = 4 }: { rows?: number }) {
   return (
@@ -91,6 +92,27 @@ export function ProfilePageSkeleton() {
             <Skeleton className="h-4 w-64" />
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+export function FriendsPageSkeleton() {
+  return (
+    <div className="space-y-6">
+      <Skeleton className="h-8 w-32" />
+      <div className="flex flex-col gap-6 md:flex-row md:items-start">
+        <div className="flex gap-2 md:w-56 md:shrink-0 md:flex-col">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-8 w-24 rounded-lg md:w-full" />
+          ))}
+          <Skeleton className="h-8 w-40 rounded-lg md:w-full" />
+        </div>
+        <Card className="min-w-0 flex-1">
+          <CardContent>
+            <FriendsListSkeleton />
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
