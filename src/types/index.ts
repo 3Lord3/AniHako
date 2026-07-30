@@ -4,4 +4,5 @@ export * from './list';
 export * from './review';
 export * from './genre';
 export * from './common';
+export * from './friend';
 
