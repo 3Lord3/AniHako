@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { TournamentCard } from './TournamentCard';
 import { MatchHeader } from './MatchHeader';
 import { ConfirmationDialog } from './ConfirmationDialog';
-import type { TournamentParticipant } from '@/hooks/useTournament';
+import type { TournamentParticipant, BracketType } from '@/hooks/useTournament';
 import { getRoundName } from '@/hooks/useTournament';
 
 interface TournamentMatchProps {
@@ -16,29 +16,37 @@ interface TournamentMatchProps {
   };
   roundNumber: number;
   totalRounds: number;
+  bracket?: BracketType;
+  totalLbRounds?: number;
   onSelectWinner: (matchId: string, winnerId: string) => void;
   onBack?: () => void;
   onBackToBracket?: () => void;
   isActive: boolean;
   totalMatchesInRound: number;
+  currentMatchNumber: number;
 }
 
 export function TournamentMatch({
   match,
   roundNumber,
   totalRounds,
+  bracket = 'winners',
+  totalLbRounds = 0,
   onSelectWinner,
   onBack,
   onBackToBracket,
   isActive,
   totalMatchesInRound,
+  currentMatchNumber,
 }: TournamentMatchProps) {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isSelecting, setIsSelecting] = useState(false);
   const [showBackDialog, setShowBackDialog] = useState(false);
 
-  const roundName = getRoundName(roundNumber, totalRounds);
-  const isFinal = roundNumber === totalRounds;
+  const roundName = getRoundName(bracket, roundNumber - 1, totalRounds, totalLbRounds);
+  // With no losers bracket at all (a 2-participant tournament), there's no
+  // 'final' bracket either — the sole winners-bracket round IS the final.
+  const isFinal = bracket === 'final' || (bracket === 'winners' && totalLbRounds === 0 && roundNumber === totalRounds);
 
   useEffect(() => {
     setSelectedId(null);
@@ -68,6 +76,7 @@ export function TournamentMatch({
       <MatchHeader
         roundName={roundName}
         totalMatches={totalMatchesInRound}
+        currentMatch={currentMatchNumber}
         isFinal={isFinal}
         onBack={onBack}
         onBackToBracket={onBackToBracket ? () => setShowBackDialog(true) : undefined}
