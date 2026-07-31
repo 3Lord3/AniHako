@@ -3,7 +3,8 @@ import {
   DndContext,
   DragOverlay,
   KeyboardSensor,
-  PointerSensor,
+  MouseSensor,
+  TouchSensor,
   closestCenter,
   useSensor,
   useSensors,
@@ -33,8 +34,11 @@ export function TierBoard({ tierList }: TierBoardProps) {
   const [activeAnimeId, setActiveAnimeId] = useState<number | null>(null);
 
   const sensors = useSensors(
-    // Small enough to feel immediate, big enough that a plain click on the corner button still registers.
-    useSensor(PointerSensor, { activationConstraint: { distance: 3 } }),
+    // Mouse: small enough to feel immediate, big enough that a plain click on the corner button still registers.
+    useSensor(MouseSensor, { activationConstraint: { distance: 3 } }),
+    // Touch: require a brief hold before a drag starts, so a quick swipe still scrolls the page
+    // instead of being captured as a drag (paired with touch-pan-y on TierCard).
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 8 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
@@ -105,7 +109,12 @@ export function TierBoard({ tierList }: TierBoardProps) {
               TIER_CARD_SIZE_CLASSES.large
             )}
           >
-            <img src={activeItem.posterUrl} alt="" className="h-full w-full object-cover" />
+            <img
+              src={activeItem.posterUrl}
+              alt=""
+              className="h-full w-full select-none object-cover [-webkit-touch-callout:none] [-webkit-user-drag:none]"
+              draggable={false}
+            />
           </div>
         ) : null}
       </DragOverlay>

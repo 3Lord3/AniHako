@@ -40,13 +40,18 @@ export function TierCard({ anime, tierId, moveTargets, onMoveToTier, size = 'lar
       {...attributes}
       {...listeners}
       className={cn(
-        'group relative aspect-2/3 shrink-0 touch-none overflow-hidden rounded-md border border-border bg-muted',
+        'group relative aspect-2/3 shrink-0 touch-pan-y select-none overflow-hidden rounded-md border border-border bg-muted [-webkit-touch-callout:none] [-webkit-user-drag:none]',
         TIER_CARD_SIZE_CLASSES[size],
         isDragging && 'opacity-40'
       )}
     >
       <TooltipWrap content={anime.title}>
-        <img src={anime.posterUrl} alt="" className="h-full w-full object-cover" draggable={false} />
+        <img
+          src={anime.posterUrl}
+          alt=""
+          className="h-full w-full select-none object-cover [-webkit-touch-callout:none] [-webkit-user-drag:none]"
+          draggable={false}
+        />
       </TooltipWrap>
 
       <DropdownMenu>
