@@ -1,0 +1,1 @@
+export { AniTierPage } from './AniTierPage';

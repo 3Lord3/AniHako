@@ -97,6 +97,27 @@ export function ProfilePageSkeleton() {
   );
 }
 
+export function AniTierPageSkeleton() {
+  return (
+    <div className="container mx-auto space-y-4 px-2 py-4 sm:space-y-6 sm:px-4 sm:py-8">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Skeleton className="h-8 w-32" />
+        <div className="flex gap-2">
+          <Skeleton className="h-8 w-16 rounded-md" />
+          <Skeleton className="h-8 w-32 rounded-md" />
+          <Skeleton className="h-8 w-24 rounded-md" />
+        </div>
+      </div>
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div key={i} className="flex gap-2">
+          <Skeleton className="h-24 w-16 shrink-0 rounded-lg sm:w-24" />
+          <Skeleton className="h-24 flex-1 rounded-lg" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function FriendsPageSkeleton() {
   return (
     <div className="space-y-6">

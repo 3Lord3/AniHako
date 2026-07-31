@@ -10,7 +10,9 @@ interface MobileBottomNavProps {
 
 export function MobileBottomNav({ pathname }: MobileBottomNavProps) {
   const isServicesActive =
-    isPathActive(pathname, '/matcher') || isPathActive(pathname, '/tournament');
+    isPathActive(pathname, '/matcher') ||
+    isPathActive(pathname, '/tournament') ||
+    isPathActive(pathname, '/tier');
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
