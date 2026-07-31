@@ -19,6 +19,24 @@ Object.defineProperty(window, 'IntersectionObserver', {
   value: IntersectionObserverMock,
 });
 
+// Mock ResizeObserver (used by cmdk and base-ui scroll-area)
+class ResizeObserverMock {
+  observe = vi.fn();
+  unobserve = vi.fn();
+  disconnect = vi.fn();
+}
+Object.defineProperty(window, 'ResizeObserver', {
+  writable: true,
+  value: ResizeObserverMock,
+});
+
+// jsdom does not implement scrollIntoView (used by cmdk to keep the
+// highlighted item in view).
+Element.prototype.scrollIntoView = vi.fn();
+
+// jsdom does not implement getAnimations (used by base-ui's ScrollArea).
+Element.prototype.getAnimations = vi.fn().mockReturnValue([]);
+
 // Mock embla-carousel-react
 vi.mock('embla-carousel-react', () => ({
   default: () => [vi.fn(), vi.fn()],

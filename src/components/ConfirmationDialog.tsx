@@ -1,3 +1,4 @@
+import type { ComponentProps } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import {
   Dialog,
@@ -17,6 +18,7 @@ interface ConfirmationDialogProps {
   description?: string;
   confirmText?: string;
   cancelText?: string;
+  confirmVariant?: ComponentProps<typeof Button>['variant'];
 }
 
 export function ConfirmationDialog({
@@ -27,6 +29,7 @@ export function ConfirmationDialog({
   description = 'Вы уверены?',
   confirmText = 'Подтвердить',
   cancelText = 'Отмена',
+  confirmVariant = 'default',
 }: ConfirmationDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -43,6 +46,7 @@ export function ConfirmationDialog({
             {cancelText}
           </Button>
           <Button
+            variant={confirmVariant}
             onClick={() => {
               onOpenChange(false);
               onConfirm();

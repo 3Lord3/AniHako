@@ -5,4 +5,5 @@ export * from './review';
 export * from './genre';
 export * from './common';
 export * from './friend';
+export * from './tier';
 

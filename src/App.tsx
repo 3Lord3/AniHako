@@ -16,6 +16,7 @@ const UserAnimeListPage = lazy(() => import('@/pages/UserAnimeListPage').then(m 
 const FriendsPage = lazy(() => import('@/pages/FriendsPage').then(m => ({ default: m.FriendsPage })));
 const AnimeMatcherPage = lazy(() => import('@/pages/AnimeMatcherPage').then(m => ({ default: m.AnimeMatcherPage })));
 const AnimeTournamentPage = lazy(() => import('@/pages/AnimeTournamentPage').then(m => ({ default: m.AnimeTournamentPage })));
+const AniTierPage = lazy(() => import('@/pages/AniTierPage').then(m => ({ default: m.AniTierPage })));
 const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then(m => ({ default: m.NotFoundPage })));
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -62,6 +63,11 @@ export function App() {
             <Route path="tournament" element={
               <ProtectedRoute>
                 <AnimeTournamentPage />
+              </ProtectedRoute>
+            } />
+            <Route path="tier" element={
+              <ProtectedRoute>
+                <AniTierPage />
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFoundPage />} />

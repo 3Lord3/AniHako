@@ -8,8 +8,8 @@ import { TournamentIntro } from './components/TournamentIntro';
 import { TournamentMatch } from './components/TournamentMatch';
 import { TournamentResults } from './components/TournamentResults';
 import { TournamentBracket } from './components/TournamentBracket';
-import { ConfirmationDialog } from './components/ConfirmationDialog';
 import { SuspenseFallback } from '@/components/SuspenseFallback';
+import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import { Swords, Target, Play, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
