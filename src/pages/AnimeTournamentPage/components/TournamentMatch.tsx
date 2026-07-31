@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TournamentCard } from './TournamentCard';
 import { MatchHeader } from './MatchHeader';
-import { ConfirmationDialog } from './ConfirmationDialog';
+import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import type { TournamentParticipant, BracketType } from '@/hooks/useTournament';
 import { getRoundName } from '@/hooks/useTournament';
 
