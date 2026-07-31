@@ -23,14 +23,14 @@ describe('navConfig', () => {
   });
 
   describe('servicesItems', () => {
-    it('contains AniMatch and AniTour', () => {
+    it('contains AniMatch, AniTour and AniTier', () => {
       const labels = servicesItems.map((i) => i.label);
-      expect(labels).toEqual(['AniMatch', 'AniTour']);
+      expect(labels).toEqual(['AniMatch', 'AniTour', 'AniTier']);
     });
 
-    it('routes are /matcher and /tournament', () => {
+    it('routes are /matcher, /tournament and /tier', () => {
       const routes = servicesItems.map((i) => i.to);
-      expect(routes).toEqual(['/matcher', '/tournament']);
+      expect(routes).toEqual(['/matcher', '/tournament', '/tier']);
     });
   });
 
