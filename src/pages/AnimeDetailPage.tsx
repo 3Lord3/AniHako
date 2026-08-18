@@ -1,119 +1,31 @@
-import { useCallback, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import {
-  useAnimeDetail,
-  useAddToList,
-  useUserAnimeList,
-  useToggleFavorite,
-  useUpdateListEntry,
-  useRemoveFromList,
-  useVideoViews,
-  useToggleVideoViewed,
-} from '@/hooks';
-import { useUser } from '@/hooks';
+import { useParams } from 'react-router-dom';
+import { useAnimeDetailPage } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
 import { getImageUrl } from '@/lib/imageUrl';
-import { mapStatusToListId } from '@/types';
 import { AnimeDetailPageSkeleton } from '@/components/loaders/PageSkeletons';
 import { AnimeCharacteristics } from './AnimeDetailPage/components/AnimeCharacteristics';
 import { EpisodeViewer } from './AnimeDetailPage/components/EpisodeViewer';
 import { ViewingOrder } from './AnimeDetailPage/components/ViewingOrder';
 import { StatusButtonGroup } from '@/components/detail/StatusButtonGroup';
-import type { AnimeStatus, YummyUserAnimeRate } from '@/types';
 
 export function AnimeDetailPage() {
   const { url } = useParams<{ url: string }>();
-  const navigate = useNavigate();
-  const { data: user } = useUser();
-
-  const { data: anime, isLoading } = useAnimeDetail(url || '');
-
-  const animeId = anime?.anime_id || 0;
-  const { data: userAnimeList } = useUserAnimeList();
-  const { mutate: addToList } = useAddToList();
-  const { mutate: toggleFavorite } = useToggleFavorite();
-  const { mutate: updateListEntry } = useUpdateListEntry();
-  const { mutate: removeFromList } = useRemoveFromList();
-  const { data: viewedVideoIds = [] } = useVideoViews(animeId || null, anime?.videos);
-  const { mutate: toggleVideoViewed } = useToggleVideoViewed(animeId || null, anime?.videos);
-
-  const viewedVideoSet = useMemo(() => new Set(viewedVideoIds), [viewedVideoIds]);
-
-  // Build a Map for O(1) lookup of the user's rate for this anime, instead
-  // of scanning the full user-anime list on every render.
-  const userAnimeById = useMemo(() => {
-    const map = new Map<number, YummyUserAnimeRate>();
-    if (Array.isArray(userAnimeList)) {
-      for (const rate of userAnimeList) {
-        if (typeof rate?.anime_id === 'number') {
-          map.set(rate.anime_id, rate);
-        }
-      }
-    }
-    return map;
-  }, [userAnimeList]);
-
-  const userAnime = animeId > 0 ? userAnimeById.get(animeId) : undefined;
-  const isFavorite = anime?.user?.list?.is_fav || false;
-  const userListId: number | null = anime?.user?.list?.list?.id ?? userAnime?.user?.list?.list?.id ?? null;
-  const canMarkWatched = !!user && animeId > 0;
-
-  const handleAddToList = (status: AnimeStatus) => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-    const statusId = mapStatusToListId(status);
-    if (userListId === statusId) {
-      removeFromList(animeId, { onError: () => {} });
-    } else if (userAnime) {
-      updateListEntry(
-        { animeId, data: { status } },
-        { onError: () => {} }
-      );
-    } else {
-      addToList(
-        { animeId, status, episodes: 0 },
-        { onError: () => {} }
-      );
-    }
-  };
-
-  const handleToggleFavorite = () => {
-    if (!user) {
-      navigate('/login');
-      return;
-    }
-    toggleFavorite({ animeId, isFavorite });
-  };
-
-  const handleToggleWatched = useCallback(
-    (videoId: number, isWatched: boolean) => {
-      if (!user) {
-        navigate('/login');
-        return;
-      }
-      toggleVideoViewed(
-        { videoId, currentlyViewed: isWatched },
-        { onError: () => {} }
-      );
-    },
-    [user, navigate, toggleVideoViewed]
-  );
-
-  const handleEpisodeComplete = useCallback(
-    (videoId: number) => {
-      if (!user) return;
-      if (viewedVideoSet.has(videoId)) return;
-      toggleVideoViewed(
-        { videoId, currentlyViewed: false },
-        { onError: () => {} }
-      );
-    },
-    [user, viewedVideoSet, toggleVideoViewed]
-  );
+  const {
+    user,
+    anime,
+    isLoading,
+    isFavorite,
+    userListId,
+    canMarkWatched,
+    viewedVideoSet,
+    handleAddToList,
+    handleToggleFavorite,
+    handleToggleWatched,
+    handleEpisodeComplete,
+    handleBack,
+  } = useAnimeDetailPage(url || '');
 
   if (isLoading) {
     return <AnimeDetailPageSkeleton />;
@@ -132,13 +44,7 @@ export function AnimeDetailPage() {
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => {
-          if (window.history.length > 1) {
-            navigate(-1);
-          } else {
-            navigate('/');
-          }
-        }}
+        onClick={handleBack}
         className="cursor-pointer text-foreground hover:bg-muted"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />

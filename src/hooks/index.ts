@@ -11,3 +11,4 @@ export * from './useRegisterForm';
 export * from './useUserAnimeListPage';
 export * from './useCatalogPage';
 export * from './useHomePage';
+export * from './useAnimeDetailPage';
