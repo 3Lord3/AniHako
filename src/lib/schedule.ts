@@ -1,7 +1,7 @@
 import type { AnimeScheduleItem } from '@/types/anime';
 
 export function formatDayMonth(timestamp: number | undefined): string {
-  if (!timestamp) return '-';
+  if (!timestamp) return '';
   return new Date(timestamp * 1000).toLocaleDateString('ru-RU', {
     day: 'numeric',
     month: 'short',

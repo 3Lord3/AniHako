@@ -34,7 +34,7 @@ export function countListStats(rates: HasUserListInfo[]): ListStats {
   const stats: ListStats = { watching: 0, planned: 0, completed: 0, paused: 0, dropped: 0, favorites: 0 };
   for (const rate of rates) {
     const status = getRateStatus(rate);
-    if (status in stats && status !== 'favourite') {
+    if (status in stats) {
       stats[status as keyof Omit<ListStats, 'favorites'>] += 1;
     }
     if (isRateFavorite(rate)) {

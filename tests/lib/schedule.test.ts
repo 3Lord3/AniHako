@@ -3,9 +3,9 @@ import { formatDayMonth, groupByDate } from '@/lib/schedule';
 import type { AnimeScheduleItem } from '@/types/anime';
 
 describe('formatDayMonth', () => {
-  it('returns a dash for a falsy or missing timestamp', () => {
-    expect(formatDayMonth(0)).toBe('-');
-    expect(formatDayMonth(undefined)).toBe('-');
+  it('returns an empty string for a falsy or missing timestamp', () => {
+    expect(formatDayMonth(0)).toBe('');
+    expect(formatDayMonth(undefined)).toBe('');
   });
 
   it('formats a unix timestamp as day + short month in Russian', () => {

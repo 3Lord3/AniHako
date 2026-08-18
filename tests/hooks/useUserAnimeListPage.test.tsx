@@ -2,7 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, act } from '@testing-library/react';
 import { createWrapper } from '../utils/queryWrapper';
 import { useUserAnimeListPage } from '@/hooks/useUserAnimeListPage';
-import type { YummyUserAnimeRate } from '@/types';
+import { getRateStatus } from '@/lib/listRate';
+import type { AnimeStatus, YummyUserAnimeRate } from '@/types';
 
 const makeRate = (id: number, listId: 0 | 1 | 2 | 3 | 5, isFav = false): YummyUserAnimeRate =>
   ({
@@ -13,7 +14,13 @@ const makeRate = (id: number, listId: 0 | 1 | 2 | 3 | 5, isFav = false): YummyUs
 // listId 0 = watching, 2 = completed (see mapListIdToStatus)
 const allRates = [makeRate(1, 0), makeRate(2, 0, true), makeRate(3, 2)];
 
-const mockUseUserAnimeList = vi.fn();
+const mockUseUserAnimeList = vi.fn((status?: AnimeStatus, favorites?: boolean) => {
+  let rates = allRates;
+  if (status) rates = rates.filter((rate) => getRateStatus(rate) === status);
+  if (favorites) rates = rates.filter((rate) => rate.user?.list?.is_fav === true);
+  return { data: rates, isLoading: false };
+});
+
 vi.mock('@/hooks/useAnime', () => ({
   useUserAnimeList: (...args: unknown[]) => mockUseUserAnimeList(...args),
 }));
@@ -21,12 +28,12 @@ vi.mock('@/hooks/useAnime', () => ({
 describe('useUserAnimeListPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mockUseUserAnimeList.mockReturnValue({ data: allRates, isLoading: false });
   });
 
-  it('fetches the list only once, unfiltered', () => {
+  it('fetches the full list for stats and the unfiltered list for display', () => {
     renderHook(() => useUserAnimeListPage(), { wrapper: createWrapper() });
-    expect(mockUseUserAnimeList).toHaveBeenCalledTimes(1);
+
+    expect(mockUseUserAnimeList).toHaveBeenCalledTimes(2);
     expect(mockUseUserAnimeList).toHaveBeenCalledWith();
   });
 
@@ -44,7 +51,7 @@ describe('useUserAnimeListPage', () => {
     });
   });
 
-  it('filters displayList client-side by status via selectStatus, without refetching', () => {
+  it('queries the server-filtered list when a status is selected via selectStatus', () => {
     const { result } = renderHook(() => useUserAnimeListPage(), {
       wrapper: createWrapper({ initialEntries: ['/list'] }),
     });
@@ -53,12 +60,12 @@ describe('useUserAnimeListPage', () => {
       result.current.selectStatus('watching');
     });
 
+    expect(mockUseUserAnimeList).toHaveBeenCalledWith('watching', false);
     expect(result.current.displayList).toEqual([allRates[0], allRates[1]]);
     expect(result.current.stats.watching).toBe(2);
-    expect(mockUseUserAnimeList).toHaveBeenCalledTimes(2);
   });
 
-  it('filters displayList client-side by favorites via selectFavorites', () => {
+  it('queries the server-filtered list when favorites is selected via selectFavorites', () => {
     const { result } = renderHook(() => useUserAnimeListPage(), {
       wrapper: createWrapper({ initialEntries: ['/list'] }),
     });
@@ -67,6 +74,7 @@ describe('useUserAnimeListPage', () => {
       result.current.selectFavorites();
     });
 
+    expect(mockUseUserAnimeList).toHaveBeenCalledWith(undefined, true);
     expect(result.current.isFavorites).toBe(true);
     expect(result.current.displayList).toEqual([allRates[1]]);
 
@@ -76,7 +84,7 @@ describe('useUserAnimeListPage', () => {
     expect(result.current.isFavorites).toBe(false);
   });
 
-  it('combines status and favorites filters', () => {
+  it('toggling favorites after a status replaces the filter with favorites only', () => {
     const { result } = renderHook(() => useUserAnimeListPage(), {
       wrapper: createWrapper({ initialEntries: ['/list'] }),
     });
@@ -88,6 +96,7 @@ describe('useUserAnimeListPage', () => {
       result.current.selectFavorites();
     });
 
+    expect(mockUseUserAnimeList).toHaveBeenCalledWith(undefined, true);
     expect(result.current.displayList).toEqual([allRates[1]]);
   });
 });

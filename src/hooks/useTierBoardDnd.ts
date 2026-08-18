@@ -10,7 +10,7 @@ import {
 } from '@dnd-kit/core';
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { resolveDropTarget } from '@/lib/tierDragUtils';
-import { buildMoveTargets } from '@/pages/AniTierPage/components/moveTargets';
+import { buildMoveTargets } from '@/lib/tierMoveTargets';
 import type { TierListState } from '@/types/tier';
 
 export function useTierBoardDnd(

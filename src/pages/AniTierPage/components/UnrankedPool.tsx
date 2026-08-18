@@ -2,7 +2,7 @@ import { useDroppable } from '@dnd-kit/core';
 import { UNRANKED_TIER_ID } from '@/types/tier';
 import type { TierAnimeItem } from '@/types/tier';
 import { TierCardGrid } from './TierCardGrid';
-import type { MoveTarget } from './moveTargets';
+import type { MoveTarget } from '@/lib/tierMoveTargets';
 
 interface UnrankedPoolProps {
   animeIds: number[];

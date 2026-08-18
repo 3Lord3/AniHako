@@ -5,7 +5,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { UnrankedPool } from '@/pages/AniTierPage/components/UnrankedPool';
 import type { TierAnimeItem } from '@/types/tier';
 import { DEFAULT_TIERS } from '@/types/tier';
-import { buildMoveTargets } from '@/pages/AniTierPage/components/moveTargets';
+import { buildMoveTargets } from '@/lib/tierMoveTargets';
 
 const items: Record<number, TierAnimeItem> = {
   1: { animeId: 1, title: 'One', posterUrl: 'one.jpg', url: 'one' },

@@ -2,7 +2,7 @@ import { SortableContext, rectSortingStrategy } from '@dnd-kit/sortable';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import type { TierAnimeItem } from '@/types/tier';
 import { TierCard, type TierCardSize } from './TierCard';
-import type { MoveTarget } from './moveTargets';
+import type { MoveTarget } from '@/lib/tierMoveTargets';
 import { cn } from '@/lib/utils';
 
 interface TierCardGridProps {

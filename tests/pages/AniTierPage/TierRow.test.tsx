@@ -4,7 +4,7 @@ import { DndContext } from '@dnd-kit/core';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { TierRow } from '@/pages/AniTierPage/components/TierRow';
 import type { TierDefinition, TierAnimeItem } from '@/types/tier';
-import { buildMoveTargets } from '@/pages/AniTierPage/components/moveTargets';
+import { buildMoveTargets } from '@/lib/tierMoveTargets';
 
 const tier: TierDefinition = { id: 'tier-s', label: 'S', color: 'rose' };
 const items: Record<number, TierAnimeItem> = {

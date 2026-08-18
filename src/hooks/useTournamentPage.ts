@@ -22,7 +22,7 @@ export function useTournamentPage() {
     resetRound,
   } = useTournament();
 
-  const completedAnime: YummyUserAnimeRate[] = completedList ?? [];
+  const completedAnime: YummyUserAnimeRate[] = Array.isArray(completedList) ? completedList : [];
 
   const handleStart = (selectedAnime: YummyUserAnimeRate[]) => {
     if (selectedAnime.length >= 4) {

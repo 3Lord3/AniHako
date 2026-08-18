@@ -35,7 +35,7 @@ export function useAnimeDetailPage(url: string) {
   // of scanning the full user-anime list on every render.
   const userAnimeById = useMemo(() => {
     const map = new Map<number, YummyUserAnimeRate>();
-    for (const rate of userAnimeList ?? []) {
+    for (const rate of Array.isArray(userAnimeList) ? userAnimeList : []) {
       if (typeof rate?.anime_id === 'number') {
         map.set(rate.anime_id, rate);
       }
