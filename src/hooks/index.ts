@@ -10,3 +10,4 @@ export * from './useLoginForm';
 export * from './useRegisterForm';
 export * from './useUserAnimeListPage';
 export * from './useCatalogPage';
+export * from './useHomePage';

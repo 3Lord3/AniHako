@@ -1,7 +1,6 @@
-import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import useEmblaCarousel from 'embla-carousel-react';
-import { useSchedule, useAnimeList } from '@/hooks';
+import { useHomePage } from '@/hooks';
 import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -9,32 +8,10 @@ import { TooltipWrap } from '@/components/ui/tooltip';
 import { AnimeTitle } from '@/components/anime/AnimeTitle';
 import { ScheduleRow } from '@/components/anime/ScheduleRow';
 import { CarouselSkeleton, ScheduleSkeleton } from '@/components/loaders/AnimeCardSkeleton';
-import type { AnimeScheduleItem, AnimeCatalogItem } from '@/types/anime';
+import type { AnimeCatalogItem } from '@/types/anime';
 import { getRatingColor } from '@/types/constants';
 import { buildAnimeUrl } from '@/lib/animeUrl';
-import { SEASONS, getCurrentSeason } from '@/lib/seasons';
-
-function formatDayMonth(timestamp: number): string {
-  if (!timestamp) return '';
-  return new Date(timestamp * 1000).toLocaleDateString('ru-RU', {
-    day: 'numeric',
-    month: 'short',
-  });
-}
-
-function groupByDate(items: AnimeScheduleItem[]): Map<string, AnimeScheduleItem[]> {
-  const groups = new Map<string, AnimeScheduleItem[]>();
-  for (const item of items) {
-    const nextDate = item.episodes?.next_date;
-    if (!nextDate) continue;
-    const dateKey = new Date(nextDate * 1000).toDateString();
-    if (!groups.has(dateKey)) {
-      groups.set(dateKey, []);
-    }
-    groups.get(dateKey)!.push(item);
-  }
-  return groups;
-}
+import { formatDayMonth } from '@/lib/schedule';
 
 interface CarouselCardProps {
   anime: AnimeCatalogItem;
@@ -124,30 +101,18 @@ function AnimeCarousel({ anime }: { anime: AnimeCatalogItem[] }) {
 }
 
 export function HomePage() {
-  const currentYear = new Date().getFullYear();
-  const currentSeason = getCurrentSeason();
-  const seasonName = SEASONS[currentSeason].label;
-
-  const [selectedDateKey, setSelectedDateKey] = useState<string | null>(new Date().toDateString());
-
-  const { data: scheduleData, isLoading: scheduleLoading } = useSchedule();
-  const { data: seasonalData, isLoading: seasonalLoading } = useAnimeList({
-    season: SEASONS[currentSeason].alias,
-    status: ['released', 'ongoing', 'announcement'],
-    from_year: currentYear,
-    sort_forward: true,
-    offset: 0,
-    limit: 20,
-  });
-
-  const dateGroups = scheduleData ? groupByDate(scheduleData) : new Map();
-  const sortedDates = Array.from(dateGroups.keys()).sort(
-    (a, b) => new Date(a).getTime() - new Date(b).getTime()
-  );
-
-  const displayItems: AnimeScheduleItem[] = selectedDateKey
-    ? dateGroups.get(selectedDateKey) || []
-    : scheduleData || [];
+  const {
+    currentYear,
+    seasonName,
+    seasonalData,
+    seasonalLoading,
+    scheduleData,
+    scheduleLoading,
+    sortedDates,
+    selectedDateKey,
+    selectDate,
+    displayItems,
+  } = useHomePage();
 
   return (
     <div className="space-y-10">
@@ -181,7 +146,7 @@ export function HomePage() {
                     key={dateKey}
                     variant={selectedDateKey === dateKey ? 'default' : 'outline'}
                     size="sm"
-                    onClick={() => setSelectedDateKey(dateKey)}
+                    onClick={() => selectDate(dateKey)}
                     className={cn(
                       'cursor-pointer shrink-0',
                       isToday && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
