@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useUser, useAddFriend, useRemoveFriend } from '@/hooks';
+import { useUser, useFriendActions } from '@/hooks';
 import { Card, CardContent } from '@/components/ui/card';
 import { LoginRequired } from '@/components/LoginRequired';
 import { AddFriendDialog } from '@/components/friends/AddFriendDialog';
@@ -8,34 +8,10 @@ import type { FriendsTab } from '@/components/friends/FriendsSidebar';
 import { FriendsTabPanel } from '@/components/friends/FriendsTabPanel';
 import { FriendsPageSkeleton } from '@/components/loaders/PageSkeletons';
 
-const MUTATION_ERROR_MESSAGE = 'Не удалось выполнить действие. Попробуйте ещё раз.';
-
 export function FriendsPage() {
   const { data: user, isLoading: isUserLoading } = useUser();
   const [tab, setTab] = useState<FriendsTab>('all');
-  const [pendingFriendIds, setPendingFriendIds] = useState<Set<number>>(new Set());
-  const [actionError, setActionError] = useState<string | null>(null);
-
-  const { mutate: addFriendMutate } = useAddFriend(user?.id);
-  const { mutate: removeFriendMutate } = useRemoveFriend(user?.id);
-
-  const runAction = (mutate: typeof addFriendMutate, friendId: number) => {
-    setActionError(null);
-    setPendingFriendIds((prev) => new Set(prev).add(friendId));
-    mutate(friendId, {
-      onError: () => setActionError(MUTATION_ERROR_MESSAGE),
-      onSettled: () => {
-        setPendingFriendIds((prev) => {
-          const next = new Set(prev);
-          next.delete(friendId);
-          return next;
-        });
-      },
-    });
-  };
-
-  const handleAdd = (friendId: number) => runAction(addFriendMutate, friendId);
-  const handleRemove = (friendId: number) => runAction(removeFriendMutate, friendId);
+  const { addFriend, removeFriend, pendingFriendIds, error: actionError } = useFriendActions(user?.id);
 
   if (isUserLoading) {
     return <FriendsPageSkeleton />;
@@ -61,8 +37,8 @@ export function FriendsPage() {
             <FriendsTabPanel
               userId={user.id}
               category={tab === 'all' ? undefined : tab}
-              onAdd={handleAdd}
-              onRemove={handleRemove}
+              onAdd={(friendId) => addFriend(friendId)}
+              onRemove={(friendId) => removeFriend(friendId)}
               pendingFriendIds={pendingFriendIds}
             />
           </CardContent>
