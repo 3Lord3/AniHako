@@ -50,3 +50,15 @@ export function getUniquePlayers(videos: AnimeVideo[]): string[] {
   }
   return result.sort(comparePlayersByPriority);
 }
+
+const ENDED_EVENT_PATTERN = /ended|finish|complete/i;
+
+export function isPlayerEndedEvent(data: unknown): boolean {
+  if (!data || typeof data !== 'object') return false;
+  const payload = data as Record<string, unknown>;
+  const event = payload.event;
+  const type = payload.type;
+  if (typeof event === 'string' && ENDED_EVENT_PATTERN.test(event)) return true;
+  if (typeof type === 'string' && ENDED_EVENT_PATTERN.test(type)) return true;
+  return false;
+}

@@ -13,3 +13,4 @@ export * from './useCatalogPage';
 export * from './useHomePage';
 export * from './useAnimeDetailPage';
 export * from './useEpisodeViewer';
+export * from './useEpisodePlayerCompletion';
