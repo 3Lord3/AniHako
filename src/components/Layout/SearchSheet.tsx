@@ -1,4 +1,3 @@
-import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, X, Loader2, Calendar, Star } from 'lucide-react';
 import {
@@ -8,37 +7,9 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
-import { useAnimeSearch, useDebounce } from '@/hooks';
+import { useSearchSheet, SEARCH_SHEET_MIN_QUERY_LENGTH } from '@/hooks';
 import { getImageUrl, getPosterUrl } from '@/lib/imageUrl';
 import { cn } from '@/lib/utils';
-import type { AnimeCatalogItem } from '@/types';
-
-const MIN_QUERY_LENGTH = 3;
-
-function useKeyboardInset(active: boolean): number {
-  const [inset, setInset] = useState(0);
-
-  useEffect(() => {
-    if (!active || typeof window === 'undefined' || !window.visualViewport) return;
-
-    const vv = window.visualViewport;
-    const update = () => {
-      const keyboardHeight = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-      setInset(keyboardHeight);
-    };
-
-    vv.addEventListener('resize', update);
-    vv.addEventListener('scroll', update);
-    update();
-
-    return () => {
-      vv.removeEventListener('resize', update);
-      vv.removeEventListener('scroll', update);
-    };
-  }, [active]);
-
-  return inset;
-}
 
 interface SearchSheetProps {
   open: boolean;
@@ -46,30 +17,19 @@ interface SearchSheetProps {
 }
 
 export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
-  const [query, setQuery] = useState('');
-  const debouncedQuery = useDebounce(query, 300);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const keyboardInset = useKeyboardInset(open);
-
-  const trimmedDebounced = debouncedQuery.trim();
-  const searchQuery = trimmedDebounced.length >= MIN_QUERY_LENGTH ? trimmedDebounced : '';
-  const { data: results, isLoading } = useAnimeSearch(searchQuery, 10);
-
-  useEffect(() => {
-    if (open) {
-      const t = setTimeout(() => inputRef.current?.focus(), 100);
-      return () => clearTimeout(t);
-    }
-    setQuery('');
-    inputRef.current?.blur();
-  }, [open]);
-
-  const list: AnimeCatalogItem[] = results && 'data' in results ? results.data : [];
-  const trimmedQuery = query.trim();
-  const isTooShort = trimmedQuery.length > 0 && trimmedQuery.length < MIN_QUERY_LENGTH;
-  const showEmpty = !trimmedQuery;
-  const showNoResults =
-    trimmedQuery.length >= MIN_QUERY_LENGTH && !isLoading && list.length === 0;
+  const {
+    query,
+    setQuery,
+    clearQuery,
+    inputRef,
+    keyboardInset,
+    list,
+    isLoading,
+    trimmedQuery,
+    isTooShort,
+    showEmpty,
+    showNoResults,
+  } = useSearchSheet(open);
 
   const sheetStyle = keyboardInset > 0
     ? {
@@ -103,7 +63,7 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
             {query ? (
               <button
                 type="button"
-                onClick={() => setQuery('')}
+                onClick={clearQuery}
                 aria-label="Очистить"
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
@@ -127,7 +87,7 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
 
           {isTooShort && (
             <p className="text-sm text-muted-foreground text-center py-8">
-              Введите минимум {MIN_QUERY_LENGTH} символа для поиска
+              Введите минимум {SEARCH_SHEET_MIN_QUERY_LENGTH} символа для поиска
             </p>
           )}
 

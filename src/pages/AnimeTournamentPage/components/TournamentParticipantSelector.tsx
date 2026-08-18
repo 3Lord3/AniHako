@@ -1,8 +1,6 @@
-import { useState } from 'react';
 import { Search, X, Plus, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { useAnimeList } from '@/hooks';
-import { useDebounce } from '@/hooks/useDebounce';
+import { useParticipantSelector, PARTICIPANT_SELECTOR_MIN_QUERY_LENGTH } from '@/hooks';
 import type { YummyUserAnimeRate } from '@/types';
 import { cn } from '@/lib/utils';
 import { getPosterUrl } from '@/lib/imageUrl';
@@ -18,73 +16,22 @@ export function TournamentParticipantSelector({
   selectedAnime,
   onSelectionChange,
 }: TournamentParticipantSelectorProps) {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [highlightedIndex, setHighlightedIndex] = useState(-1);
-
-  const debouncedSearch = useDebounce(searchQuery, 300);
-  const minQueryLength = 3;
-  const isQueryLongEnough = debouncedSearch.trim().length >= minQueryLength;
-
-  const { data: searchResults, isLoading: isSearching } = useAnimeList(
-    { search: debouncedSearch, limit: 10 },
-    { enabled: isQueryLongEnough }
-  );
-
-  const availableResults = (searchResults?.data || []).filter(
-    (anime) => !selectedAnime.some((a) => a.anime_id === anime.anime_id)
-  );
-
-  const handleAddAllCompleted = () => {
-    const remaining = completedAnime.filter(
-      (anime) => !selectedAnime.some((a) => a.anime_id === anime.anime_id)
-    );
-    onSelectionChange([...selectedAnime, ...remaining]);
-    setSearchQuery('');
-    setShowDropdown(false);
-  };
-
-  const handleAddFromSearch = (anime: { anime_id: number; title: string; year?: number; poster?: { small?: string; medium?: string; big?: string; huge?: string; fullsize?: string; mega?: string }; anime_url?: string; rating?: { average?: number }; type?: { name: string; value: number; shortname: string; alias: string } }) => {
-    const emptyPoster = { small: '', medium: '', big: '', huge: '', fullsize: '', mega: '' };
-    const poster = anime.poster
-      ? { ...emptyPoster, ...anime.poster }
-      : emptyPoster;
-    const rate: YummyUserAnimeRate = {
-      anime_id: anime.anime_id,
-      anime_url: anime.anime_url || String(anime.anime_id),
-      title: anime.title,
-      poster,
-      rating: anime.rating?.average || 0,
-      type: anime.type || { name: '', value: 0, shortname: '', alias: '' },
-      year: anime.year,
-      user: undefined,
-      // Captured at click time inside an event handler, not at render.
-      // eslint-disable-next-line react-hooks/purity
-      date: Math.floor(Date.now() / 1000),
-    };
-    onSelectionChange([...selectedAnime, rate]);
-    setSearchQuery('');
-    setShowDropdown(false);
-    setHighlightedIndex(-1);
-  };
-
-  const handleRemove = (animeId: number) => {
-    onSelectionChange(selectedAnime.filter((a) => a.anime_id !== animeId));
-  };
-
-  const handleClearAll = () => {
-    onSelectionChange([]);
-  };
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-    setShowDropdown(true);
-    setHighlightedIndex(-1);
-  };
-
-  const remaining = completedAnime.filter(
-    (anime) => !selectedAnime.some((a) => a.anime_id === anime.anime_id)
-  );
+  const {
+    searchQuery,
+    showDropdown,
+    setShowDropdown,
+    highlightedIndex,
+    availableResults,
+    isSearching,
+    debouncedSearch,
+    remaining,
+    handleAddAllCompleted,
+    handleAddFromSearch,
+    handleRemove,
+    handleClearAll,
+    handleInputChange,
+    clearSearch,
+  } = useParticipantSelector(completedAnime, selectedAnime, onSelectionChange);
 
   return (
     <div className="w-full space-y-4">
@@ -101,10 +48,7 @@ export function TournamentParticipantSelector({
           />
           {searchQuery && (
             <button
-              onClick={() => {
-                setSearchQuery('');
-                setShowDropdown(false);
-              }}
+              onClick={clearSearch}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             >
               <X className="w-4 h-4" />
@@ -148,9 +92,9 @@ export function TournamentParticipantSelector({
                   </li>
                 ))}
               </ul>
-            ) : searchQuery.trim().length > 0 && searchQuery.trim().length < minQueryLength ? (
+            ) : searchQuery.trim().length > 0 && searchQuery.trim().length < PARTICIPANT_SELECTOR_MIN_QUERY_LENGTH ? (
               <div className="py-4 text-center text-sm text-muted-foreground">
-                Введите минимум {minQueryLength} символа
+                Введите минимум {PARTICIPANT_SELECTOR_MIN_QUERY_LENGTH} символа
               </div>
             ) : debouncedSearch ? (
               <div className="py-4 text-center text-sm text-muted-foreground">

@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Command, CommandInput, CommandList, CommandEmpty, CommandItem } from '@/components/ui/command';
-import { useAnimeList } from '@/hooks';
-import { useDebounce } from '@/hooks/useDebounce';
+import { useAnimeSearchQuery } from '@/hooks';
 import { toTierAnimeItem } from '@/lib/tierAnimeMapper';
 import { getPosterUrl } from '@/lib/imageUrl';
 import type { AnimeCatalogItem } from '@/types/anime';
@@ -19,17 +18,12 @@ const MIN_QUERY_LENGTH = 2;
 
 export function AddAnimeDialog({ open, onOpenChange, existingAnimeIds, onSelect }: AddAnimeDialogProps) {
   const [query, setQuery] = useState('');
-  const debouncedQuery = useDebounce(query, 300);
-  const isQueryLongEnough = debouncedQuery.trim().length >= MIN_QUERY_LENGTH;
-
-  const { data, isLoading } = useAnimeList(
-    { search: debouncedQuery, limit: 20 },
-    { enabled: open && isQueryLongEnough }
-  );
-
-  const results: AnimeCatalogItem[] = (data?.data ?? []).filter(
-    (anime) => !existingAnimeIds.has(anime.anime_id)
-  );
+  const { results, isLoading, isQueryLongEnough } = useAnimeSearchQuery(query, {
+    minLength: MIN_QUERY_LENGTH,
+    limit: 20,
+    enabled: open,
+    exclude: (anime) => existingAnimeIds.has(anime.anime_id),
+  });
 
   const handleSelect = (anime: AnimeCatalogItem) => {
     onSelect(toTierAnimeItem(anime));
