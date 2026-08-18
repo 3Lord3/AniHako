@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createWrapper } from '../utils/queryWrapper';
 import { useUserByNickname } from '@/hooks/useUsers';
 import { usersApi } from '@/api/users';
 
@@ -9,13 +9,6 @@ vi.mock('@/api/users', () => ({
     getByNickname: vi.fn(),
   },
 }));
-
-const createWrapper = () => {
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
-  return ({ children }: { children: React.ReactNode }) => (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-  );
-};
 
 describe('useUserByNickname', () => {
   beforeEach(() => {

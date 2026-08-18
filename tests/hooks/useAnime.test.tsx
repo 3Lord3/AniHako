@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor, act } from '@testing-library/react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
+import { createWrapper } from '../utils/queryWrapper';
 import { useAnimeList, useAnimeDetail, useAnimeSearch, useRandomAnime, useGenres, useVideoViews, useToggleVideoViewed } from '@/hooks/useAnime';
 import * as animeApiModule from '@/api/anime';
 import { userListApi } from '@/api/list';
@@ -25,22 +26,6 @@ vi.mock('@/api/list', () => ({
     unmarkVideoViewed: vi.fn(),
   },
 }));
-
-const createWrapper = () => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-    },
-  });
-
-  return ({ children }: { children: React.ReactNode }) => (
-    <MemoryRouter>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </MemoryRouter>
-  );
-};
 
 describe('useAnime', () => {
   beforeEach(() => {

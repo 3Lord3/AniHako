@@ -1,7 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { MemoryRouter } from 'react-router-dom';
+import { createWrapper } from '../utils/queryWrapper';
 import { useAuth, useUser } from '@/hooks/useAuth';
 import * as authApiModule from '@/api/auth';
 import * as apiIndex from '@/api';
@@ -21,22 +20,6 @@ vi.mock('@/api', () => ({
   setUser: vi.fn(),
   getUser: vi.fn(),
 }));
-
-const createWrapper = () => {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: false,
-      },
-    },
-  });
-
-  return ({ children }: { children: React.ReactNode }) => (
-    <MemoryRouter>
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-    </MemoryRouter>
-  );
-};
 
 const setLocalStorageMock = (storage: Record<string, string>) => {
   Object.defineProperty(window, 'localStorage', {
