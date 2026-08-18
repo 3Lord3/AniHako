@@ -8,3 +8,4 @@ export * from './useUsers';
 export * from './useTierList';
 export * from './useLoginForm';
 export * from './useRegisterForm';
+export * from './useUserAnimeListPage';

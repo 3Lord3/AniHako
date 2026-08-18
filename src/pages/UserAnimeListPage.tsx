@@ -1,5 +1,5 @@
-import { Link, useSearchParams } from 'react-router-dom';
-import { useUserAnimeList } from '@/hooks';
+import { Link } from 'react-router-dom';
+import { useUserAnimeListPage } from '@/hooks';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -8,57 +8,21 @@ import { TooltipWrap } from '@/components/ui/tooltip';
 import { AnimeTitle } from '@/components/anime/AnimeTitle';
 import { getImageUrl } from '@/lib/imageUrl';
 import { buildAnimeUrl } from '@/lib/animeUrl';
+import { getRateStatus, isRateFavorite } from '@/lib/listRate';
 import { STATUS_ICONS, STATUS_COLORS, STATUS_LABELS, FAVORITE_ICON, ALL_STATUSES, type StatusType } from '@/types/constants';
 import type { YummyUserAnimeRate } from '@/types';
-import { mapListIdToStatus } from '@/types';
 
 export function UserAnimeListPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const statusParam = searchParams.get('status') || undefined;
-  const isFavorites = searchParams.get('favorites') === 'true';
-  const { data: userAnimeList, isLoading } = useUserAnimeList(statusParam as StatusType | undefined, isFavorites);
-  const { data: allListsData } = useUserAnimeList();
-  
-  const allListsRaw = (() => {
-    if (allListsData == null) return [];
-    if (Array.isArray(allListsData)) return allListsData;
-    return [];
-  })();
-  const allLists = allListsRaw;
+  const { statusParam, isFavorites, isLoading, stats, displayList, selectStatus, selectFavorites } = useUserAnimeListPage();
 
-  const getRateStatus = (rate: YummyUserAnimeRate): string => {
-    const listId = rate.user?.list?.list?.id;
-    return mapListIdToStatus(listId);
-  };
-
-  const isRateFavorite = (rate: YummyUserAnimeRate): boolean => {
-    return rate.user?.list?.is_fav === true;
-  };
-
-  const watching = allLists.filter((a: YummyUserAnimeRate) => getRateStatus(a) === 'watching').length || 0;
-  const planned = allLists.filter((a: YummyUserAnimeRate) => getRateStatus(a) === 'planned').length || 0;
-  const completed = allLists.filter((a: YummyUserAnimeRate) => getRateStatus(a) === 'completed').length || 0;
-  const paused = allLists.filter((a: YummyUserAnimeRate) => getRateStatus(a) === 'paused').length || 0;
-  const dropped = allLists.filter((a: YummyUserAnimeRate) => getRateStatus(a) === 'dropped').length || 0;
-  const favoritesCount = allLists.filter((a: YummyUserAnimeRate) => isRateFavorite(a)).length || 0;
-
-  const stats = [
-    { label: STATUS_LABELS.watching, count: watching },
-    { label: STATUS_LABELS.planned, count: planned },
-    { label: STATUS_LABELS.completed, count: completed },
-    { label: STATUS_LABELS.paused, count: paused },
-    { label: STATUS_LABELS.dropped, count: dropped },
-    { label: 'Любимое', count: favoritesCount },
+  const statCards = [
+    { label: STATUS_LABELS.watching, count: stats.watching },
+    { label: STATUS_LABELS.planned, count: stats.planned },
+    { label: STATUS_LABELS.completed, count: stats.completed },
+    { label: STATUS_LABELS.paused, count: stats.paused },
+    { label: STATUS_LABELS.dropped, count: stats.dropped },
+    { label: 'Любимое', count: stats.favorites },
   ];
-
-  const userAnimeListRaw = (() => {
-    if (userAnimeList == null) return [];
-    if (Array.isArray(userAnimeList)) return userAnimeList;
-    return [];
-  })();
-  const displayList = !statusParam && !isFavorites
-    ? allLists
-    : userAnimeListRaw;
 
   return (
     <div className="space-y-6">
@@ -72,7 +36,7 @@ export function UserAnimeListPage() {
             </div>
           ))
         ) : (
-          stats.map((stat) => (
+          statCards.map((stat) => (
             <Card key={stat.label}>
               <CardContent className="text-center">
                 <p className="text-3xl font-bold">{stat.count}</p>
@@ -100,16 +64,14 @@ export function UserAnimeListPage() {
               <Button
                 key={s}
                 variant={statusParam === s ? 'default' : 'outline'}
-                onClick={() =>
-                  setSearchParams(statusParam === s ? {} : { status: s })
-                }
+                onClick={() => selectStatus(s)}
               >
                 {STATUS_LABELS[s as keyof typeof STATUS_LABELS] || s}
               </Button>
             ))}
             <Button
               variant={isFavorites ? 'default' : 'outline'}
-              onClick={() => setSearchParams(isFavorites ? {} : { favorites: 'true' })}
+              onClick={selectFavorites}
             >
               Любимое
             </Button>
@@ -134,7 +96,7 @@ export function UserAnimeListPage() {
             const displayTitle = rate.title || 'Unknown';
             const isFavorite = isRateFavorite(rate);
             const status = getRateStatus(rate);
-            
+
             return (
               <Link key={rate.anime_id} to={buildAnimeUrl(rate)} className="group block relative rounded-lg overflow-hidden">
                 <img

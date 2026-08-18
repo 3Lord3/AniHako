@@ -4,6 +4,7 @@ import { AnimeCard } from './AnimeCard';
 import { TooltipWrap } from '@/components/ui/tooltip';
 import type { AnimeCatalogItem, YummyUserAnimeRate } from '@/types';
 import { mapListIdToStatus } from '@/types';
+import { isRateFavorite } from '@/lib/listRate';
 import { getImageUrl, getPosterUrl } from '@/lib/imageUrl';
 import { buildAnimeUrl } from '@/lib/animeUrl';
 import { STATUS_ICONS, STATUS_COLORS, STATUS_LABELS, FAVORITE_ICON, getRatingColor } from '@/types/constants';
@@ -27,7 +28,7 @@ function AnimeListItem({ anime, userAnime }: { anime: AnimeCatalogItem; userAnim
   const isAnnouncement = anime.anime_status?.alias === 'announcement';
   const validRating = rating !== null && !isNaN(rating) && !isAnnouncement;
   const userStatus = userAnime ? mapListIdToStatus(userAnime.user?.list?.list?.id) : undefined;
-  const isFavorite = userAnime?.user?.list?.is_fav || false;
+  const isFavorite = userAnime ? isRateFavorite(userAnime) : false;
 
   const url = buildAnimeUrl(anime);
 
@@ -154,7 +155,7 @@ export function AnimeGrid({ anime, userAnimeList, isLoading, skeletonCount, view
             <AnimeCard
               anime={item}
               userStatus={userAnime ? mapListIdToStatus(userAnime.user?.list?.list?.id) : undefined}
-              isFavorite={userAnime?.user?.list?.is_fav || false}
+              isFavorite={userAnime ? isRateFavorite(userAnime) : false}
             />
           </div>
         );
