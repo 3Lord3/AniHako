@@ -18,3 +18,4 @@ export * from './useAnimeMatcher';
 export * from './useSwipeGesture';
 export * from './useFriendActions';
 export * from './useAddFriendDialog';
+export * from './useTournamentPage';

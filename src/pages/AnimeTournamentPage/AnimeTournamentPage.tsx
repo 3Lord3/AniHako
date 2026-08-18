@@ -1,9 +1,4 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useUserAnimeList } from '@/hooks';
-import { useTournament, getRoundName, type Pair } from '@/hooks/useTournament';
-import type { AnimeCatalogItem, YummyUserAnimeRate } from '@/types';
-import type { AnimeReleaseStatus } from '@/types';
+import { useTournamentPage } from '@/hooks';
 import { TournamentIntro } from './components/TournamentIntro';
 import { TournamentMatch } from './components/TournamentMatch';
 import { TournamentResults } from './components/TournamentResults';
@@ -14,104 +9,28 @@ import { Swords, Target, Play, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function AnimeTournamentPage() {
-  const [isStarted, setIsStarted] = useState(false);
-  const [activePair, setActivePair] = useState<Pair | null>(null);
-  const [pairQueue, setPairQueue] = useState<Pair[]>([]);
-  const [showExitDialog, setShowExitDialog] = useState(false);
-  const navigate = useNavigate();
-  const { data: completedList, isLoading } = useUserAnimeList('completed');
   const {
+    isLoading,
+    isStarted,
+    completedAnime,
     tournament,
-    initializeTournament,
-    startRound,
-    selectWinner,
+    activePair,
+    showExitDialog,
+    setShowExitDialog,
+    handleStart,
+    handleRestart,
+    handleSelectWinner,
+    handleStartRound,
+    handleExitConfirm,
+    handleIntroBack,
+    handleBackToBracket,
     getResults,
-    resetTournament,
-    resetRound,
-  } = useTournament();
-
-  const completedListRaw = (() => {
-    if (completedList == null) return [];
-    if (Array.isArray(completedList)) return completedList;
-    return [];
-  })();
-  const completedAnime: YummyUserAnimeRate[] = completedListRaw;
-
-  const handleStart = (selectedAnime: YummyUserAnimeRate[]) => {
-    if (selectedAnime.length >= 4) {
-      const animeItems: AnimeCatalogItem[] = selectedAnime.map(rate => ({
-        anime_id: rate.anime_id,
-        anime_status: rate.anime_status as AnimeReleaseStatus,
-        anime_url: rate.anime_url,
-        poster: rate.poster,
-        rating: { average: rate.rating, counters: 0 },
-        user: rate.user,
-        title: rate.title,
-        type: rate.type,
-        year: rate.year || 0,
-        description: '',
-        views: 0,
-        season: 1 as const,
-        episodes: { aired: 0, count: 0 },
-      }));
-      initializeTournament(animeItems);
-      setIsStarted(true);
-      setPairQueue([]);
-      setActivePair(null);
-    }
-  };
-
-  const handleRestart = () => {
-    resetTournament();
-    setIsStarted(false);
-    setActivePair(null);
-    setPairQueue([]);
-  };
-
-  const handleSelectWinner = (pairId: string, winnerId: string) => {
-    selectWinner(pairId, winnerId);
-    setActivePair(null);
-
-    if (pairQueue.length > 0) {
-      const nextPair = pairQueue[0];
-      setPairQueue(prev => prev.slice(1));
-      setActivePair(nextPair);
-    }
-  };
-
-  const handleStartRound = () => {
-    if (!tournament) return;
-    startRound();
-  };
-
-  const handleExitConfirm = () => {
-    resetTournament();
-    setIsStarted(false);
-    setActivePair(null);
-    setPairQueue([]);
-  };
-
-  const handleIntroBack = () => {
-    navigate('/');
-  };
-
-  useEffect(() => {
-    if (!tournament || !tournament.roundStarted) return;
-
-    const currentRound = tournament.rounds.find(
-      r => r.bracket === tournament.currentBracket && r.roundInBracket === tournament.currentRoundInBracket
-    );
-    if (!currentRound) return;
-
-    const playablePairs = currentRound.pairs.filter(
-      p => p.status === 'playing' && !p.winner && p.participants.length === 2
-    );
-
-    if (playablePairs.length > 0) {
-      setPairQueue(playablePairs.slice(1));
-      setActivePair(playablePairs[0]);
-    }
-  }, [tournament, tournament?.roundStarted, tournament?.currentBracket, tournament?.currentRoundInBracket]);
+    match,
+    currentMatchNumber,
+    totalInRound,
+    totalWbRounds,
+    currentRoundName,
+  } = useTournamentPage();
 
   if (isLoading) {
     return <SuspenseFallback message="Загрузка списка аниме..." />;
@@ -153,34 +72,7 @@ export function AnimeTournamentPage() {
     );
   }
 
-  if (activePair && tournament) {
-    const currentRound = tournament.rounds.find(
-      r => r.bracket === tournament.currentBracket && r.roundInBracket === tournament.currentRoundInBracket
-    );
-    const currentPairIdx = currentRound?.pairs.findIndex(p => p.id === activePair.id) ?? 0;
-    const totalInRound = currentRound?.pairs.filter(p => p.participants.length === 2 && p.status !== 'bye').length ?? 0;
-    // pairQueue holds matches still waiting after this one, so subtracting it
-    // from the real-match total gives the 1-based position of the match the
-    // user is looking at right now.
-    const currentMatchNumber = totalInRound - pairQueue.length;
-    const totalWbRounds = tournament.meta.winnersRounds;
-
-    const match = {
-      id: activePair.id,
-      round: tournament.currentRoundInBracket + 1,
-      matchNumber: currentPairIdx + 1,
-      participant1: activePair.participants[0] || null,
-      participant2: activePair.participants[1] || null,
-      winner: activePair.winner,
-      nextMatchId: null,
-    };
-
-    const handleBackToBracket = () => {
-      resetRound();
-      setActivePair(null);
-      setPairQueue([]);
-    };
-
+  if (activePair && tournament && match) {
     return (
       <div className="fixed inset-0 z-50 bg-background">
         <TournamentMatch
@@ -203,13 +95,6 @@ export function AnimeTournamentPage() {
   if (!tournament) {
     return null;
   }
-
-  const currentRoundName = getRoundName(
-    tournament.currentBracket,
-    tournament.currentRoundInBracket,
-    tournament.meta.winnersRounds,
-    tournament.meta.losersRounds
-  );
 
   return (
     <div className="container mx-auto py-4 sm:py-8 relative">
@@ -237,30 +122,26 @@ export function AnimeTournamentPage() {
         </div>
       </div>
 
-      {tournament && (
-        <>
-          <TournamentBracket
-            rounds={tournament.rounds}
-            currentBracket={tournament.currentBracket}
-            currentRoundInBracket={tournament.currentRoundInBracket}
-            roundStarted={tournament.roundStarted}
-            winnersRounds={tournament.meta.winnersRounds}
-            losersRounds={tournament.meta.losersRounds}
-          />
+      <TournamentBracket
+        rounds={tournament.rounds}
+        currentBracket={tournament.currentBracket}
+        currentRoundInBracket={tournament.currentRoundInBracket}
+        roundStarted={tournament.roundStarted}
+        winnersRounds={tournament.meta.winnersRounds}
+        losersRounds={tournament.meta.losersRounds}
+      />
 
-          {!tournament.roundStarted && (
-            <div className="text-center mt-6 sm:mt-8">
-              <Button
-                onClick={handleStartRound}
-                size="lg"
-                className="gap-2 text-base sm:text-lg px-6 py-4 sm:px-8 sm:py-6 bg-gradient-to-r from-primary to-yellow-500 hover:from-primary/90 hover:to-yellow-500/90 text-white font-semibold"
-              >
-                <Play className="w-4 h-4 sm:w-5 sm:h-5" />
-                Начать {currentRoundName.toLowerCase()}
-              </Button>
-            </div>
-          )}
-        </>
+      {!tournament.roundStarted && (
+        <div className="text-center mt-6 sm:mt-8">
+          <Button
+            onClick={handleStartRound}
+            size="lg"
+            className="gap-2 text-base sm:text-lg px-6 py-4 sm:px-8 sm:py-6 bg-gradient-to-r from-primary to-yellow-500 hover:from-primary/90 hover:to-yellow-500/90 text-white font-semibold"
+          >
+            <Play className="w-4 h-4 sm:w-5 sm:h-5" />
+            Начать {currentRoundName.toLowerCase()}
+          </Button>
+        </div>
       )}
 
       <ConfirmationDialog
