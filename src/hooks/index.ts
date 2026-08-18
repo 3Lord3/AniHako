@@ -6,3 +6,5 @@ export * from './useTournament';
 export * from './useFriends';
 export * from './useUsers';
 export * from './useTierList';
+export * from './useLoginForm';
+export * from './useRegisterForm';

@@ -1,35 +1,12 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks';
+import { Link } from 'react-router-dom';
+import { useLoginForm } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 
 export function LoginPage() {
-  const [login, setLogin] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const { login: doLogin, isLoggingIn } = useAuth();
-  const navigate = useNavigate();
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    
-    doLogin(
-      { login, password },
-      {
-        onSuccess: () => {
-          navigate('/');
-        },
-        onError: (err: unknown) => {
-          const axiosError = err as { response?: { data?: { detail?: string } } };
-          setError(axiosError.response?.data?.detail || 'Ошибка входа');
-        },
-      }
-    );
-  };
+  const { login, setLogin, password, setPassword, error, isLoggingIn, handleSubmit } = useLoginForm();
 
   return (
     <div className="flex items-center justify-center min-h-[calc(100dvh-10rem)] py-4">

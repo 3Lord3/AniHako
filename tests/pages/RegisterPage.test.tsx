@@ -3,11 +3,23 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { RegisterPage } from '@/pages/RegisterPage';
 
-const mockRegisterMutate = vi.fn();
 vi.mock('@/hooks', () => ({
-  useAuth: () => ({
-    register: mockRegisterMutate,
+  useRegisterForm: () => ({
+    email: '',
+    setEmail: vi.fn(),
+    username: '',
+    setUsername: vi.fn(),
+    password: '',
+    setPassword: vi.fn(),
+    confirmPassword: '',
+    setConfirmPassword: vi.fn(),
+    acceptRules: false,
+    setAcceptRules: vi.fn(),
+    acceptPrivacy: false,
+    setAcceptPrivacy: vi.fn(),
+    error: '',
     isRegistering: false,
+    handleSubmit: vi.fn(),
   }),
   useUser: () => ({ data: null, isLoading: false }),
 }));

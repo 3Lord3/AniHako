@@ -3,11 +3,15 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { LoginPage } from '@/pages/LoginPage';
 
-const mockLoginMutate = vi.fn();
 vi.mock('@/hooks', () => ({
-  useAuth: () => ({
-    login: mockLoginMutate,
+  useLoginForm: () => ({
+    login: '',
+    setLogin: vi.fn(),
+    password: '',
+    setPassword: vi.fn(),
+    error: '',
     isLoggingIn: false,
+    handleSubmit: vi.fn(),
   }),
   useUser: () => ({ data: null, isLoading: false }),
 }));
