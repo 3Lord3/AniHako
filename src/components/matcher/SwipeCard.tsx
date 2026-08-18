@@ -1,11 +1,9 @@
-import { useState, useRef } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Star, Calendar, Clock, Film } from 'lucide-react';
 import { getImageUrl, getPosterUrl } from '@/lib/imageUrl';
 import { cn } from '@/lib/utils';
+import { useSwipeGesture } from '@/hooks/useSwipeGesture';
 import type { AnimeDetail } from '@/types';
-
-const SWIPE_THRESHOLD = 100;
 
 interface SwipeCardProps {
   anime: AnimeDetail;
@@ -14,69 +12,9 @@ interface SwipeCardProps {
 }
 
 export function SwipeCard({ anime, onSwipe, isActive }: SwipeCardProps) {
-  const [translateX, setTranslateX] = useState(0);
-  const [translateY, setTranslateY] = useState(0);
-  const [rotation, setRotation] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
-  const startX = useRef(0);
-  const startY = useRef(0);
+  const { cardRef, translateX, translateY, rotation, isDragging, swipeDirection, swipeOpacity, handlers } =
+    useSwipeGesture(onSwipe, isActive);
 
-  const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
-    if (!isActive) return;
-    setIsDragging(true);
-    const clientX = 'touches' in e && e.touches.length > 0 ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
-    const clientY = 'touches' in e && e.touches.length > 0 ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
-    startX.current = clientX;
-    startY.current = clientY;
-    if ('preventDefault' in e) {
-      e.preventDefault();
-    }
-    if (cardRef.current && 'setCapture' in cardRef.current) {
-      (cardRef.current as unknown as { setCapture: () => void }).setCapture();
-    }
-  };
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!isDragging || !isActive) return;
-    const deltaX = e.clientX - startX.current;
-    const deltaY = e.clientY - startY.current;
-    setTranslateX(deltaX);
-    setTranslateY(deltaY * 0.3);
-    setRotation(deltaX / 20);
-  };
-
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging || !isActive) return;
-    if ('preventDefault' in e) {
-      e.preventDefault();
-    }
-    const clientX = e.touches.length > 0 ? e.touches[0].clientX : 0;
-    const clientY = e.touches.length > 0 ? e.touches[0].clientY : 0;
-    const deltaX = clientX - startX.current;
-    const deltaY = clientY - startY.current;
-    setTranslateX(deltaX);
-    setTranslateY(deltaY * 0.3);
-    setRotation(deltaX / 20);
-  };
-
-  const handleTouchEnd = () => {
-    if (!isDragging) return;
-    setIsDragging(false);
-    if (cardRef.current && 'releaseCapture' in cardRef.current) {
-      (cardRef.current as unknown as { releaseCapture: () => void }).releaseCapture();
-    }
-    if (Math.abs(translateX) > SWIPE_THRESHOLD) {
-      onSwipe(translateX > 0 ? 'right' : 'left');
-    } else {
-      setTranslateX(0);
-      setTranslateY(0);
-      setRotation(0);
-    }
-  };
-
-  const swipeDirection = translateX > 50 ? 'right' : translateX < -50 ? 'left' : null;
-  const swipeOpacity = Math.min(Math.abs(translateX) / SWIPE_THRESHOLD, 1);
   const isAnnouncement = anime.anime_status?.alias === 'announcement';
   const hasRating = !isAnnouncement && anime.rating?.average != null && anime.rating.average > 0;
   const hasYear = !isAnnouncement && anime.year != null && anime.year > 0;
@@ -93,13 +31,7 @@ export function SwipeCard({ anime, onSwipe, isActive }: SwipeCardProps) {
         transition: isDragging ? 'none' : 'transform 0.3s ease-out',
         touchAction: 'none',
       }}
-      onMouseDown={handleTouchStart}
-      onMouseMove={handleMouseMove}
-      onMouseUp={handleTouchEnd}
-      onMouseLeave={handleTouchEnd}
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
+      {...handlers}
     >
       <div className="relative bg-muted aspect-[2/3]">
         {anime.poster ? (
@@ -113,7 +45,7 @@ export function SwipeCard({ anime, onSwipe, isActive }: SwipeCardProps) {
             <Film className="w-20 h-20 text-muted-foreground" />
           </div>
         )}
-        
+
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
         {swipeDirection && (
@@ -129,7 +61,7 @@ export function SwipeCard({ anime, onSwipe, isActive }: SwipeCardProps) {
             </span>
           </div>
         )}
-        
+
         {anime.genres && anime.genres.length > 0 && (
           <div className="absolute top-3 left-3 right-3 flex flex-wrap gap-2 z-10">
             {anime.genres.slice(0, 3).map((genre) => (

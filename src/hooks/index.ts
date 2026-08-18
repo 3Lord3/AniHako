@@ -14,3 +14,5 @@ export * from './useHomePage';
 export * from './useAnimeDetailPage';
 export * from './useEpisodeViewer';
 export * from './useEpisodePlayerCompletion';
+export * from './useAnimeMatcher';
+export * from './useSwipeGesture';

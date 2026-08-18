@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useRandomAnime, useAddToList } from '@/hooks';
+import { useAnimeMatcher } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -17,52 +17,10 @@ import { buildAnimeUrl } from '@/lib/animeUrl';
 
 export function AnimeMatcherPage() {
   const navigate = useNavigate();
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
 
-  const { data: anime, isLoading, refetch } = useRandomAnime();
-  const { mutate: addToList, isPending: isAdding } = useAddToList();
-
-  const currentAnime = anime ?? null;
-
-  const loadNextAnime = () => {
-    setIsTransitioning(true);
-    refetch().then(() => {
-      setIsTransitioning(false);
-    });
-  };
-
-  const handleSwipe = (direction: 'left' | 'right') => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-    setShowDescriptionModal(false);
-
-    if (direction === 'right' && currentAnime) {
-      addToList(
-        { animeId: currentAnime.anime_id, status: 'planned' },
-        {
-          onSuccess: () => {
-            loadNextAnime();
-          },
-          onError: () => {
-            setIsTransitioning(false);
-          }
-        }
-      );
-    } else {
-      loadNextAnime();
-    }
-  };
-
-  const handleSkip = () => {
-    if (isTransitioning || isAdding) return;
-    handleSwipe('left');
-  };
-
-  const handleAdd = () => {
-    if (isTransitioning || isAdding) return;
-    handleSwipe('right');
-  };
+  const { currentAnime, isLoading, isTransitioning, isAdding, refetch, handleSwipe, handleSkip, handleAdd } =
+    useAnimeMatcher(() => setShowDescriptionModal(false));
 
   if (isLoading && !currentAnime) {
     return (
