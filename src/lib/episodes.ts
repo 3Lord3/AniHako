@@ -1,8 +1,8 @@
 import type { AnimeTranslate, AnimeVideo } from '@/types';
 
-export const PLAYER_PRIORITY = ['Kodik', 'CVH', 'Alloha'];
+const PLAYER_PRIORITY = ['Kodik', 'CVH', 'Alloha'];
 
-export const GENERIC_TRANSLATE_TITLES = new Set(['Многоголосый', 'Одноголосый', 'Двухголосый', 'Субтитры']);
+const GENERIC_TRANSLATE_TITLES = new Set(['Многоголосый', 'Одноголосый', 'Двухголосый', 'Субтитры']);
 
 export function filterVideosByTranslate(videos: AnimeVideo[], translate: AnimeTranslate | undefined): AnimeVideo[] {
   if (!translate) return videos;
@@ -22,7 +22,7 @@ export function synthesizeTranslatesFromVideos(videos: AnimeVideo[]): AnimeTrans
   return result;
 }
 
-export function isGenericTranslateTitle(title: string): boolean {
+function isGenericTranslateTitle(title: string): boolean {
   return GENERIC_TRANSLATE_TITLES.has(title);
 }
 

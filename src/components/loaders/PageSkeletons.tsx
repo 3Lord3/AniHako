@@ -1,35 +1,6 @@
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { FriendsListSkeleton } from '@/components/friends/FriendsListSkeleton';
-
-export function ViewingOrderSkeleton({ rows = 4 }: { rows?: number }) {
-  return (
-    <Card>
-      <CardHeader>
-        <div className="flex items-baseline justify-between gap-2 flex-wrap">
-          <Skeleton className="h-5 w-40" />
-          <Skeleton className="h-3 w-24" />
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-1">
-        {Array.from({ length: rows }).map((_, idx) => (
-          <div key={idx} className="flex items-stretch gap-3 sm:gap-4 p-2 sm:p-3">
-            <Skeleton className="w-16 sm:w-20 aspect-[3/4] rounded-md shrink-0" />
-            <div className="flex-1 min-w-0 space-y-2">
-              <div className="flex flex-wrap gap-1.5">
-                <Skeleton className="h-4 w-14 rounded-full" />
-                <Skeleton className="h-4 w-10 rounded-full" />
-                <Skeleton className="h-4 w-10 rounded-full" />
-              </div>
-              <Skeleton className="h-4 w-3/4" />
-              <Skeleton className="h-3 w-1/2" />
-            </div>
-          </div>
-        ))}
-      </CardContent>
-    </Card>
-  );
-}
 
 export function AnimeDetailPageSkeleton() {
   return (
@@ -66,7 +37,6 @@ export function AnimeDetailPageSkeleton() {
         <Skeleton className="h-6 w-32" />
         <Skeleton className="h-20 w-full" />
       </div>
-      <ViewingOrderSkeleton rows={4} />
       <div className="space-y-4">
         <Skeleton className="h-6 w-24" />
         <Skeleton className="w-full aspect-video rounded-lg" />

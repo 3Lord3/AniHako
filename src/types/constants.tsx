@@ -1,8 +1,7 @@
 import { Eye, CheckCircle, XCircle, CalendarClock, Heart, Pause, Star } from 'lucide-react';
-import type { AnimeStatus, ListStatus } from '@/types';
+import type { AnimeStatus } from '@/types';
 
 export type StatusType = AnimeStatus;
-export type ListStatusType = ListStatus;
 
 // YummyAnime API lists: watch_now=0, will=1, watched=2, lost=3, postpone=5
 // `favourite` is UI-only and is not in the API.
@@ -34,13 +33,11 @@ export const STATUS_COLORS: Record<StatusType, string> = {
   favourite: 'bg-pink-500 text-white dark:bg-pink-600',
 };
 
-export const YUMMY_LIST_STATUSES: ListStatusType[] = ['watching', 'planned', 'completed', 'paused', 'dropped'];
-
 // `favourite` is UI-only; it's exposed in the union for display purposes
 // (e.g. icon/label lookup) but should not be used in `ALL_STATUSES` to drive
 // filters — see `UserAnimeListPage` which has a dedicated "Любимое" button
 // that toggles `?favorites=true` instead.
-export const ALL_STATUSES: StatusType[] = YUMMY_LIST_STATUSES;
+export const ALL_STATUSES: StatusType[] = ['watching', 'planned', 'completed', 'paused', 'dropped'];
 
 export const FAVORITE_ICON = <Heart size={24} strokeWidth={2.5} />;
 
@@ -60,16 +57,4 @@ export function getRatingColor(rating: number | string | null): string {
   if (r >= 7) return 'bg-green-500 text-white dark:bg-green-600';
   if (r >= 5) return 'bg-yellow-500 text-black dark:bg-yellow-500 dark:text-black';
   return 'bg-red-500 text-white dark:bg-red-600';
-}
-
-export function getKindIcon(kind: string | null): string {
-  const kindMap: Record<string, string> = {
-    tv: '📺',
-    movie: '🎬',
-    ova: '💿',
-    onu: '🌐',
-    special: '⭐',
-    music: '🎵',
-  };
-  return kindMap[kind || ''] || '📺';
 }

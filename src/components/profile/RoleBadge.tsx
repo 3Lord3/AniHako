@@ -5,7 +5,7 @@ interface RoleBadgeProps {
   role: string;
 }
 
-export function RoleBadge({ role }: RoleBadgeProps) {
+function RoleBadge({ role }: RoleBadgeProps) {
   const roleLower = role.toLowerCase();
   const variant = Object.entries(ROLE_VARIANTS).find(([key]) => 
     roleLower.includes(key.toLowerCase())

@@ -1,7 +1,6 @@
 import type {
   AnimeCatalogItem,
   AnimePoster,
-  AnimeRating,
   AnimeReleaseStatus,
   AnimeType,
   AnimeEpisodes,
@@ -438,6 +437,3 @@ export function formatAnimeListResponse(
     total: meta?.total ?? data.length,
   };
 }
-
-// Re-exports for `re-exported as AnimeRating` consumers.
-export type { AnimePoster, AnimeRating };

@@ -1,6 +1,6 @@
 import type { FriendStatus } from '@/types/friend';
 
-export type FriendActionMethod = 'add' | 'remove';
+type FriendActionMethod = 'add' | 'remove';
 
 export interface FriendAction {
   key: 'accept' | 'add' | 'unfollow' | 'remove' | 'decline' | 'cancel';

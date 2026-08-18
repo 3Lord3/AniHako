@@ -4,5 +4,3 @@ export interface GenreResponse {
   value: number;
   group_id: number;
 }
-
-export type TagResponse = GenreResponse;

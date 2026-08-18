@@ -29,13 +29,13 @@ export const FRIEND_STATUS_LABELS: Record<FriendStatus, string> = {
   'sent-requests': 'Исходящие заявки',
 };
 
-export interface YummyFriendIds {
+interface YummyFriendIds {
   shikimori?: { id: number; nickname: string };
   tg_nickname?: string;
   vk?: number;
 }
 
-export interface YummyFriendAvatars {
+interface YummyFriendAvatars {
   big?: string;
   full?: string;
   small?: string;

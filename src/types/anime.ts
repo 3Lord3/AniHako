@@ -7,16 +7,6 @@ export interface AnimePoster {
   mega: string;
 }
 
-export interface AnimeRating {
-  average: number;
-  kp_rating?: number;
-  anidub_rating?: number;
-  counters: number;
-  myanimelist_rating?: number;
-  shikimori_rating?: number;
-  worldart_rating?: number;
-}
-
 export interface AnimeType {
   name: string;
   value: number;
@@ -51,7 +41,7 @@ export interface AnimeGenre {
   url: string;
 }
 
-export interface AnimeUserList {
+interface AnimeUserList {
   title: string;
   href: string;
   id: 0 | 1 | 2 | 3 | 5;
@@ -205,5 +195,3 @@ export interface AnimeScheduleItem {
     prev_date: number;
   };
 }
-
-export type AnimeScheduleResponse = AnimeScheduleItem[];

@@ -101,35 +101,11 @@ export interface UserAnimeRate {
   updated_at: string;
 }
 
-export interface UserAnimeCreate {
-  anime_id: number;
-  status: AnimeStatus;
-  score?: number;
-  episodes?: number;
-  text?: string;
-}
-
 export interface UserAnimeUpdate {
   status?: AnimeStatus | null;
   score?: number;
   episodes?: number;
   text?: string;
-}
-
-export interface UserListResponse {
-  id: number;
-  name: string;
-  user_id: number;
-  anime: UserAnimeRate[];
-}
-
-export interface UserAnimeResponse {
-  anime_id: number;
-  status: string | null;
-  score: number | null;
-  episodes_watched: number;
-  is_favorite: boolean;
-  anime: AnimeCatalogItem;
 }
 
 export function mapListIdToStatus(listId: number | undefined): AnimeStatus {
