@@ -2,15 +2,11 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { AddAnimeDialog } from '@/pages/AniTierPage/components/AddAnimeDialog';
 
-vi.mock('@/hooks/useDebounce', () => ({
-  useDebounce: (value: string) => value,
-}));
-
 vi.mock('@/hooks', () => ({
-  useAnimeList: vi.fn(),
+  useAnimeSearchQuery: vi.fn(),
 }));
 
-import { useAnimeList } from '@/hooks';
+import { useAnimeSearchQuery } from '@/hooks';
 
 const posterField = { small: 'poster.jpg', medium: '', big: '', huge: '', fullsize: '', mega: '' };
 
@@ -32,8 +28,12 @@ function renderDialog(overrides: Partial<React.ComponentProps<typeof AddAnimeDia
 describe('AddAnimeDialog', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    vi.mocked(useAnimeList).mockReturnValue({ data: { data: [] }, isLoading: false } as any);
+    vi.mocked(useAnimeSearchQuery).mockReturnValue({
+      results: [],
+      isLoading: false,
+      isQueryLongEnough: false,
+      debouncedQuery: '',
+    } as unknown as ReturnType<typeof useAnimeSearchQuery>);
   });
 
   it('prompts for a longer query before searching', () => {
@@ -42,11 +42,12 @@ describe('AddAnimeDialog', () => {
   });
 
   it('shows search results and lets the user pick one', () => {
-    vi.mocked(useAnimeList).mockReturnValue({
-      data: { data: [{ anime_id: 9, title: 'Found Anime', anime_url: 'found', poster: posterField }] },
+    vi.mocked(useAnimeSearchQuery).mockReturnValue({
+      results: [{ anime_id: 9, title: 'Found Anime', anime_url: 'found', poster: posterField }],
       isLoading: false,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any);
+      isQueryLongEnough: true,
+      debouncedQuery: 'Found',
+    } as unknown as ReturnType<typeof useAnimeSearchQuery>);
 
     const { onSelect, onOpenChange } = renderDialog();
 
@@ -62,22 +63,21 @@ describe('AddAnimeDialog', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
-  it('excludes anime already present in the tier list', () => {
-    vi.mocked(useAnimeList).mockReturnValue({
-      data: { data: [{ anime_id: 9, title: 'Already Added', anime_url: 'added', poster: posterField }] },
-      isLoading: false,
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any);
-
+  it('passes an exclude predicate that filters out already-added anime', () => {
     renderDialog({ existingAnimeIds: new Set([9]) });
-    fireEvent.change(screen.getByPlaceholderText('Название аниме...'), { target: { value: 'Already' } });
 
-    expect(screen.queryByText('Already Added')).not.toBeInTheDocument();
+    const options = vi.mocked(useAnimeSearchQuery).mock.calls[0][1];
+    expect(options?.exclude?.({ anime_id: 9 } as never)).toBe(true);
+    expect(options?.exclude?.({ anime_id: 1 } as never)).toBe(false);
   });
 
   it('shows a loading indicator while searching', () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    vi.mocked(useAnimeList).mockReturnValue({ data: undefined, isLoading: true } as any);
+    vi.mocked(useAnimeSearchQuery).mockReturnValue({
+      results: [],
+      isLoading: true,
+      isQueryLongEnough: true,
+      debouncedQuery: 'Query',
+    } as unknown as ReturnType<typeof useAnimeSearchQuery>);
 
     renderDialog();
     fireEvent.change(screen.getByPlaceholderText('Название аниме...'), { target: { value: 'Query' } });

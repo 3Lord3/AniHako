@@ -5,7 +5,7 @@ import { DndContext } from '@dnd-kit/core';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { TierCard } from '@/pages/AniTierPage/components/TierCard';
 import type { TierAnimeItem } from '@/types/tier';
-import type { MoveTarget } from '@/pages/AniTierPage/components/moveTargets';
+import type { MoveTarget } from '@/lib/tierMoveTargets';
 
 const anime: TierAnimeItem = { animeId: 1, title: 'My Anime', posterUrl: 'poster.jpg', url: 'my-anime' };
 const moveTargets: MoveTarget[] = [

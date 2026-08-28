@@ -2,14 +2,7 @@ import { Link } from 'react-router-dom';
 import { Calendar } from 'lucide-react';
 import type { AnimeScheduleItem } from '@/types/anime';
 import { buildAnimeUrl } from '@/lib/animeUrl';
-
-function formatDate(timestamp: number | undefined): string {
-  if (!timestamp) return '-';
-  return new Date(timestamp * 1000).toLocaleDateString('ru-RU', {
-    day: 'numeric',
-    month: 'short',
-  });
-}
+import { formatDayMonth as formatDate } from '@/lib/schedule';
 
 interface ScheduleRowProps {
   item: AnimeScheduleItem;

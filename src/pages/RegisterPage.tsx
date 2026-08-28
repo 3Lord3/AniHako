@@ -1,6 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks';
+import { Link } from 'react-router-dom';
+import { useRegisterForm } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -8,53 +7,23 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Label } from '@/components/ui/label';
 
 export function RegisterPage() {
-  const [email, setEmail] = useState('');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [acceptRules, setAcceptRules] = useState(false);
-  const [acceptPrivacy, setAcceptPrivacy] = useState(false);
-  const [error, setError] = useState('');
-  const { register, isRegistering } = useAuth();
-  const navigate = useNavigate();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (password !== confirmPassword) {
-      setError('Пароли не совпадают');
-      return;
-    }
-
-    if (password.length < 6) {
-      setError('Пароль должен быть не менее 6 символов');
-      return;
-    }
-
-    if (username.length < 3) {
-      setError('Имя пользователя должно быть не менее 3 символов');
-      return;
-    }
-
-    if (!acceptRules || !acceptPrivacy) {
-      setError('Необходимо принять правила сайта и политику конфиденциальности');
-      return;
-    }
-
-    register(
-      { email, username, password },
-      {
-        onSuccess: () => {
-          navigate('/');
-        },
-        onError: (err: unknown) => {
-          const axiosError = err as { response?: { data?: { detail?: string } } };
-          setError(axiosError.response?.data?.detail || 'Ошибка регистрации');
-        },
-      }
-    );
-  };
+  const {
+    email,
+    setEmail,
+    username,
+    setUsername,
+    password,
+    setPassword,
+    confirmPassword,
+    setConfirmPassword,
+    acceptRules,
+    setAcceptRules,
+    acceptPrivacy,
+    setAcceptPrivacy,
+    error,
+    isRegistering,
+    handleSubmit,
+  } = useRegisterForm();
 
   return (
     <div className="flex items-center justify-center min-h-[calc(100dvh-10rem)] py-4">

@@ -10,8 +10,7 @@ vi.mock('@/hooks', async () => {
   return {
     ...actual,
     useUser: vi.fn(),
-    useAddFriend: vi.fn(),
-    useRemoveFriend: vi.fn(),
+    useFriendActions: vi.fn(),
     useFriends: vi.fn(),
     useFriendsByCategory: vi.fn(),
   };
@@ -31,16 +30,13 @@ const renderPage = () => {
 describe('FriendsPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    vi.mocked(hooks.useAddFriend).mockReturnValue({
-      mutate: vi.fn(),
-      isPending: false,
-      variables: undefined,
-    } as unknown as ReturnType<typeof hooks.useAddFriend>);
-    vi.mocked(hooks.useRemoveFriend).mockReturnValue({
-      mutate: vi.fn(),
-      isPending: false,
-      variables: undefined,
-    } as unknown as ReturnType<typeof hooks.useRemoveFriend>);
+    vi.mocked(hooks.useFriendActions).mockReturnValue({
+      addFriend: vi.fn(),
+      removeFriend: vi.fn(),
+      pendingFriendIds: new Set(),
+      error: null,
+      resetError: vi.fn(),
+    } as unknown as ReturnType<typeof hooks.useFriendActions>);
     vi.mocked(hooks.useFriendsByCategory).mockReturnValue({
       data: [],
       isLoading: false,
@@ -73,15 +69,14 @@ describe('FriendsPage', () => {
     expect(screen.getByText('Входящие заявки')).toBeInTheDocument();
   });
 
-  it('keeps multiple friends marked pending simultaneously instead of only the latest one', async () => {
-    const addFriendMutate = vi.fn();
-    const removeFriendMutate = vi.fn();
-    vi.mocked(hooks.useAddFriend).mockReturnValue({
-      mutate: addFriendMutate,
-    } as unknown as ReturnType<typeof hooks.useAddFriend>);
-    vi.mocked(hooks.useRemoveFriend).mockReturnValue({
-      mutate: removeFriendMutate,
-    } as unknown as ReturnType<typeof hooks.useRemoveFriend>);
+  it('marks friends as pending using the ids reported by useFriendActions', async () => {
+    vi.mocked(hooks.useFriendActions).mockReturnValue({
+      addFriend: vi.fn(),
+      removeFriend: vi.fn(),
+      pendingFriendIds: new Set([1, 2]),
+      error: null,
+      resetError: vi.fn(),
+    } as unknown as ReturnType<typeof hooks.useFriendActions>);
     vi.mocked(hooks.useUser).mockReturnValue({
       data: { id: 42, nickname: 'Me' },
       isLoading: false,
@@ -97,20 +92,18 @@ describe('FriendsPage', () => {
     renderPage();
     await waitFor(() => expect(screen.getByText('Alice')).toBeInTheDocument());
 
-    fireEvent.click(screen.getByText('Удалить из друзей'));
-    fireEvent.click(screen.getByText('Принять'));
-
-    await waitFor(() => {
-      expect(screen.getByText('Удалить из друзей')).toBeDisabled();
-      expect(screen.getByText('Принять')).toBeDisabled();
-    });
+    expect(screen.getByText('Удалить из друзей')).toBeDisabled();
+    expect(screen.getByText('Принять')).toBeDisabled();
   });
 
-  it('shows an error message when an action mutation fails', async () => {
-    const failingAdd = vi.fn((_id, opts) => opts?.onError?.());
-    vi.mocked(hooks.useAddFriend).mockReturnValue({
-      mutate: failingAdd,
-    } as unknown as ReturnType<typeof hooks.useAddFriend>);
+  it('shows the error message reported by useFriendActions', async () => {
+    vi.mocked(hooks.useFriendActions).mockReturnValue({
+      addFriend: vi.fn(),
+      removeFriend: vi.fn(),
+      pendingFriendIds: new Set(),
+      error: 'Не удалось выполнить действие. Попробуйте ещё раз.',
+      resetError: vi.fn(),
+    } as unknown as ReturnType<typeof hooks.useFriendActions>);
     vi.mocked(hooks.useUser).mockReturnValue({
       data: { id: 42, nickname: 'Me' },
       isLoading: false,
@@ -121,13 +114,8 @@ describe('FriendsPage', () => {
     } as unknown as ReturnType<typeof hooks.useFriends>);
 
     renderPage();
-    await waitFor(() => expect(screen.getByText('Bob')).toBeInTheDocument());
 
-    fireEvent.click(screen.getByText('Принять'));
-
-    await waitFor(() =>
-      expect(screen.getByText('Не удалось выполнить действие. Попробуйте ещё раз.')).toBeInTheDocument()
-    );
+    expect(screen.getByText('Не удалось выполнить действие. Попробуйте ещё раз.')).toBeInTheDocument();
   });
 
   it('switches to a category tab and shows its empty state', async () => {

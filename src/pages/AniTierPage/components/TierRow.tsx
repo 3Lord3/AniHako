@@ -2,7 +2,7 @@ import { useDroppable } from '@dnd-kit/core';
 import { getTierColorPreset } from '@/types/tier';
 import type { TierDefinition, TierAnimeItem } from '@/types/tier';
 import { TierCardGrid } from './TierCardGrid';
-import type { MoveTarget } from './moveTargets';
+import type { MoveTarget } from '@/lib/tierMoveTargets';
 import { cn } from '@/lib/utils';
 
 interface TierRowProps {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { buildMoveTargets } from '@/pages/AniTierPage/components/moveTargets';
+import { buildMoveTargets } from '@/lib/tierMoveTargets';
 import { DEFAULT_TIERS, UNRANKED_TIER_ID } from '@/types/tier';
 
 describe('buildMoveTargets', () => {

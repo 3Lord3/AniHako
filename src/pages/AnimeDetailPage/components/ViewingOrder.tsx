@@ -8,6 +8,7 @@ import { getImageUrl, getPosterUrl } from '@/lib/imageUrl';
 import { buildAnimeUrl } from '@/lib/animeUrl';
 import { KIND_LABELS, STATUS_LABELS, STATUS_COLORS, STATUS_ICONS, getRatingColor } from '@/types/constants';
 import { mapListIdToStatus } from '@/types';
+import { isRateFavorite } from '@/lib/listRate';
 import type { AnimeStatus, AnimeViewingOrder } from '@/types';
 
 interface ViewingOrderProps {
@@ -88,7 +89,7 @@ function StatusBadge({ status }: { status: AnimeStatus }) {
 
 function UserStatusBadges({ item }: { item: AnimeViewingOrder }) {
   const listId = item.user?.list?.list?.id;
-  const isFav = item.user?.list?.is_fav === true;
+  const isFav = isRateFavorite(item);
 
   const listStatus = listId !== undefined ? mapListIdToStatus(listId) : null;
 

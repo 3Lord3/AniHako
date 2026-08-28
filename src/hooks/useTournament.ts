@@ -15,7 +15,6 @@ import {
 } from './tournament-utils';
 
 export type { TournamentParticipant, Pair, Round, TournamentState, TournamentResult, BracketType } from './tournament-types';
-export type { PairStatus } from './tournament-types';
 export { getRoundName } from './tournament-utils';
 
 function findRound(rounds: Round[], bracket: BracketType, roundInBracket: number): Round | undefined {

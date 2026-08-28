@@ -8,28 +8,6 @@ export const RATING_OPTIONS = [
   { value: 5, label: '5+' },
 ];
 
-export const KIND_OPTIONS = [
-  { value: 'tv', label: 'TV' },
-  { value: 'movie', label: 'Movie' },
-  { value: 'ova', label: 'OVA' },
-  { value: 'ona', label: 'ONA' },
-  { value: 'special', label: 'Special' },
-  { value: 'music', label: 'Music' },
-];
-
-export const STATUS_OPTIONS = [
-  { value: 'ongoing', label: 'Онгоинг' },
-  { value: 'released', label: 'Вышло' },
-  { value: 'announcement', label: 'Анонс' },
-];
-
-export const SORT_OPTIONS = [
-  { value: 'rank', label: 'По рейтингу' },
-  { value: 'popularity', label: 'По популярности' },
-  { value: 'name', label: 'По имени' },
-  { value: 'random', label: 'Случайное' },
-];
-
 export const ROLE_VARIANTS: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
   'admin': 'destructive',
   'moderator': 'secondary',

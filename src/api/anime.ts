@@ -63,13 +63,6 @@ function buildCatalogParams(params?: CatalogParams): CatalogApiParams {
   return out;
 }
 
-export interface PaginatedCatalogResponse<T> {
-  response: T[];
-  page?: number;
-  total_pages?: number;
-  total?: number;
-}
-
 export interface CatalogResult<T> {
   data: T[];
   page: number;

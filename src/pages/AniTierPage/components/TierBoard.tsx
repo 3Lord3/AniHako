@@ -1,23 +1,13 @@
-import { useMemo, useState } from 'react';
 import {
   DndContext,
   DragOverlay,
-  KeyboardSensor,
-  MouseSensor,
-  TouchSensor,
   closestCenter,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-  type DragStartEvent,
 } from '@dnd-kit/core';
-import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import { UNRANKED_TIER_ID } from '@/types/tier';
-import { resolveDropTarget } from '@/lib/tierDragUtils';
 import type { useTierList } from '@/hooks/useTierList';
+import { useTierBoardDnd } from '@/hooks/useTierBoardDnd';
 import { TierRow } from './TierRow';
 import { UnrankedPool } from './UnrankedPool';
-import { buildMoveTargets } from './moveTargets';
 import { TIER_CARD_SIZE_CLASSES } from './TierCard';
 import { cn } from '@/lib/utils';
 
@@ -31,37 +21,8 @@ const EMPTY_ORDER: number[] = [];
 
 export function TierBoard({ tierList }: TierBoardProps) {
   const { state, moveAnime } = tierList;
-  const [activeAnimeId, setActiveAnimeId] = useState<number | null>(null);
-
-  const sensors = useSensors(
-    // Mouse: small enough to feel immediate, big enough that a plain click on the corner button still registers.
-    useSensor(MouseSensor, { activationConstraint: { distance: 3 } }),
-    // Touch: require a brief hold before a drag starts, so a quick swipe still scrolls the page
-    // instead of being captured as a drag (paired with touch-pan-y on TierCard).
-    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 8 } }),
-    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
-  );
-
-  const moveTargets = useMemo(() => buildMoveTargets(state.tiers), [state.tiers]);
-
-  function handleDragStart(event: DragStartEvent) {
-    setActiveAnimeId(Number(event.active.id));
-  }
-
-  function handleDragEnd(event: DragEndEvent) {
-    setActiveAnimeId(null);
-    const { active, over } = event;
-    if (!over) return;
-
-    const animeId = Number(active.id);
-    const overData = over.data.current as { tierId?: string; type?: string } | undefined;
-    const { tierId, index } = resolveDropTarget(state.order, String(over.id), overData);
-    if (index === -1) return;
-
-    moveAnime(animeId, tierId, index);
-  }
-
-  const activeItem = activeAnimeId !== null ? state.items[activeAnimeId] : undefined;
+  const { sensors, activeItem, moveTargets, handleDragStart, handleDragEnd, handleDragCancel } =
+    useTierBoardDnd(state, moveAnime);
 
   return (
     <DndContext
@@ -69,7 +30,7 @@ export function TierBoard({ tierList }: TierBoardProps) {
       collisionDetection={closestCenter}
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
-      onDragCancel={() => setActiveAnimeId(null)}
+      onDragCancel={handleDragCancel}
     >
       <div className="space-y-2">
         {state.tiers.length === 0 && (

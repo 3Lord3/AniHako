@@ -9,7 +9,7 @@ import {
   DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
 import type { TierAnimeItem } from '@/types/tier';
-import type { MoveTarget } from './moveTargets';
+import type { MoveTarget } from '@/lib/tierMoveTargets';
 import { cn } from '@/lib/utils';
 
 export type TierCardSize = 'compact' | 'large';

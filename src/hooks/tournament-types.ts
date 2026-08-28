@@ -13,7 +13,7 @@ export interface TournamentParticipant {
   isPlaceholder: boolean;
 }
 
-export type PairStatus = 'pending' | 'bye' | 'playing' | 'completed';
+type PairStatus = 'pending' | 'bye' | 'playing' | 'completed';
 
 export interface Pair {
   id: string;
@@ -24,8 +24,6 @@ export interface Pair {
   winner: TournamentParticipant | null;
   status: PairStatus;
 }
-
-export type TournamentMatch = Pair;
 
 export interface Round {
   index: number;
