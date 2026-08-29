@@ -4,9 +4,21 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { CaptchaField } from '@/components/CaptchaField';
 
 export function LoginPage() {
-  const { login, setLogin, password, setPassword, error, isLoggingIn, handleSubmit } = useLoginForm();
+  const {
+    login,
+    setLogin,
+    password,
+    setPassword,
+    error,
+    isLoggingIn,
+    captchaRequired,
+    captchaNonce,
+    handleSubmit,
+    handleCaptchaSolved,
+  } = useLoginForm();
 
   return (
     <div className="flex items-center justify-center min-h-[calc(100dvh-10rem)] py-4">
@@ -16,7 +28,7 @@ export function LoginPage() {
           <CardDescription>Войдите в свой аккаунт</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4 pb-6">
+          <CardContent className="space-y-4 pb-4">
             {error && (
               <div className="bg-destructive/10 text-destructive p-3 rounded-md text-sm">
                 {error}
@@ -44,6 +56,9 @@ export function LoginPage() {
                 required
               />
             </div>
+            {captchaRequired && (
+              <CaptchaField key={captchaNonce} onSolved={handleCaptchaSolved} />
+            )}
           </CardContent>
           <CardFooter className="flex flex-col gap-4 border-border">
             <Button type="submit" className="w-full" disabled={isLoggingIn}>
