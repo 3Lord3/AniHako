@@ -9,8 +9,16 @@ export function useAuth() {
   const navigate = useNavigate();
 
   const loginMutation = useMutation({
-    mutationFn: async ({ login, password }: { login: string; password: string }) => {
-      const response = await authApi.login(login, password);
+    mutationFn: async ({
+      login,
+      password,
+      captchaResponse,
+    }: {
+      login: string;
+      password: string;
+      captchaResponse?: string;
+    }) => {
+      const response = await authApi.login(login, password, captchaResponse);
       const { token } = response.data.response;
       
       if (!token) {

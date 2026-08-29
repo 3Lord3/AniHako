@@ -56,7 +56,7 @@ describe('useAuth', () => {
       result.current.login({ login: 'test@test.com', password: 'password123' });
 
       await waitFor(() => expect(result.current.isLoggingIn).toBe(false));
-      expect(authApiModule.authApi.login).toHaveBeenCalledWith('test@test.com', 'password123');
+      expect(authApiModule.authApi.login).toHaveBeenCalledWith('test@test.com', 'password123', undefined);
     });
 
     it('stores token in localStorage on successful login', async () => {
