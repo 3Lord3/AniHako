@@ -10,11 +10,12 @@ export const authApi = {
       password,
     }),
 
-  login: (email: string, password: string) =>
+  login: (email: string, password: string, captchaResponse?: string) =>
     api.post<{ response: { success: boolean; token: string } }>('/profile/login', {
       login: email,
       password,
       need_json: true,
+      ...(captchaResponse ? { recaptcha_response: captchaResponse } : {}),
     }),
 
   logout: () =>
