@@ -9,6 +9,7 @@ import { AnimeCharacteristics } from './AnimeDetailPage/components/AnimeCharacte
 import { EpisodeViewer } from './AnimeDetailPage/components/EpisodeViewer';
 import { ViewingOrder } from './AnimeDetailPage/components/ViewingOrder';
 import { StatusButtonGroup } from '@/components/detail/StatusButtonGroup';
+import { RatingBlock } from '@/components/detail/RatingBlock';
 
 export function AnimeDetailPage() {
   const { url } = useParams<{ url: string }>();
@@ -63,20 +64,29 @@ export function AnimeDetailPage() {
       )}
 
       <div className="flex flex-col md:flex-row gap-8">
-        <div className="flex-shrink-0 flex flex-col items-center">
+        <div className="flex-shrink-0 flex flex-col items-center self-center md:self-auto">
           <img
             src={getImageUrl(anime.poster?.medium || anime.poster?.big || anime.poster?.huge)}
             alt={displayTitle}
             className="w-64 rounded-lg shadow-lg"
           />
           {user && (
-            <div className="mt-4">
+            <div className="mt-4 flex flex-col items-center gap-3 w-full">
               <StatusButtonGroup
                 isFavorite={isFavorite}
                 userListId={userListId}
                 onToggleFavorite={handleToggleFavorite}
                 onAddToList={handleAddToList}
               />
+              {anime.anime_id > 0 && (
+                <RatingBlock
+                  animeId={anime.anime_id}
+                  currentUserRating={anime.user?.rating}
+                  overallRating={anime.rating?.average}
+                  votes={anime.rating?.counters}
+                  enabled
+                />
+              )}
             </div>
           )}
         </div>

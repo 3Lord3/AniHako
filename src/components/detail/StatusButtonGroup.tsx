@@ -25,7 +25,7 @@ export function StatusButtonGroup({
   const favoriteLabel = isFavorite ? 'В любимом' : 'В любимое';
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2 w-full justify-center">
       <TooltipWrap content={favoriteLabel}>
         <Button
           variant={isFavorite ? 'default' : 'outline'}
