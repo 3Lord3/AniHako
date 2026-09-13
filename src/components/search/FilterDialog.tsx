@@ -51,7 +51,7 @@ export function FilterDialogContent({
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h4 className="font-medium text-sm">Минимальный рейтинг</h4>
+        <h4 className="font-medium text-sm text-foreground">Минимальный рейтинг</h4>
         <div className="flex flex-wrap gap-2">
           {RATING_OPTIONS.map((r) => (
             <Badge
@@ -68,7 +68,7 @@ export function FilterDialogContent({
       </div>
 
       <div className="space-y-2">
-        <h4 className="font-medium text-sm">Год выпуска</h4>
+        <h4 className="font-medium text-sm text-foreground">Год выпуска</h4>
         <div className="flex items-center gap-2 flex-wrap">
           <select
             className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
@@ -98,7 +98,7 @@ export function FilterDialogContent({
       </div>
 
       <div className="space-y-2">
-        <h4 className="font-medium text-sm">Жанры</h4>
+        <h4 className="font-medium text-sm text-foreground">Жанры</h4>
         <Input
           placeholder="Поиск жанров..."
           value={genreSearchInput}

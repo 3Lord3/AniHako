@@ -2,7 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { animeApi } from '@/api/anime';
 import { userListApi } from '@/api/list';
 import { useUser } from './useAuth';
-import type { UserAnimeUpdate, AnimeStatus, YummyAnimeDetailResponse, AnimeVideo } from '@/types';
+import type { UserAnimeUpdate, AnimeStatus, YummyAnimeDetailResponse, AnimeVideo, AnimeRateStats } from '@/types';
 import { mapStatusToListId } from '@/types';
 import { normalizeAnimeResponse, formatAnimeListResponse } from '@/api/normalizers/anime';
 import type { YummyUserAnimeRate } from '@/types/list';
@@ -219,6 +219,46 @@ export function useToggleFavorite() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['anime', 'detail'] });
       queryClient.invalidateQueries({ queryKey: ['user', 'anime'] });
+    },
+  });
+}
+
+function invalidateOnRatingChange(queryClient: ReturnType<typeof useQueryClient>) {
+  queryClient.invalidateQueries({ queryKey: ['anime', 'detail'] });
+  queryClient.invalidateQueries({ queryKey: ['anime', 'catalog'] });
+  queryClient.invalidateQueries({ queryKey: ['user', 'anime'] });
+}
+
+/**
+ * Ставит/обновляет оценку аниме через `PUT /anime/{id}/rate`.
+ * Возвращает новые средний рейтинг ({@link AnimeRateStats}) для локального
+ * обновления UI. После мутации инвалидируем кэш, чтобы карточки и
+ * характеристики показали актуальный средний рейтинг.
+ */
+export function useRateAnime() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ animeId, rate }: { animeId: number; rate: number }): Promise<AnimeRateStats> =>
+      animeApi.rate(animeId, rate),
+    onSuccess: (data) => {
+      invalidateOnRatingChange(queryClient);
+      return data;
+    },
+  });
+}
+
+/**
+ * Убирает оценку аниме через `DELETE /anime/{id}/rate`.
+ */
+export function useUnrateAnime() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (animeId: number): Promise<AnimeRateStats> => animeApi.unrate(animeId),
+    onSuccess: (data) => {
+      invalidateOnRatingChange(queryClient);
+      return data;
     },
   });
 }

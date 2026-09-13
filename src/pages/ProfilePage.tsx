@@ -40,7 +40,7 @@ export function ProfilePage() {
               size="lg"
             />
             <div className="flex-1">
-              <h1 className="text-2xl font-bold">{user.nickname}</h1>
+              <h1 className="text-2xl font-bold text-foreground">{user.nickname}</h1>
               {user.email && <p className="text-muted-foreground">{user.email}</p>}
               
               <RoleBadges roles={user.roles} />
@@ -60,7 +60,7 @@ export function ProfilePage() {
 
       <Card>
         <CardContent className="space-y-4 pt-6">
-          <h2 className="text-lg font-semibold">Информация</h2>
+          <h2 className="text-lg font-semibold text-foreground">Информация</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>

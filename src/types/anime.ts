@@ -175,6 +175,11 @@ export type AnimeDetail = AnimeDetailResponse;
 
 export type YummyAnimeDetailResponse = AnimeCatalogItem;
 
+export interface AnimeRateStats {
+  rating: number;
+  votes: number;
+}
+
 export function formatEpisodeCount(episodes: AnimeEpisodes | undefined): string {
   if (!episodes) return '';
   if (episodes.count === 0) return '?';

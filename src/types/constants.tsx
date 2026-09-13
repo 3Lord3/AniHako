@@ -55,6 +55,6 @@ export function getRatingColor(rating: number | string | null): string {
   const r = typeof rating === 'number' ? rating : parseFloat(rating);
   if (isNaN(r)) return 'bg-gray-500 text-white dark:bg-gray-600';
   if (r >= 7) return 'bg-green-500 text-white dark:bg-green-600';
-  if (r >= 5) return 'bg-yellow-500 text-black dark:bg-yellow-500 dark:text-black';
+  if (r >= 5) return 'bg-yellow-500 text-white dark:bg-yellow-500 dark:text-white';
   return 'bg-red-500 text-white dark:bg-red-600';
 }
