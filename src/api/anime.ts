@@ -1,5 +1,5 @@
 import { api } from './index';
-import type { YummyAnimeDetailResponse, AnimeScheduleItem } from '../types/anime';
+import type { YummyAnimeDetailResponse, AnimeScheduleItem, AnimeRateStats } from '../types/anime';
 import type { GenreResponse } from '../types/genre';
 import type { YummyAnimeListId } from '../types/list';
 
@@ -187,5 +187,15 @@ export const animeApi = {
   getSchedule: (): Promise<AnimeScheduleItem[]> =>
     api
       .get<{ response: AnimeScheduleItem[] }>('/anime/schedule')
+      .then((res) => res.data.response),
+
+  rate: (animeId: number, rate: number): Promise<AnimeRateStats> =>
+    api
+      .put<{ response: AnimeRateStats }>(`/anime/${animeId}/rate`, { rate })
+      .then((res) => res.data.response),
+
+  unrate: (animeId: number): Promise<AnimeRateStats> =>
+    api
+      .delete<{ response: AnimeRateStats }>(`/anime/${animeId}/rate`)
       .then((res) => res.data.response),
 };
