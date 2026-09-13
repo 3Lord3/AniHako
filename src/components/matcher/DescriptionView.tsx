@@ -11,7 +11,7 @@ export function DescriptionPanel({ anime }: DescriptionViewProps) {
     <div className="w-full select-text">
       <Card className="py-0">
         <CardContent className="p-6">
-          <h3 className="font-semibold text-lg mb-2">Описание</h3>
+          <h3 className="font-semibold text-lg mb-2 text-foreground">Описание</h3>
           {anime?.description ? (
             <p className="text-sm text-muted-foreground whitespace-pre-wrap leading-relaxed">
               {anime.description}
@@ -22,7 +22,7 @@ export function DescriptionPanel({ anime }: DescriptionViewProps) {
 
           {anime?.genres && anime.genres.length > 0 && (
             <div className="space-y-2 mt-4">
-              <h4 className="text-sm font-medium">Жанры</h4>
+              <h4 className="text-sm font-medium text-foreground">Жанры</h4>
               <div className="flex flex-wrap gap-1.5">
                 {anime.genres.map((g) => (
                   <Badge key={g.id} variant="outline" className="text-xs">

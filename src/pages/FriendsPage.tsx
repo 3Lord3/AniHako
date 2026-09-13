@@ -23,7 +23,7 @@ export function FriendsPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Друзья</h1>
+      <h1 className="text-2xl font-bold text-foreground">Друзья</h1>
       {actionError && <p className="text-sm text-destructive">{actionError}</p>}
 
       <div className="flex flex-col gap-6 md:flex-row md:items-start">

@@ -42,7 +42,7 @@ export function AnimeMatcherPage() {
   return (
     <div className="md:space-y-6 flex flex-col min-h-[calc(100svh-64px)] md:min-h-0">
       <div className="hidden md:block text-center md:space-y-2">
-        <h1 className="text-4xl font-bold select-text">AniMatch</h1>
+        <h1 className="text-4xl font-bold select-text text-foreground">AniMatch</h1>
         <p className="text-muted-foreground select-text">
           Свайпайте влево чтобы пропустить, вправо чтобы добавить в запланированное
         </p>
@@ -133,7 +133,7 @@ export function AnimeMatcherPage() {
             )}
             {currentAnime?.genres && currentAnime.genres.length > 0 && (
               <div className="space-y-2">
-                <h4 className="text-sm font-medium">Жанры</h4>
+                <h4 className="text-sm font-medium text-foreground">Жанры</h4>
                 <div className="flex flex-wrap gap-1.5">
                   {currentAnime.genres.slice(0, 2).map((g: { title: string }) => (
                     <Badge key={g.title} variant="outline" className="text-xs">

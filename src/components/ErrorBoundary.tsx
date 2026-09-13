@@ -10,12 +10,12 @@ function ErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
         <AlertTriangle className="w-12 h-12 text-destructive" />
       </div>
       <div className="text-center space-y-2">
-        <h2 className="text-2xl font-bold">Что-то пошло не так</h2>
+        <h2 className="text-2xl font-bold text-foreground">Что-то пошло не так</h2>
         <p className="text-muted-foreground">
           Произошла непредвиденная ошибка. Попробуйте обновить страницу.
         </p>
       </div>
-      <pre className="text-xs bg-muted p-4 rounded-lg max-w-md overflow-auto text-left">
+      <pre className="text-xs bg-muted text-foreground border border-border p-4 rounded-lg max-w-md overflow-auto text-left">
         {error instanceof Error ? error.message : String(error)}
       </pre>
       <Button onClick={resetErrorBoundary} className="gap-2">
