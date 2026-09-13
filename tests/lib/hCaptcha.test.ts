@@ -159,7 +159,7 @@ describe('getUnsupportedHostMessage', () => {
     const { getUnsupportedHostMessage } = await import('@/lib/hCaptcha');
     setHost('127.0.0.1');
     expect(getUnsupportedHostMessage()).toBeNull();
-    setHost('anihako.netlify.app');
+    setHost('anihako.vercel.app');
     expect(getUnsupportedHostMessage()).toBeNull();
     setHost('app.localhost');
     expect(getUnsupportedHostMessage()).toBeNull();
