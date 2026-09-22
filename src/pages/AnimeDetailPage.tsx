@@ -82,6 +82,7 @@ export function AnimeDetailPage() {
               />
               {anime.anime_id > 0 && (
                 <RatingBlock
+                  key={anime.anime_id}
                   animeId={anime.anime_id}
                   currentUserRating={anime.user?.rating}
                   overallRating={anime.rating?.average}
