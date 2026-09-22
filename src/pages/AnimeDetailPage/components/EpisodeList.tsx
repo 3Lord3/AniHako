@@ -9,8 +9,8 @@ interface EpisodeListProps {
   videos: AnimeVideo[];
   selectedIndex: number;
   onSelect: (index: number) => void;
-  viewedVideoIds?: Set<number>;
-  onToggleWatched?: (videoId: number, isWatched: boolean) => void;
+  viewedEpisodeNumbers?: Set<string>;
+  onToggleWatched?: (video: AnimeVideo, isWatched: boolean) => void;
   canMarkWatched?: boolean;
 }
 
@@ -18,7 +18,7 @@ export function EpisodeList({
   videos,
   selectedIndex,
   onSelect,
-  viewedVideoIds,
+  viewedEpisodeNumbers,
   onToggleWatched,
   canMarkWatched = false,
 }: EpisodeListProps) {
@@ -80,11 +80,11 @@ export function EpisodeList({
       {videos.map((video, idx) => {
         const label = video.number || String(video.index);
         const isActive = idx === selectedIndex;
-        const isWatched = !!viewedVideoIds?.has(video.video_id);
+        const isWatched = !!viewedEpisodeNumbers?.has(video.number);
         const showToggle = canMarkWatched && !!onToggleWatched;
 
         const handleToggle = () => {
-          onToggleWatched?.(video.video_id, isWatched);
+          onToggleWatched?.(video, isWatched);
         };
 
         return (

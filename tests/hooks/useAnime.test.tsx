@@ -156,59 +156,28 @@ describe('useGenres', () => {
 });
 
 describe('useVideoViews', () => {
-  const videos = [
-    { video_id: 100, iframe_url: '', data: { dubbing: '', player: '', player_id: 0 }, number: '1', date: 0, index: 1, views: 0, duration: 0 },
-    { video_id: 200, iframe_url: '', data: { dubbing: '', player: '', player_id: 0 }, number: '2', date: 0, index: 2, views: 0, duration: 0 },
-    { video_id: 300, iframe_url: '', data: { dubbing: '', player: '', player_id: 0 }, number: '3', date: 0, index: 3, views: 0, duration: 0 },
-  ];
-
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  it('fetches video watch history and maps ep_title to video_id', async () => {
+  it('fetches video watch history and returns watched ep_titles as strings', async () => {
     vi.mocked(userListApi.getVideoWatchHistory).mockResolvedValueOnce([
       { anime_id: 42, ep_title: '1' },
       { anime_id: 42, ep_title: '3' },
       { anime_id: 99, ep_title: '1' },
     ]);
 
-    const { result } = renderHook(() => useVideoViews(42, videos), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useVideoViews(42), { wrapper: createWrapper() });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(userListApi.getVideoWatchHistory).toHaveBeenCalledTimes(1);
-    expect(result.current.data).toEqual([100, 300]);
-  });
-
-  it('refetches when the videos list changes (signature in queryKey)', async () => {
-    vi.mocked(userListApi.getVideoWatchHistory).mockResolvedValue([
-      { anime_id: 42, ep_title: '1' },
-    ]);
-
-    const initial = [
-      { video_id: 100, iframe_url: '', data: { dubbing: '', player: '', player_id: 0 }, number: '1', date: 0, index: 1, views: 0, duration: 0 },
-    ];
-    const rerendered = [
-      { video_id: 999, iframe_url: '', data: { dubbing: '', player: '', player_id: 0 }, number: '1', date: 0, index: 1, views: 0, duration: 0 },
-    ];
-
-    const { result, rerender } = renderHook(
-      ({ v }) => useVideoViews(42, v),
-      { wrapper: createWrapper(), initialProps: { v: initial } }
-    );
-
-    await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(result.current.data).toEqual([100]);
-
-    rerender({ v: rerendered });
-    await waitFor(() => expect(result.current.data).toEqual([999]));
-    expect(userListApi.getVideoWatchHistory).toHaveBeenCalledTimes(2);
+    expect(result.current.data).toEqual(['1', '3']);
   });
 
   it('degrades gracefully on error (returns empty array)', async () => {
     vi.mocked(userListApi.getVideoWatchHistory).mockRejectedValueOnce(new Error('Network error'));
 
-    const { result } = renderHook(() => useVideoViews(42, videos), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useVideoViews(42), { wrapper: createWrapper() });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toEqual([]);
@@ -220,27 +189,18 @@ describe('useVideoViews', () => {
       { anime_id: 99, ep_title: '1' },
     ]);
 
-    const { result } = renderHook(() => useVideoViews(42, videos), { wrapper: createWrapper() });
+    const { result } = renderHook(() => useVideoViews(42), { wrapper: createWrapper() });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(result.current.data).toEqual([]);
   });
 
-  it('does not fetch when videos list is empty (anime not loaded yet)', () => {
+  it('is disabled when animeId is 0, null, or missing', () => {
     vi.mocked(userListApi.getVideoWatchHistory).mockClear();
 
-    const { result } = renderHook(() => useVideoViews(42, []), { wrapper: createWrapper() });
-
-    expect(userListApi.getVideoWatchHistory).not.toHaveBeenCalled();
-    expect(result.current.data).toBeUndefined();
-  });
-
-  it('is disabled when animeId is 0, null, or videos are missing', () => {
-    vi.mocked(userListApi.getVideoWatchHistory).mockClear();
-
-    renderHook(() => useVideoViews(0, videos), { wrapper: createWrapper() });
-    renderHook(() => useVideoViews(null, videos), { wrapper: createWrapper() });
-    renderHook(() => useVideoViews(42, undefined), { wrapper: createWrapper() });
+    renderHook(() => useVideoViews(0), { wrapper: createWrapper() });
+    renderHook(() => useVideoViews(null), { wrapper: createWrapper() });
+    renderHook(() => useVideoViews(undefined), { wrapper: createWrapper() });
 
     expect(userListApi.getVideoWatchHistory).not.toHaveBeenCalled();
   });
@@ -257,7 +217,7 @@ describe('useToggleVideoViewed', () => {
     const { result } = renderHook(() => useToggleVideoViewed(1), { wrapper: createWrapper() });
 
     await act(async () => {
-      result.current.mutate({ videoId: 100, currentlyViewed: false });
+      result.current.mutate({ epTitle: '1', videoId: 100, currentlyViewed: false });
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
@@ -270,14 +230,35 @@ describe('useToggleVideoViewed', () => {
     const { result } = renderHook(() => useToggleVideoViewed(1), { wrapper: createWrapper() });
 
     await act(async () => {
-      result.current.mutate({ videoId: 100, currentlyViewed: true });
+      result.current.mutate({ epTitle: '2', videoId: 100, currentlyViewed: true });
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(userListApi.unmarkVideoViewed).toHaveBeenCalledWith(100);
   });
 
-  it('optimistically adds the video id to cache when marking viewed', async () => {
+  it('unmarks every video of the episode across all dubbings/players', async () => {
+    const videos = [
+      { video_id: 1, iframe_url: '', data: { dubbing: 'A', player: 'Kodik', player_id: 1 }, number: '1', date: 0, index: 1, views: 0, duration: 0 },
+      { video_id: 2, iframe_url: '', data: { dubbing: 'B', player: 'Kodik', player_id: 1 }, number: '1', date: 0, index: 1, views: 0, duration: 0 },
+      { video_id: 3, iframe_url: '', data: { dubbing: 'A', player: 'Alloha', player_id: 2 }, number: '1', date: 0, index: 1, views: 0, duration: 0 },
+      { video_id: 4, iframe_url: '', data: { dubbing: 'A', player: 'Kodik', player_id: 1 }, number: '2', date: 0, index: 2, views: 0, duration: 0 },
+    ];
+
+    const { result } = renderHook(() => useToggleVideoViewed(1, videos), { wrapper: createWrapper() });
+
+    await act(async () => {
+      result.current.mutate({ epTitle: '1', videoId: 1, currentlyViewed: true });
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(userListApi.unmarkVideoViewed).toHaveBeenCalledTimes(3);
+    expect(userListApi.unmarkVideoViewed).toHaveBeenCalledWith(1);
+    expect(userListApi.unmarkVideoViewed).toHaveBeenCalledWith(2);
+    expect(userListApi.unmarkVideoViewed).toHaveBeenCalledWith(3);
+  });
+
+  it('optimistically adds the ep_title to cache when marking viewed', async () => {
     let resolveMark!: () => void;
     vi.mocked(userListApi.markVideoViewed).mockImplementationOnce(
       () => new Promise((resolve) => { resolveMark = () => resolve({ data: {} } as never); })
@@ -292,28 +273,23 @@ describe('useToggleVideoViewed', () => {
       </MemoryRouter>
     );
 
-    // Match the queryKey that useVideoViews produces: includes videosSignature.
-    const videos = [
-      { video_id: 1, iframe_url: '', data: { dubbing: '', player: '', player_id: 0 }, number: '1', date: 0, index: 1, views: 0, duration: 0 },
-    ];
-    const videosSignature = videos.map((v) => v.video_id).join(',');
-    queryClient.setQueryData(['anime', 'video-views', 1, videosSignature], [10]);
+    queryClient.setQueryData(['anime', 'video-views', 1], ['3']);
 
-    const { result } = renderHook(() => useToggleVideoViewed(1, videos), { wrapper });
+    const { result } = renderHook(() => useToggleVideoViewed(1), { wrapper });
 
     act(() => {
-      result.current.mutate({ videoId: 20, currentlyViewed: false });
+      result.current.mutate({ epTitle: '2', videoId: 20, currentlyViewed: false });
     });
 
     await waitFor(() => {
-      const cached = queryClient.getQueryData<number[]>(['anime', 'video-views', 1, videosSignature]);
-      expect(cached).toEqual([10, 20]);
+      const cached = queryClient.getQueryData<string[]>(['anime', 'video-views', 1]);
+      expect(cached).toEqual(['3', '2']);
     });
 
     resolveMark();
   });
 
-  it('optimistically removes the video id from cache when unmarking', async () => {
+  it('optimistically removes the ep_title from cache when unmarking', async () => {
     let resolveUnmark!: () => void;
     vi.mocked(userListApi.unmarkVideoViewed).mockImplementationOnce(
       () => new Promise((resolve) => { resolveUnmark = () => resolve({ data: {} } as never); })
@@ -328,21 +304,17 @@ describe('useToggleVideoViewed', () => {
       </MemoryRouter>
     );
 
-    const videos = [
-      { video_id: 1, iframe_url: '', data: { dubbing: '', player: '', player_id: 0 }, number: '1', date: 0, index: 1, views: 0, duration: 0 },
-    ];
-    const videosSignature = videos.map((v) => v.video_id).join(',');
-    queryClient.setQueryData(['anime', 'video-views', 1, videosSignature], [10, 20]);
+    queryClient.setQueryData(['anime', 'video-views', 1], ['1', '2']);
 
-    const { result } = renderHook(() => useToggleVideoViewed(1, videos), { wrapper });
+    const { result } = renderHook(() => useToggleVideoViewed(1), { wrapper });
 
     act(() => {
-      result.current.mutate({ videoId: 10, currentlyViewed: true });
+      result.current.mutate({ epTitle: '1', videoId: 10, currentlyViewed: true });
     });
 
     await waitFor(() => {
-      const cached = queryClient.getQueryData<number[]>(['anime', 'video-views', 1, videosSignature]);
-      expect(cached).toEqual([20]);
+      const cached = queryClient.getQueryData<string[]>(['anime', 'video-views', 1]);
+      expect(cached).toEqual(['2']);
     });
 
     resolveUnmark();
@@ -365,7 +337,7 @@ describe('useToggleVideoViewed', () => {
     const { result } = renderHook(() => useToggleVideoViewed(1), { wrapper });
 
     await act(async () => {
-      result.current.mutate({ videoId: 5, currentlyViewed: false });
+      result.current.mutate({ epTitle: '1', videoId: 5, currentlyViewed: false });
     });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));

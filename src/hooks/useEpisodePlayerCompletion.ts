@@ -4,12 +4,12 @@ import { isPlayerEndedEvent } from '@/lib/episodes';
 
 export function useEpisodePlayerCompletion(
   video: AnimeVideo,
-  onEpisodeComplete?: (videoId: number) => void
+  onEpisodeComplete?: (video: AnimeVideo) => void
 ) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const completedRef = useRef(false);
-  const videoIdRef = useRef<number>(video.video_id);
+  const videoRef = useRef<AnimeVideo>(video);
   const onCompleteRef = useRef(onEpisodeComplete);
 
   useEffect(() => {
@@ -18,8 +18,8 @@ export function useEpisodePlayerCompletion(
 
   useEffect(() => {
     completedRef.current = false;
-    videoIdRef.current = video.video_id;
-  }, [video.video_id]);
+    videoRef.current = video;
+  }, [video]);
 
   useEffect(() => {
     return () => {
@@ -42,7 +42,7 @@ export function useEpisodePlayerCompletion(
     timerRef.current = setTimeout(() => {
       if (completedRef.current) return;
       completedRef.current = true;
-      onCompleteRef.current?.(videoIdRef.current);
+      onCompleteRef.current?.(videoRef.current);
     }, ms);
     return () => {
       if (timerRef.current) {
@@ -59,7 +59,7 @@ export function useEpisodePlayerCompletion(
       if (!isPlayerEndedEvent(e.data)) return;
       if (completedRef.current) return;
       completedRef.current = true;
-      onCompleteRef.current?.(videoIdRef.current);
+      onCompleteRef.current?.(videoRef.current);
     };
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);

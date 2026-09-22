@@ -11,9 +11,9 @@ interface EpisodeViewerProps {
   videos: AnimeVideo[];
   translates?: AnimeTranslate[];
   title: string;
-  viewedVideoIds?: Set<number>;
-  onToggleWatched?: (videoId: number, isWatched: boolean) => void;
-  onEpisodeComplete?: (videoId: number) => void;
+  viewedEpisodeNumbers?: Set<string>;
+  onToggleWatched?: (video: AnimeVideo, isWatched: boolean) => void;
+  onEpisodeComplete?: (video: AnimeVideo) => void;
   canMarkWatched?: boolean;
 }
 
@@ -21,7 +21,7 @@ export function EpisodeViewer({
   videos,
   translates,
   title,
-  viewedVideoIds,
+  viewedEpisodeNumbers,
   onToggleWatched,
   onEpisodeComplete,
   canMarkWatched = false,
@@ -65,7 +65,7 @@ export function EpisodeViewer({
             videos={filteredVideos}
             selectedIndex={selectedIndex}
             onSelect={setSelectedIndex}
-            viewedVideoIds={viewedVideoIds}
+            viewedEpisodeNumbers={viewedEpisodeNumbers}
             onToggleWatched={onToggleWatched}
             canMarkWatched={canMarkWatched}
           />

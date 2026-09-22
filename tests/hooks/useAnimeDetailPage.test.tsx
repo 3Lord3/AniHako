@@ -17,7 +17,7 @@ const mockToggleVideoViewed = vi.fn();
 
 let animeDetail: unknown;
 let userAnimeList: unknown;
-let videoViews: number[];
+let videoViews: string[];
 let currentUser: { id: number } | null;
 
 vi.mock('@/hooks/useAnime', () => ({
@@ -39,6 +39,17 @@ const baseAnime = {
   anime_id: 42,
   user: { list: { is_fav: false, list: undefined } },
 };
+
+const makeVideo = (videoId: number, number: string) => ({
+  video_id: videoId,
+  number,
+  iframe_url: '',
+  data: { dubbing: '', player: '', player_id: 0 },
+  date: 0,
+  index: Number(number),
+  views: 0,
+  duration: 0,
+});
 
 describe('useAnimeDetailPage', () => {
   beforeEach(() => {
@@ -101,11 +112,11 @@ describe('useAnimeDetailPage', () => {
   });
 
   it('skips marking an episode complete if it is already viewed', () => {
-    videoViews = [7];
+    videoViews = ['7'];
     const { result } = renderHook(() => useAnimeDetailPage('some-url'), { wrapper: createWrapper() });
 
     act(() => {
-      result.current.handleEpisodeComplete(7);
+      result.current.handleEpisodeComplete(makeVideo(7, '7'));
     });
 
     expect(mockToggleVideoViewed).not.toHaveBeenCalled();
@@ -115,11 +126,24 @@ describe('useAnimeDetailPage', () => {
     const { result } = renderHook(() => useAnimeDetailPage('some-url'), { wrapper: createWrapper() });
 
     act(() => {
-      result.current.handleEpisodeComplete(9);
+      result.current.handleEpisodeComplete(makeVideo(9, '9'));
     });
 
     expect(mockToggleVideoViewed).toHaveBeenCalledWith(
-      { videoId: 9, currentlyViewed: false },
+      { epTitle: '9', videoId: 9, currentlyViewed: false },
+      expect.objectContaining({ onError: expect.any(Function) })
+    );
+  });
+
+  it('toggles watched via handleToggleWatched with the episode title', () => {
+    const { result } = renderHook(() => useAnimeDetailPage('some-url'), { wrapper: createWrapper() });
+
+    act(() => {
+      result.current.handleToggleWatched(makeVideo(5, '5'), true);
+    });
+
+    expect(mockToggleVideoViewed).toHaveBeenCalledWith(
+      { epTitle: '5', videoId: 5, currentlyViewed: true },
       expect.objectContaining({ onError: expect.any(Function) })
     );
   });

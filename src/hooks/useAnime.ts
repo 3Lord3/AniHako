@@ -264,35 +264,17 @@ export function useUnrateAnime() {
 }
 
 /**
- * Возвращает множество просмотренных `video_id` для указанного аниме.
+ * Returns the episode titles (`ep_title`) the user watched for the anime.
  *
- * YummyAnime API не возвращает `video_id` в `/video/watch-history`
- * (там есть `anime_id`, `ep_title`, но не сам ID видео). Уникальный
- * `video_id` доступен только через `getByUrl({ need_videos: true })` →
- * `anime.videos[].video_id`. Поэтому:
- *
- *  1. Загружаем всю историю просмотров с пагинацией (до пустой/короткой
- *     страницы), чтобы просмотренные серии гарантированно попали в выборку
- *     независимо от их позиции в общей истории пользователя
- *  2. Фильтруем записи по `anime_id`
- *  3. Собираем множество `ep_title` (строки номеров эпизодов)
- *  4. Маппим их в `video_id` через переданный `videos` —
- *     совпадение по `ep_title === video.number`
- *
- * `videosSignature` включается в queryKey, чтобы при смене списка видео
- * (например, при переключении озвучки/плеера в EpisodeViewer, когда
- * `videos[]` пересобирается с новыми `video_id`) кэш инвалидировался и
- * маппинг `ep_title → video_id` работал по актуальным данным.
+ * `/video/watch-history` has no `video_id`, only `anime_id` + `ep_title`.
+ * History is per episode title, shared across dubbings and players, so the
+ * cache stores `ep_title` strings: marking an episode in one dubbing shows
+ * it in all others immediately, without refetch on dubbing switch.
  */
-export function useVideoViews(
-  animeId: number | null | undefined,
-  videos?: AnimeVideo[]
-) {
-  const videosSignature = videos?.map((v) => v.video_id).join(',') ?? '';
-  return useQuery<number[]>({
-    queryKey: ['anime', 'video-views', animeId, videosSignature],
+export function useVideoViews(animeId: number | null | undefined) {
+  return useQuery<string[]>({
+    queryKey: ['anime', 'video-views', animeId],
     queryFn: async () => {
-      if (!videos?.length) return [];
       try {
         const history = await userListApi.getVideoWatchHistory();
         const watchedNumbers = new Set<string>();
@@ -301,14 +283,7 @@ export function useVideoViews(
             watchedNumbers.add(item.ep_title);
           }
         }
-        if (!watchedNumbers.size) return [];
-        const ids = new Set<number>();
-        for (const v of videos) {
-          if (typeof v.number === 'string' && watchedNumbers.has(v.number)) {
-            ids.add(v.video_id);
-          }
-        }
-        return Array.from(ids);
+        return Array.from(watchedNumbers);
       } catch {
         // Network/auth/server error: degrade gracefully. The watched
         // indicators simply won't render for this page; auto-mark and
@@ -316,52 +291,59 @@ export function useVideoViews(
         return [];
       }
     },
-    enabled: typeof animeId === 'number' && animeId > 0 && !!videos?.length,
+    enabled: typeof animeId === 'number' && animeId > 0,
     staleTime: 1000 * 30,
   });
 }
 
 /**
- * Помечает/снимает отметку просмотра конкретного видео через
- * `PUT/DELETE /video/{videoId}`. Оптимистично обновляет кэш
- * `['anime', 'video-views', animeId, videosSignature]`.
+ * Marks/unmarks an episode via `PUT/DELETE /video/{videoId}` and updates the
+ * `['anime', 'video-views', animeId]` cache by `ep_title`, shared across
+ * dubbings. Optimistic update is visible in all dubbings immediately.
  *
- * `videos` принимается как параметр, чтобы queryKey совпадал с
- * `useVideoViews`. Иначе `setQueryData` запишет в один ключ, а
- * `useQuery` будет читать из другого — optimistic update потеряется.
+ * The server tracks views per `video_id`, not per `ep_title`, so:
+ *  - mark (`currentlyViewed: false`) - `PUT` on the current dubbing's
+ *    `video_id` (idempotent; duplicate ep_title entries collapse in a Set);
+ *  - unmark (`currentlyViewed: true`) - `DELETE` every `video_id` of the
+ *    episode from the passed `videos` (all dubbings/players), keeping the
+ *    server history in sync with the UI.
  *
- * `currentlyViewed: true` → видео помечено как просмотренное, действие — снять отметку
- * (DELETE). `currentlyViewed: false` → не помечено, действие — отметить (PUT).
+ * `videos` is only used to map `ep_title -> video_id[]` on unmark and is
+ * NOT part of the queryKey (the cache does not depend on the video list).
  *
- * После мутации вызывается `invalidateQueries` с `refetchType: 'none'`:
- * кэш помечается как stale, но refetch не запускается немедленно — это
- * предотвращает «мигание» UI, когда сервер ещё не подтвердил изменение.
- * При следующем обращении к хуку (mount / refetch on focus) данные будут
- * перезапрошены — это даёт eventual consistency без UI-артефактов.
+ * `invalidateQueries` runs with `refetchType: 'none'` after the mutation so
+ * the UI doesn't flicker; the cache refetches on the next mount or focus.
  */
 export function useToggleVideoViewed(
   animeId: number | null | undefined,
   videos?: AnimeVideo[]
 ) {
   const queryClient = useQueryClient();
-  const videosSignature = videos?.map((v) => v.video_id).join(',') ?? '';
-  const key = ['anime', 'video-views', animeId, videosSignature];
+  const key = ['anime', 'video-views', animeId];
 
   return useMutation({
-    mutationFn: async ({ videoId, currentlyViewed }: { videoId: number; currentlyViewed: boolean }) => {
+    mutationFn: async ({ epTitle, videoId, currentlyViewed }: { epTitle: string; videoId: number; currentlyViewed: boolean }) => {
       if (currentlyViewed) {
-        return userListApi.unmarkVideoViewed(videoId);
+        // Unmark every video of the episode: the server tracks views per
+        // video_id while the UI/cache works per ep_title. If all DELETEs
+        // fail, throw so onError rolls back the optimistic update.
+        const ids = videos?.filter((v) => v.number === epTitle).map((v) => v.video_id) ?? [videoId];
+        const results = await Promise.allSettled(ids.map((id) => userListApi.unmarkVideoViewed(id)));
+        if (results.every((r) => r.status === 'rejected')) {
+          throw (results[0] as PromiseRejectedResult).reason;
+        }
+        return;
       }
       return userListApi.markVideoViewed(videoId);
     },
-    onMutate: async ({ videoId, currentlyViewed }) => {
+    onMutate: async ({ epTitle, currentlyViewed }) => {
       if (typeof animeId !== 'number' || animeId <= 0) return { previous: undefined };
       await queryClient.cancelQueries({ queryKey: key });
-      const previous = queryClient.getQueryData<number[]>(key);
-      queryClient.setQueryData<number[]>(key, (old) => {
+      const previous = queryClient.getQueryData<string[]>(key);
+      queryClient.setQueryData<string[]>(key, (old) => {
         const list = old ?? [];
-        if (currentlyViewed) return list.filter((id) => id !== videoId);
-        return list.includes(videoId) ? list : [...list, videoId];
+        if (currentlyViewed) return list.filter((t) => t !== epTitle);
+        return list.includes(epTitle) ? list : [...list, epTitle];
       });
       return { previous };
     },

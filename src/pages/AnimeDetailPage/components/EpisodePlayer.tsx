@@ -8,7 +8,7 @@ import { useT } from '@/i18n';
 interface EpisodePlayerProps {
   video: AnimeVideo;
   title: string;
-  onEpisodeComplete?: (videoId: number) => void;
+  onEpisodeComplete?: (video: AnimeVideo) => void;
 }
 
 export function EpisodePlayer({ video, title, onEpisodeComplete }: EpisodePlayerProps) {

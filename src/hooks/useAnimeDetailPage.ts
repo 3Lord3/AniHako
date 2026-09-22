@@ -12,7 +12,7 @@ import {
 } from './useAnime';
 import { useUser } from './useAuth';
 import { mapStatusToListId } from '@/types';
-import type { AnimeStatus, YummyUserAnimeRate } from '@/types';
+import type { AnimeStatus, AnimeVideo, YummyUserAnimeRate } from '@/types';
 
 export function useAnimeDetailPage(url: string) {
   const navigate = useNavigate();
@@ -26,10 +26,10 @@ export function useAnimeDetailPage(url: string) {
   const { mutate: toggleFavorite } = useToggleFavorite();
   const { mutate: updateListEntry } = useUpdateListEntry();
   const { mutate: removeFromList } = useRemoveFromList();
-  const { data: viewedVideoIds = [] } = useVideoViews(animeId || null, anime?.videos);
+  const { data: viewedEpisodeNumbers = [] } = useVideoViews(animeId || null);
   const { mutate: toggleVideoViewed } = useToggleVideoViewed(animeId || null, anime?.videos);
 
-  const viewedVideoSet = useMemo(() => new Set(viewedVideoIds), [viewedVideoIds]);
+  const viewedEpisodeSet = useMemo(() => new Set(viewedEpisodeNumbers), [viewedEpisodeNumbers]);
 
   // Build a Map for O(1) lookup of the user's rate for this anime, instead
   // of scanning the full user-anime list on every render.
@@ -82,21 +82,27 @@ export function useAnimeDetailPage(url: string) {
   }, [requireAuth, toggleFavorite, animeId, isFavorite]);
 
   const handleToggleWatched = useCallback(
-    (videoId: number, isWatched: boolean) => {
+    (video: AnimeVideo, isWatched: boolean) => {
       requireAuth(() => {
-        toggleVideoViewed({ videoId, currentlyViewed: isWatched }, { onError: () => {} });
+        toggleVideoViewed(
+          { epTitle: video.number, videoId: video.video_id, currentlyViewed: isWatched },
+          { onError: () => {} }
+        );
       });
     },
     [requireAuth, toggleVideoViewed]
   );
 
   const handleEpisodeComplete = useCallback(
-    (videoId: number) => {
+    (video: AnimeVideo) => {
       if (!user) return;
-      if (viewedVideoSet.has(videoId)) return;
-      toggleVideoViewed({ videoId, currentlyViewed: false }, { onError: () => {} });
+      if (viewedEpisodeSet.has(video.number)) return;
+      toggleVideoViewed(
+        { epTitle: video.number, videoId: video.video_id, currentlyViewed: false },
+        { onError: () => {} }
+      );
     },
-    [user, viewedVideoSet, toggleVideoViewed]
+    [user, viewedEpisodeSet, toggleVideoViewed]
   );
 
   const handleBack = useCallback(() => {
@@ -114,7 +120,7 @@ export function useAnimeDetailPage(url: string) {
     isFavorite,
     userListId,
     canMarkWatched,
-    viewedVideoSet,
+    viewedEpisodeSet,
     handleAddToList,
     handleToggleFavorite,
     handleToggleWatched,
