@@ -54,7 +54,7 @@ describe('EpisodeList', () => {
         videos={mockVideos}
         selectedIndex={0}
         onSelect={vi.fn()}
-        viewedVideoIds={new Set([2])}
+        viewedEpisodeNumbers={new Set(['2'])}
         onToggleWatched={vi.fn()}
         canMarkWatched={false}
       />
@@ -62,13 +62,13 @@ describe('EpisodeList', () => {
     expect(screen.queryByRole('checkbox')).not.toBeInTheDocument();
   });
 
-  it('marks episodes in viewedVideoIds as watched checkboxes', () => {
+  it('marks episodes in viewedEpisodeNumbers as watched checkboxes', () => {
     render(
       <EpisodeList
         videos={mockVideos}
         selectedIndex={0}
         onSelect={vi.fn()}
-        viewedVideoIds={new Set([1, 2])}
+        viewedEpisodeNumbers={new Set(['1', '2'])}
         onToggleWatched={vi.fn()}
         canMarkWatched
       />
@@ -78,36 +78,36 @@ describe('EpisodeList', () => {
     expect(screen.getByRole('checkbox', { name: 'Отметить серию 3 как просмотренную' })).toHaveAttribute('aria-checked', 'false');
   });
 
-  it('clicking an unwatched toggle invokes onToggleWatched with videoId and isWatched=false', () => {
+  it('clicking an unwatched toggle invokes onToggleWatched with the video and isWatched=false', () => {
     const onToggleWatched = vi.fn();
     render(
       <EpisodeList
         videos={mockVideos}
         selectedIndex={0}
         onSelect={vi.fn()}
-        viewedVideoIds={new Set([1])}
+        viewedEpisodeNumbers={new Set(['1'])}
         onToggleWatched={onToggleWatched}
         canMarkWatched
       />
     );
     fireEvent.click(screen.getByTestId('episode-watched-toggle-3'));
-    expect(onToggleWatched).toHaveBeenCalledWith(3, false);
+    expect(onToggleWatched).toHaveBeenCalledWith(mockVideos[2], false);
   });
 
-  it('clicking a watched toggle invokes onToggleWatched with videoId and isWatched=true', () => {
+  it('clicking a watched toggle invokes onToggleWatched with the video and isWatched=true', () => {
     const onToggleWatched = vi.fn();
     render(
       <EpisodeList
         videos={mockVideos}
         selectedIndex={0}
         onSelect={vi.fn()}
-        viewedVideoIds={new Set([2])}
+        viewedEpisodeNumbers={new Set(['2'])}
         onToggleWatched={onToggleWatched}
         canMarkWatched
       />
     );
     fireEvent.click(screen.getByTestId('episode-watched-toggle-2'));
-    expect(onToggleWatched).toHaveBeenCalledWith(2, true);
+    expect(onToggleWatched).toHaveBeenCalledWith(mockVideos[1], true);
   });
 
   it('toggle click does not trigger onSelect', () => {
@@ -117,7 +117,7 @@ describe('EpisodeList', () => {
         videos={mockVideos}
         selectedIndex={0}
         onSelect={onSelect}
-        viewedVideoIds={new Set([1])}
+        viewedEpisodeNumbers={new Set(['1'])}
         onToggleWatched={vi.fn()}
         canMarkWatched
       />
@@ -132,7 +132,7 @@ describe('EpisodeList', () => {
         videos={mockVideos}
         selectedIndex={0}
         onSelect={vi.fn()}
-        viewedVideoIds={new Set()}
+        viewedEpisodeNumbers={new Set()}
         onToggleWatched={vi.fn()}
         canMarkWatched
       />
@@ -156,7 +156,7 @@ describe('EpisodeList', () => {
         videos={mockVideos}
         selectedIndex={0}
         onSelect={vi.fn()}
-        viewedVideoIds={new Set([1])}
+        viewedEpisodeNumbers={new Set(['1'])}
         onToggleWatched={vi.fn()}
         canMarkWatched
       />
@@ -175,7 +175,7 @@ describe('EpisodeList', () => {
         videos={mockVideos}
         selectedIndex={0}
         onSelect={vi.fn()}
-        viewedVideoIds={new Set([1])}
+        viewedEpisodeNumbers={new Set(['1'])}
         onToggleWatched={vi.fn()}
         canMarkWatched
       />
@@ -192,7 +192,7 @@ describe('EpisodeList', () => {
         videos={mockVideos}
         selectedIndex={0}
         onSelect={vi.fn()}
-        viewedVideoIds={new Set([2])}
+        viewedEpisodeNumbers={new Set(['2'])}
         onToggleWatched={vi.fn()}
         canMarkWatched
       />
@@ -244,7 +244,7 @@ describe('EpisodeList', () => {
         videos={mockVideos}
         selectedIndex={1}
         onSelect={vi.fn()}
-        viewedVideoIds={new Set([2])}
+        viewedEpisodeNumbers={new Set(['2'])}
         onToggleWatched={vi.fn()}
         canMarkWatched
       />
@@ -260,7 +260,7 @@ describe('EpisodeList', () => {
         videos={mockVideos}
         selectedIndex={1}
         onSelect={vi.fn()}
-        viewedVideoIds={new Set([2])}
+        viewedEpisodeNumbers={new Set(['2'])}
         onToggleWatched={vi.fn()}
         canMarkWatched
       />
@@ -275,7 +275,7 @@ describe('EpisodeList', () => {
         videos={mockVideos}
         selectedIndex={0}
         onSelect={vi.fn()}
-        viewedVideoIds={new Set([1])}
+        viewedEpisodeNumbers={new Set(['1'])}
         onToggleWatched={vi.fn()}
         canMarkWatched
       />
@@ -291,7 +291,7 @@ describe('EpisodeList', () => {
         videos={mockVideos}
         selectedIndex={0}
         onSelect={vi.fn()}
-        viewedVideoIds={new Set()}
+        viewedEpisodeNumbers={new Set()}
         onToggleWatched={vi.fn()}
         canMarkWatched
       />
@@ -308,7 +308,7 @@ describe('EpisodeList', () => {
         videos={mockVideos}
         selectedIndex={0}
         onSelect={vi.fn()}
-        viewedVideoIds={new Set([1])}
+        viewedEpisodeNumbers={new Set(['1'])}
         onToggleWatched={vi.fn()}
         canMarkWatched
       />
@@ -323,7 +323,7 @@ describe('EpisodeList', () => {
         videos={mockVideos}
         selectedIndex={1}
         onSelect={vi.fn()}
-        viewedVideoIds={new Set([2])}
+        viewedEpisodeNumbers={new Set(['2'])}
         onToggleWatched={vi.fn()}
         canMarkWatched
       />
@@ -339,7 +339,7 @@ describe('EpisodeList', () => {
         videos={mockVideos}
         selectedIndex={0}
         onSelect={vi.fn()}
-        viewedVideoIds={new Set()}
+        viewedEpisodeNumbers={new Set()}
         onToggleWatched={vi.fn()}
         canMarkWatched
       />

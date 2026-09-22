@@ -309,7 +309,7 @@ describe('EpisodeViewer', () => {
       <EpisodeViewer
         videos={[anidubVideo, anidubVideo2]}
         title="t"
-        viewedVideoIds={new Set([1])}
+        viewedEpisodeNumbers={new Set(['1'])}
         canMarkWatched
         onToggleWatched={vi.fn()}
       />
@@ -323,7 +323,7 @@ describe('EpisodeViewer', () => {
       <EpisodeViewer
         videos={[anidubVideo, anidubVideo2]}
         title="t"
-        viewedVideoIds={new Set([1])}
+        viewedEpisodeNumbers={new Set(['1'])}
         canMarkWatched={false}
         onToggleWatched={vi.fn()}
       />
@@ -331,19 +331,19 @@ describe('EpisodeViewer', () => {
     expect(screen.queryByTestId('episode-watched-toggle-1')).not.toBeInTheDocument();
   });
 
-  it('forwards onToggleWatched with videoId and isWatched flag', () => {
+  it('forwards onToggleWatched with the video and isWatched flag', () => {
     const onToggleWatched = vi.fn();
     render(
       <EpisodeViewer
         videos={[anidubVideo, anidubVideo2]}
         title="t"
-        viewedVideoIds={new Set([1])}
+        viewedEpisodeNumbers={new Set(['1'])}
         canMarkWatched
         onToggleWatched={onToggleWatched}
       />
     );
     fireEvent.click(screen.getByTestId('episode-watched-toggle-3'));
-    expect(onToggleWatched).toHaveBeenCalledWith(3, false);
+    expect(onToggleWatched).toHaveBeenCalledWith(anidubVideo2, false);
   });
 
   it('forwards onEpisodeComplete with videoId from iframe ended message', () => {
@@ -364,7 +364,7 @@ describe('EpisodeViewer', () => {
         })
       );
     });
-    expect(onEpisodeComplete).toHaveBeenCalledWith(anidubVideo.video_id);
+    expect(onEpisodeComplete).toHaveBeenCalledWith(anidubVideo);
   });
 
   it('auto-advances to the next episode when the current one ends', () => {
@@ -405,7 +405,7 @@ describe('EpisodeViewer', () => {
       );
     });
     expect(onEpisodeComplete).toHaveBeenCalledTimes(1);
-    expect(onEpisodeComplete).toHaveBeenLastCalledWith(anidubVideo.video_id);
+    expect(onEpisodeComplete).toHaveBeenLastCalledWith(anidubVideo);
 
     const secondIframe = screen.getByTitle('t - Серия 2') as HTMLIFrameElement;
     act(() => {
@@ -417,7 +417,7 @@ describe('EpisodeViewer', () => {
       );
     });
     expect(onEpisodeComplete).toHaveBeenCalledTimes(2);
-    expect(onEpisodeComplete).toHaveBeenLastCalledWith(anidubVideo2.video_id);
+    expect(onEpisodeComplete).toHaveBeenLastCalledWith(anidubVideo2);
   });
 
   it('does not advance or re-fire the callback on duplicate ended signals from the same iframe', () => {
@@ -446,7 +446,7 @@ describe('EpisodeViewer', () => {
     dispatchEnded();
 
     expect(onEpisodeComplete).toHaveBeenCalledTimes(1);
-    expect(onEpisodeComplete).toHaveBeenCalledWith(anidubVideo.video_id);
+    expect(onEpisodeComplete).toHaveBeenCalledWith(anidubVideo);
     const nextIframe = screen.getByTitle('t - Серия 2') as HTMLIFrameElement;
     expect(nextIframe.src).toBe('https://player.example.com/embed/3');
   });

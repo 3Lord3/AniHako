@@ -98,7 +98,7 @@ describe('EpisodePlayer', () => {
         source: iframe.contentWindow,
       })
     );
-    expect(onEpisodeComplete).toHaveBeenCalledWith(mockVideo.video_id);
+    expect(onEpisodeComplete).toHaveBeenCalledWith(mockVideo);
   });
 
   it('ignores ended messages that do not originate from the iframe', () => {
