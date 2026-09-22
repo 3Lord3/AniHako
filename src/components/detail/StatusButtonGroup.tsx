@@ -4,6 +4,7 @@ import { Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { STATUS_LABELS, STATUS_ICONS } from '@/types/constants';
 import { mapStatusToListId } from '@/types';
+import { useT, type TranslationKey } from '@/i18n';
 import type { AnimeStatus } from '@/types';
 
 interface StatusButtonGroupProps {
@@ -21,8 +22,9 @@ export function StatusButtonGroup({
   onAddToList,
   disabled,
 }: StatusButtonGroupProps) {
+  const { t } = useT();
   const statusOptions: AnimeStatus[] = ['watching', 'planned', 'completed', 'paused', 'dropped'];
-  const favoriteLabel = isFavorite ? 'В любимом' : 'В любимое';
+  const favoriteLabel = isFavorite ? t('status.inFavorites') : t('status.addToFavorites');
 
   return (
     <div className="flex gap-2 w-full justify-center">
@@ -44,7 +46,7 @@ export function StatusButtonGroup({
       {statusOptions.map((status) => {
         const statusId = mapStatusToListId(status);
         const isActive = userListId === statusId;
-        const label = STATUS_LABELS[status];
+        const label = t(STATUS_LABELS[status] as TranslationKey);
         return (
           <TooltipWrap key={status} content={label}>
             <Button

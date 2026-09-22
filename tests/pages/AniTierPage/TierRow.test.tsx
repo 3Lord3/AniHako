@@ -5,6 +5,9 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { TierRow } from '@/pages/AniTierPage/components/TierRow';
 import type { TierDefinition, TierAnimeItem } from '@/types/tier';
 import { buildMoveTargets } from '@/lib/tierMoveTargets';
+import i18n from '@/i18n';
+
+const t = i18n.t.bind(i18n);
 
 const tier: TierDefinition = { id: 'tier-s', label: 'S', color: 'rose' };
 const items: Record<number, TierAnimeItem> = {
@@ -23,7 +26,7 @@ function renderRow(overrides: Partial<React.ComponentProps<typeof TierRow>> = {}
           tier={tier}
           animeIds={[1, 2]}
           items={items}
-          moveTargets={buildMoveTargets([tier])}
+          moveTargets={buildMoveTargets([tier], t)}
           {...handlers}
           {...overrides}
         />

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n';
 
 export interface DropdownOption {
   value: string;
@@ -21,11 +22,12 @@ export function Dropdown({
   options,
   value,
   onChange,
-  placeholder = 'Выберите...',
+  placeholder,
   className,
   triggerClassName,
   contentClassName,
 }: DropdownProps) {
+  const { t } = useT();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -65,7 +67,7 @@ export function Dropdown({
           triggerClassName
         )}
       >
-        <span className="truncate">{selected?.label ?? placeholder}</span>
+        <span className="truncate">{selected?.label ?? placeholder ?? t('dropdown.placeholder')}</span>
         <ChevronDown
           className={cn(
             'size-4 shrink-0 text-muted-foreground transition-transform',

@@ -1,5 +1,6 @@
 import { Users, UserCheck, ArrowDownLeft, ArrowUpRight, Inbox, Send, type LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useT, type TranslationKey } from '@/i18n';
 import { FRIEND_STATUSES, FRIEND_STATUS_LABELS } from '@/types/friend';
 import type { FriendStatus } from '@/types/friend';
 
@@ -8,7 +9,7 @@ export type FriendsTab = 'all' | FriendStatus;
 const TABS: FriendsTab[] = ['all', ...FRIEND_STATUSES];
 
 const TAB_LABELS: Record<FriendsTab, string> = {
-  all: 'Все',
+  all: 'friends.tabs.all',
   ...FRIEND_STATUS_LABELS,
 };
 
@@ -28,9 +29,10 @@ interface FriendsSidebarProps {
 
 // На мобильных вертикальная панель не помещается — там это горизонтальная прокрутка.
 export function FriendsSidebar({ active, onChange }: FriendsSidebarProps) {
+  const { t } = useT();
   return (
     <nav
-      aria-label="Категории друзей"
+      aria-label={t('friends.categoriesAria')}
       className="flex gap-1 overflow-x-auto pb-1 md:flex-col md:overflow-visible md:pb-0"
     >
       {TABS.map((tab) => {
@@ -48,7 +50,7 @@ export function FriendsSidebar({ active, onChange }: FriendsSidebarProps) {
             )}
           >
             <Icon className="h-4 w-4 shrink-0" />
-            {TAB_LABELS[tab]}
+            {t(TAB_LABELS[tab] as TranslationKey)}
           </button>
         );
       })}

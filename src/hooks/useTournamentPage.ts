@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useUserAnimeList } from './useAnime';
 import { useTournament, getRoundName, type Pair } from './useTournament';
 import { toTournamentParticipant } from '@/lib/tournamentMapper';
 import type { YummyUserAnimeRate } from '@/types';
 
 export function useTournamentPage() {
+  const { t } = useTranslation();
   const [isStarted, setIsStarted] = useState(false);
   const [activePair, setActivePair] = useState<Pair | null>(null);
   const [pairQueue, setPairQueue] = useState<Pair[]>([]);
@@ -120,6 +122,7 @@ export function useTournamentPage() {
 
   const currentRoundName = tournament
     ? getRoundName(
+        t,
         tournament.currentBracket,
         tournament.currentRoundInBracket,
         tournament.meta.winnersRounds,

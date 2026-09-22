@@ -6,7 +6,7 @@ import { BottomNavItem } from '@/components/Layout/BottomNavItem';
 
 const baseItem = {
   to: '/catalog',
-  label: 'Каталог',
+  labelKey: 'nav.catalog',
   icon: Home,
 };
 

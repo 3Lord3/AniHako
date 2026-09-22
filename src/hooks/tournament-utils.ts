@@ -1,5 +1,7 @@
 import type { TournamentParticipant, Pair, Round, BracketType } from './tournament-types';
 import type { AnimeCatalogItem } from '@/types';
+import i18n from '@/i18n';
+import type { Translator } from '@/i18n';
 
 export function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
@@ -202,7 +204,7 @@ export function buildTournamentRounds(animeList: AnimeCatalogItem[]): BuiltRound
         bracket: 'final',
         roundInBracket: 0,
         pairIndex: 0,
-        participants: [placeholder('final', 0, 0, 'Победитель сетки победителей'), placeholder('final', 0, 1, 'Победитель сетки проигравших')],
+        participants: [placeholder('final', 0, 0, i18n.t('tournament.wbWinnerTitle')), placeholder('final', 0, 1, i18n.t('tournament.lbWinnerTitle'))],
         winner: null,
         status: 'pending',
       },
@@ -214,24 +216,25 @@ export function buildTournamentRounds(animeList: AnimeCatalogItem[]): BuiltRound
 }
 
 export function getRoundName(
+  t: Translator,
   bracket: BracketType,
   roundInBracket: number,
   totalWbRounds: number,
   totalLbRounds: number
 ): string {
-  if (bracket === 'final') return 'Гранд-финал';
+  if (bracket === 'final') return t('tournament.grandFinal');
 
   if (bracket === 'winners') {
     const display = roundInBracket + 1;
     const fromTop = totalWbRounds - display;
-    if (fromTop === 0) return 'Финал';
-    if (fromTop === 1) return 'Полуфинал';
-    if (fromTop === 2) return 'Четвертьфинал';
-    if (fromTop === 3) return '1/8 финала';
-    return `${display} раунд`;
+    if (fromTop === 0) return t('tournament.final');
+    if (fromTop === 1) return t('tournament.semifinal');
+    if (fromTop === 2) return t('tournament.quarterfinal');
+    if (fromTop === 3) return t('tournament.eighthFinal');
+    return t('tournament.round', { count: display });
   }
 
   const display = roundInBracket + 1;
-  if (roundInBracket === totalLbRounds - 1) return 'Финал';
-  return `${display} раунд`;
+  if (roundInBracket === totalLbRounds - 1) return t('tournament.final');
+  return t('tournament.round', { count: display });
 }

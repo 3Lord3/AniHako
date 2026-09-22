@@ -2,6 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Star, Calendar, Clock, Film, Building2, Tag } from 'lucide-react';
 import { KIND_LABELS } from '@/types/constants';
 import { SEASONS, type Season } from '@/lib/seasons';
+import { useT, type TranslationKey } from '@/i18n';
 import type { AnimeDetailResponse } from '@/types';
 
 interface CharacteristicItemProps {
@@ -31,12 +32,13 @@ interface AnimeCharacteristicsProps {
   className?: string;
 }
 
-function getSeasonLabel(season: Season | undefined): string | null {
+function getSeasonLabel(season: Season | undefined, t: (key: TranslationKey) => string): string | null {
   if (!season) return null;
-  return SEASONS[season].label;
+  return t(SEASONS[season].labelKey as TranslationKey);
 }
 
 export function AnimeCharacteristics({ anime, className }: AnimeCharacteristicsProps) {
+  const { t } = useT();
   const year = anime.year;
   const season = anime.season as Season | undefined;
   const genres = anime.genres?.map(g => g.title) || [];
@@ -55,13 +57,13 @@ export function AnimeCharacteristics({ anime, className }: AnimeCharacteristicsP
   const typeName = anime.type?.name;
   const typeShortname = anime.type?.shortname;
   const kindLabel = typeShortname && KIND_LABELS[typeShortname]
-    ? KIND_LABELS[typeShortname]
+    ? t(KIND_LABELS[typeShortname] as TranslationKey)
     : typeName;
 
   return (
     <div className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-1 ${className || ''}`}>
       <CharacteristicItem
-        label="Рейтинг"
+        label={t('characteristics.rating')}
         icon={<Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />}
         value={
           rating && !isNaN(rating) ? (
@@ -70,17 +72,17 @@ export function AnimeCharacteristics({ anime, className }: AnimeCharacteristicsP
         }
       />
       <CharacteristicItem
-        label="Год"
+        label={t('characteristics.year')}
         icon={<Calendar className="w-3.5 h-3.5" />}
         value={year ? <span className="text-foreground">{year}</span> : null}
       />
       <CharacteristicItem
-        label="Сезон"
+        label={t('characteristics.season')}
         icon={<Calendar className="w-3.5 h-3.5" />}
-        value={season ? <span className="text-foreground">{getSeasonLabel(season)}</span> : null}
+        value={season ? <span className="text-foreground">{getSeasonLabel(season, t)}</span> : null}
       />
       <CharacteristicItem
-        label="Тип"
+        label={t('characteristics.type')}
         value={
           kindLabel ? (
             <Badge variant="secondary">
@@ -90,43 +92,43 @@ export function AnimeCharacteristics({ anime, className }: AnimeCharacteristicsP
         }
       />
       <CharacteristicItem
-        label="Статус"
+        label={t('characteristics.status')}
         value={
           statusTitle ? (
             <Badge variant={status === 'ongoing' ? 'default' : 'secondary'}>
-              {status === 'ongoing' ? 'Онгоинг' : statusTitle === 'released' ? 'Вышло' : statusTitle}
+              {status === 'ongoing' ? t('characteristics.ongoing') : statusTitle === 'released' ? t('characteristics.released') : statusTitle}
             </Badge>
           ) : null
         }
       />
       <CharacteristicItem
-        label="Эпизоды"
+        label={t('characteristics.episodes')}
         icon={<Film className="w-3.5 h-3.5" />}
         value={
           episodesCount !== undefined && episodesCount > 0 ? (
             <span className="text-foreground">
-              {episodesCount} эп.
-              {episodesAired && episodesAired > 0 && episodesAired !== episodesCount && ` (вышло ${episodesAired})`}
+              {t('matcher.episodes', { count: episodesCount })}
+              {episodesAired && episodesAired > 0 && episodesAired !== episodesCount && t('characteristics.episodesAired', { count: episodesAired })}
             </span>
           ) : episodesAired ? (
-            <span className="text-foreground">{episodesAired} эп.</span>
+            <span className="text-foreground">{t('matcher.episodes', { count: episodesAired })}</span>
           ) : null
         }
       />
       <CharacteristicItem
-        label="Длительность"
+        label={t('characteristics.duration')}
         icon={<Clock className="w-3.5 h-3.5" />}
-        value={duration && duration > 0 ? <span className="text-foreground">{Math.floor(duration / 60)} мин.</span> : null}
+        value={duration && duration > 0 ? <span className="text-foreground">{t('characteristics.minutes', { count: Math.floor(duration / 60) })}</span> : null}
       />
       {studios.length > 0 && (
         <CharacteristicItem
-          label="Студия"
+          label={t('characteristics.studio')}
           icon={<Building2 className="w-3.5 h-3.5" />}
           value={<span className="text-foreground">{studios.join(', ')}</span>}
         />
       )}
       <CharacteristicItem
-        label="Жанры"
+        label={t('characteristics.genres')}
         icon={<Tag className="w-3.5 h-3.5" />}
         value={
           genres.length > 0 ? (

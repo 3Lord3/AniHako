@@ -4,6 +4,7 @@ import { Layout } from '@/components/Layout';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { SuspenseFallback } from '@/components/SuspenseFallback';
 import { useUser } from '@/hooks';
+import { useT } from '@/i18n';
 
 // Lazy load pages for code splitting
 const LoginPage = lazy(() => import('@/pages/LoginPage').then(m => ({ default: m.LoginPage })));
@@ -21,9 +22,10 @@ const NotFoundPage = lazy(() => import('@/pages/NotFoundPage').then(m => ({ defa
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { data: user, isLoading } = useUser();
+  const { t } = useT();
 
   if (isLoading) {
-    return <SuspenseFallback message="Проверка авторизации..." />;
+    return <SuspenseFallback message={t('suspense.authCheck')} />;
   }
 
   if (!user) {

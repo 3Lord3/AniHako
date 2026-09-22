@@ -1,3 +1,5 @@
+import type { Translator } from '@/i18n';
+
 export interface RegisterFormValues {
   password: string;
   confirmPassword: string;
@@ -6,21 +8,21 @@ export interface RegisterFormValues {
   acceptPrivacy: boolean;
 }
 
-export function validateRegisterForm(values: RegisterFormValues): string {
+export function validateRegisterForm(values: RegisterFormValues, t: Translator): string {
   if (values.password !== values.confirmPassword) {
-    return 'Пароли не совпадают';
+    return t('validation.passwordsMismatch');
   }
 
   if (values.password.length < 6) {
-    return 'Пароль должен быть не менее 6 символов';
+    return t('validation.passwordTooShort');
   }
 
   if (values.username.length < 3) {
-    return 'Имя пользователя должно быть не менее 3 символов';
+    return t('validation.usernameTooShort');
   }
 
   if (!values.acceptRules || !values.acceptPrivacy) {
-    return 'Необходимо принять правила сайта и политику конфиденциальности';
+    return t('validation.mustAccept');
   }
 
   return '';

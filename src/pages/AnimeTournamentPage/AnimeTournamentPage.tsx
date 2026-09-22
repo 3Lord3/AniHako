@@ -7,8 +7,10 @@ import { SuspenseFallback } from '@/components/SuspenseFallback';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import { Swords, Target, Play, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useT } from '@/i18n';
 
 export function AnimeTournamentPage() {
+  const { t } = useT();
   const {
     isLoading,
     isStarted,
@@ -33,7 +35,7 @@ export function AnimeTournamentPage() {
   } = useTournamentPage();
 
   if (isLoading) {
-    return <SuspenseFallback message="Загрузка списка аниме..." />;
+    return <SuspenseFallback message={t('suspense.animeList')} />;
   }
 
   if (!isStarted) {
@@ -42,10 +44,10 @@ export function AnimeTournamentPage() {
         <button
           onClick={handleIntroBack}
           className="absolute left-2 top-2 sm:left-4 sm:top-4 z-10 flex items-center gap-1 sm:gap-2 text-muted-foreground hover:text-foreground transition-colors text-xs sm:text-sm"
-          aria-label="На главную"
+          aria-label={t('tournament.backAria')}
         >
           <ArrowLeft className="w-4 h-4" />
-          <span className="hidden sm:inline">Назад</span>
+          <span className="hidden sm:inline">{t('common.back')}</span>
         </button>
         <TournamentIntro
           completedAnime={completedAnime}
@@ -60,8 +62,8 @@ export function AnimeTournamentPage() {
     return (
       <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-8">
         <div className="text-center mb-6 sm:mb-8">
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 text-foreground">🏆 Турнир завершён!</h1>
-          <p className="text-xs sm:text-sm text-muted-foreground">Поздравляем с определением победителя</p>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 text-foreground">{t('tournament.completedTitle')}</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground">{t('tournament.completedSubtitle')}</p>
         </div>
         <TournamentResults
           participants={results}
@@ -101,10 +103,10 @@ export function AnimeTournamentPage() {
       <button
         onClick={() => setShowExitDialog(true)}
         className="absolute left-2 top-2 sm:left-4 sm:top-4 z-10 flex items-center gap-1 sm:gap-2 text-muted-foreground hover:text-foreground transition-colors text-xs sm:text-sm"
-        aria-label="Выйти из турнира"
+        aria-label={t('tournament.exitAria')}
       >
         <ArrowLeft className="w-4 h-4" />
-        <span className="hidden sm:inline">Назад</span>
+        <span className="hidden sm:inline">{t('common.back')}</span>
       </button>
 
       <div className="text-center mb-6 sm:mb-8">
@@ -118,7 +120,7 @@ export function AnimeTournamentPage() {
             <span className="font-semibold">{currentRoundName}</span>
           </span>
           <span>•</span>
-          <span>{tournament.allParticipants.length} участников</span>
+          <span>{t('tournament.participantsCount', { count: tournament.allParticipants.length })}</span>
         </div>
       </div>
 
@@ -139,7 +141,7 @@ export function AnimeTournamentPage() {
             className="gap-2 text-base sm:text-lg px-6 py-4 sm:px-8 sm:py-6 bg-gradient-to-r from-primary to-yellow-500 hover:from-primary/90 hover:to-yellow-500/90 text-white font-semibold"
           >
             <Play className="w-4 h-4 sm:w-5 sm:h-5" />
-            Начать {currentRoundName.toLowerCase()}
+            {t('tournament.startRound', { name: currentRoundName.toLowerCase() })}
           </Button>
         </div>
       )}
@@ -148,10 +150,10 @@ export function AnimeTournamentPage() {
         open={showExitDialog}
         onOpenChange={setShowExitDialog}
         onConfirm={handleExitConfirm}
-        title="Выйти из турнира?"
-        description="Прогресс текущего турнира будет потерян."
-        confirmText="Выйти"
-        cancelText="Продолжить"
+        title={t('tournament.exitDialogTitle')}
+        description={t('tournament.exitDialogDesc')}
+        confirmText={t('tournament.exitConfirm')}
+        cancelText={t('tournament.exitCancel')}
       />
     </div>
   );

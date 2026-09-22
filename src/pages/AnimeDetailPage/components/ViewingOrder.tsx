@@ -9,6 +9,7 @@ import { buildAnimeUrl } from '@/lib/animeUrl';
 import { KIND_LABELS, STATUS_LABELS, STATUS_COLORS, STATUS_ICONS, getRatingColor } from '@/types/constants';
 import { mapListIdToStatus } from '@/types';
 import { isRateFavorite } from '@/lib/listRate';
+import { useT, type TranslationKey } from '@/i18n';
 import type { AnimeStatus, AnimeViewingOrder } from '@/types';
 
 interface ViewingOrderProps {
@@ -38,9 +39,9 @@ function getValidYear(item: AnimeViewingOrder): number | null {
   return y;
 }
 
-function getKindLabel(item: AnimeViewingOrder): string {
+function getKindLabel(item: AnimeViewingOrder, t: (key: TranslationKey, opts?: Record<string, unknown>) => string): string {
   const shortname = item.type?.shortname;
-  if (shortname && KIND_LABELS[shortname]) return KIND_LABELS[shortname];
+  if (shortname && KIND_LABELS[shortname]) return t(KIND_LABELS[shortname] as TranslationKey);
   const name = item.type?.name?.trim();
   if (!name || name.toLowerCase() === 'неизвестно') return '';
   return name;
@@ -50,14 +51,6 @@ function getValidTitle(item: AnimeViewingOrder): string {
   const title = item.title?.trim();
   if (!title || title.toLowerCase() === 'неизвестно') return '';
   return title;
-}
-
-function pluralizeTitles(n: number): string {
-  const mod10 = n % 10;
-  const mod100 = n % 100;
-  if (mod10 === 1 && mod100 !== 11) return `${n} тайтл`;
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return `${n} тайтла`;
-  return `${n} тайтлов`;
 }
 
 function buildOrderItems(items: AnimeViewingOrder[], currentAnimeId: number): OrderItem[] {
@@ -70,8 +63,9 @@ function buildOrderItems(items: AnimeViewingOrder[], currentAnimeId: number): Or
 }
 
 function StatusBadge({ status }: { status: AnimeStatus }) {
+  const { t } = useT();
   const color = STATUS_COLORS[status];
-  const label = STATUS_LABELS[status];
+  const label = t(STATUS_LABELS[status] as TranslationKey);
   if (!color || !label) return null;
   const isFav = status === 'favourite';
   return (
@@ -102,11 +96,12 @@ function UserStatusBadges({ item }: { item: AnimeViewingOrder }) {
 }
 
 function OrderRow({ order }: { order: OrderItem }) {
+  const { t } = useT();
   const { item, isCurrent, index } = order;
   const url = buildAnimeUrl(item);
   const rating = getValidRating(item);
   const year = getValidYear(item);
-  const kindLabel = getKindLabel(item);
+  const kindLabel = getKindLabel(item, t);
   const relation = item.data?.text?.trim() || null;
   const announcement = isAnnouncement(item);
   const title = getValidTitle(item);
@@ -123,7 +118,7 @@ function OrderRow({ order }: { order: OrderItem }) {
       <div className="relative w-16 sm:w-20 aspect-[3/4] rounded-md overflow-hidden bg-muted shrink-0">
         <img
           src={getImageUrl(getPosterUrl({ poster: item.poster }, 'medium'))}
-          alt={title || 'Аниме'}
+          alt={title || t('viewingOrder.animeAlt')}
           className="object-cover w-full h-full"
           loading="lazy"
         />
@@ -142,7 +137,7 @@ function OrderRow({ order }: { order: OrderItem }) {
             </Badge>
           )}
           {rating !== null && (
-            <TooltipWrap content={`Оценка: ${rating.toFixed(1)}`}>
+            <TooltipWrap content={t('viewingOrder.rating', { rating: rating.toFixed(1) })}>
               <Badge
                 variant="default"
                 className={cn(
@@ -157,7 +152,7 @@ function OrderRow({ order }: { order: OrderItem }) {
           )}
           {announcement && (
             <Badge variant="outline" className="hidden sm:inline-flex text-[10px]">
-              Анонс
+              {t('viewingOrder.announcement')}
             </Badge>
           )}
           <UserStatusBadges item={item} />
@@ -194,6 +189,7 @@ function OrderRow({ order }: { order: OrderItem }) {
 }
 
 export function ViewingOrder({ items, currentAnimeId }: ViewingOrderProps) {
+  const { t } = useT();
   if (!items || items.length === 0) return null;
 
   const ordered = buildOrderItems(items, currentAnimeId);
@@ -202,9 +198,9 @@ export function ViewingOrder({ items, currentAnimeId }: ViewingOrderProps) {
     <Card>
       <CardHeader>
         <div className="flex items-baseline justify-between gap-2 flex-wrap">
-          <CardTitle className="select-text">Порядок просмотра</CardTitle>
+          <CardTitle className="select-text">{t('viewingOrder.title')}</CardTitle>
           <span className="text-xs text-muted-foreground select-text">
-            Всего {pluralizeTitles(ordered.length)}
+            {t('viewingOrder.total', { count: ordered.length })}
           </span>
         </div>
       </CardHeader>

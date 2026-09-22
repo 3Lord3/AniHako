@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Star } from 'lucide-react';
 import { ALL_YEARS_RANGE, RATING_OPTIONS } from '@/lib/constants';
+import { useT } from '@/i18n';
 
 interface FilterDialogProps {
   open: boolean;
@@ -30,6 +31,7 @@ export function FilterDialogContent({
   onClearFilters,
 }: FilterDialogProps) {
   const [genreSearchInput, setGenreSearchInput] = useState('');
+  const { t } = useT();
 
   const filteredGenres = useMemo(() => {
     if (!genresData?.genres) return [];
@@ -45,13 +47,13 @@ export function FilterDialogContent({
   };
 
   const yearError = fromYear && toYear && parseInt(fromYear) > parseInt(toYear)
-    ? 'Год "От" должен быть меньше чем "До"'
+    ? t('search.yearsError')
     : null;
 
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h4 className="font-medium text-sm text-foreground">Минимальный рейтинг</h4>
+        <h4 className="font-medium text-sm text-foreground">{t('search.minRating')}</h4>
         <div className="flex flex-wrap gap-2">
           {RATING_OPTIONS.map((r) => (
             <Badge
@@ -68,14 +70,14 @@ export function FilterDialogContent({
       </div>
 
       <div className="space-y-2">
-        <h4 className="font-medium text-sm text-foreground">Год выпуска</h4>
+        <h4 className="font-medium text-sm text-foreground">{t('search.yearRelease')}</h4>
         <div className="flex items-center gap-2 flex-wrap">
           <select
             className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
             value={fromYear}
             onChange={(e) => handleYearChange('from', e.target.value)}
           >
-            <option value="">От года</option>
+            <option value="">{t('search.fromYear')}</option>
             {ALL_YEARS_RANGE.map((y) => (
               <option key={y} value={y}>{y}</option>
             ))}
@@ -86,7 +88,7 @@ export function FilterDialogContent({
             value={toYear}
             onChange={(e) => handleYearChange('to', e.target.value)}
           >
-            <option value="">До года</option>
+            <option value="">{t('search.toYear')}</option>
             {ALL_YEARS_RANGE.map((y) => (
               <option key={y} value={y}>{y}</option>
             ))}
@@ -98,9 +100,9 @@ export function FilterDialogContent({
       </div>
 
       <div className="space-y-2">
-        <h4 className="font-medium text-sm text-foreground">Жанры</h4>
+        <h4 className="font-medium text-sm text-foreground">{t('search.genres')}</h4>
         <Input
-          placeholder="Поиск жанров..."
+          placeholder={t('search.genreSearch')}
           value={genreSearchInput}
           onChange={(e) => setGenreSearchInput(e.target.value)}
           className="mb-2"
@@ -126,7 +128,7 @@ export function FilterDialogContent({
           className="cursor-pointer"
           onClick={onClearFilters}
         >
-          Очистить
+          {t('common.clear')}
         </Button>
         <Button
           size="sm"
@@ -134,7 +136,7 @@ export function FilterDialogContent({
           onClick={() => onOpenChange(false)}
           disabled={!!yearError}
         >
-          Применить
+          {t('common.apply')}
         </Button>
       </div>
     </div>

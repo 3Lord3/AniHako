@@ -3,6 +3,7 @@ import { UNRANKED_TIER_ID } from '@/types/tier';
 import type { TierAnimeItem } from '@/types/tier';
 import { TierCardGrid } from './TierCardGrid';
 import type { MoveTarget } from '@/lib/tierMoveTargets';
+import { useT } from '@/i18n';
 
 interface UnrankedPoolProps {
   animeIds: number[];
@@ -12,6 +13,7 @@ interface UnrankedPoolProps {
 }
 
 export function UnrankedPool({ animeIds, items, moveTargets, onMoveAnimeToTier }: UnrankedPoolProps) {
+  const { t } = useT();
   // Droppable spans the whole block (label + cards), not just the card grid.
   const { setNodeRef } = useDroppable({
     id: UNRANKED_TIER_ID,
@@ -21,7 +23,7 @@ export function UnrankedPool({ animeIds, items, moveTargets, onMoveAnimeToTier }
   return (
     <div ref={setNodeRef} className="flex flex-col overflow-hidden rounded-lg border border-dashed border-border">
       <div className="flex w-full shrink-0 items-center justify-center p-2 text-center text-xs font-medium text-muted-foreground sm:text-sm">
-        Не оценено
+        {t('tier.unranked')}
       </div>
       <TierCardGrid
         tierId={UNRANKED_TIER_ID}
@@ -30,7 +32,7 @@ export function UnrankedPool({ animeIds, items, moveTargets, onMoveAnimeToTier }
         moveTargets={moveTargets}
         scrollable={false}
         cardSize="large"
-        emptyMessage="Нет аниме — добавьте через поиск"
+        emptyMessage={t('tier.noAnime')}
         onMoveAnimeToTier={onMoveAnimeToTier}
       />
     </div>

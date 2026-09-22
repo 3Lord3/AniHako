@@ -1,9 +1,9 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAddFriend, useRemoveFriend } from './useFriends';
 
-const MUTATION_ERROR_MESSAGE = 'Не удалось выполнить действие. Попробуйте ещё раз.';
-
 export function useFriendActions(userId: number | undefined) {
+  const { t } = useTranslation();
   const { mutate: addFriendMutate } = useAddFriend(userId);
   const { mutate: removeFriendMutate } = useRemoveFriend(userId);
   const [pendingFriendIds, setPendingFriendIds] = useState<Set<number>>(new Set());
@@ -14,7 +14,7 @@ export function useFriendActions(userId: number | undefined) {
     setPendingFriendIds((prev) => new Set(prev).add(friendId));
     mutate(friendId, {
       onSuccess: () => onSuccess?.(),
-      onError: () => setError(MUTATION_ERROR_MESSAGE),
+      onError: () => setError(t('friends.mutationError')),
       onSettled: () => {
         setPendingFriendIds((prev) => {
           const next = new Set(prev);

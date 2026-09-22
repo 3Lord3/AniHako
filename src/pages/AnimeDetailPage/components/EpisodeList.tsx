@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, type KeyboardEvent as ReactKeyboardEven
 import { Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n';
 import type { AnimeVideo } from '@/types';
 
 interface EpisodeListProps {
@@ -21,6 +22,7 @@ export function EpisodeList({
   onToggleWatched,
   canMarkWatched = false,
 }: EpisodeListProps) {
+  const { t } = useT();
   const buttonRefs = useRef<Array<HTMLButtonElement | null>>([]);
 
   const setButtonRef = useCallback(
@@ -72,7 +74,7 @@ export function EpisodeList({
     <div
       className="flex gap-1.5 overflow-x-auto pt-2.5 pb-2 -mx-1 px-1 scrollbar-thin"
       role="tablist"
-      aria-label="Список серий"
+      aria-label={t('episodes.listAria')}
       onKeyDown={handleTablistKeyDown}
     >
       {videos.map((video, idx) => {
@@ -97,8 +99,8 @@ export function EpisodeList({
                 aria-checked={isWatched}
                 aria-label={
                   isWatched
-                    ? `Снять отметку с серии ${label}`
-                    : `Отметить серию ${label} как просмотренную`
+                    ? t('episodes.unmark', { label })
+                    : t('episodes.markWatched', { label })
                 }
                 onClick={handleToggle}
                 className={cn(
@@ -153,7 +155,7 @@ export function EpisodeList({
                 isActive && !isWatched && 'font-semibold',
                 isWatched && !isActive && 'opacity-70'
               )}
-              aria-label={`Серия ${label}${isWatched ? ', просмотрена' : ''}`}
+              aria-label={t('episodes.seriesAria', { label, watched: isWatched ? t('episodes.watchedSuffix') : '' })}
             >
               {label}
             </Button>

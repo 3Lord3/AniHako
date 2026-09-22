@@ -9,6 +9,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { useT } from '@/i18n';
 
 interface ConfirmationDialogProps {
   open: boolean;
@@ -25,25 +26,32 @@ export function ConfirmationDialog({
   open,
   onOpenChange,
   onConfirm,
-  title = 'Подтверждение',
-  description = 'Вы уверены?',
-  confirmText = 'Подтвердить',
-  cancelText = 'Отмена',
+  title,
+  description,
+  confirmText,
+  cancelText,
   confirmVariant = 'default',
 }: ConfirmationDialogProps) {
+  const { t } = useT();
+  const resolved = {
+    title: title ?? t('confirm.title'),
+    description: description ?? t('confirm.description'),
+    confirmText: confirmText ?? t('common.confirm'),
+    cancelText: cancelText ?? t('common.cancel'),
+  };
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <AlertTriangle className="w-5 h-5 text-yellow-500" />
-            {title}
+            {resolved.title}
           </DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
+          <DialogDescription>{resolved.description}</DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
-            {cancelText}
+            {resolved.cancelText}
           </Button>
           <Button
             variant={confirmVariant}
@@ -52,7 +60,7 @@ export function ConfirmationDialog({
               onConfirm();
             }}
           >
-            {confirmText}
+            {resolved.confirmText}
           </Button>
         </DialogFooter>
       </DialogContent>

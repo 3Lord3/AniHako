@@ -1,15 +1,16 @@
 import { useFriends, useFriendsByCategory } from '@/hooks';
 import { FriendsList } from './FriendsList';
 import { FRIENDS_LIST_MAX_LIMIT } from '@/types/friend';
+import { useT, type TranslationKey } from '@/i18n';
 import type { FriendStatus } from '@/types/friend';
 
 const EMPTY_MESSAGES: Record<'all' | FriendStatus, string> = {
-  all: 'Пока никого нет — найдите друзей по ID',
-  friends: 'У вас пока нет друзей',
-  followers: 'На вас пока никто не подписан',
-  following: 'Вы пока ни на кого не подписаны',
-  requests: 'Нет входящих заявок в друзья',
-  'sent-requests': 'Нет исходящих заявок',
+  all: 'friends.empty.all',
+  friends: 'friends.empty.friends',
+  followers: 'friends.empty.followers',
+  following: 'friends.empty.following',
+  requests: 'friends.empty.requests',
+  'sent-requests': 'friends.empty.sentRequests',
 };
 
 interface FriendsTabPanelProps {
@@ -34,6 +35,7 @@ export function FriendsTabPanel({
   onRemove,
   pendingFriendIds,
 }: FriendsTabPanelProps) {
+  const { t } = useT();
   const allQuery = useFriends(
     userId,
     { limit: FRIENDS_LIST_MAX_LIMIT, offset: 0 },
@@ -50,7 +52,7 @@ export function FriendsTabPanel({
       friends={query.data}
       isLoading={query.isLoading}
       isError={query.isError}
-      emptyMessage={EMPTY_MESSAGES[category ?? 'all']}
+      emptyMessage={t(EMPTY_MESSAGES[category ?? 'all'] as TranslationKey)}
       onAdd={onAdd}
       onRemove={onRemove}
       pendingFriendIds={pendingFriendIds}

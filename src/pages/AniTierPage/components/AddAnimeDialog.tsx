@@ -4,6 +4,7 @@ import { Command, CommandInput, CommandList, CommandEmpty, CommandItem } from '@
 import { useAnimeSearchQuery } from '@/hooks';
 import { toTierAnimeItem } from '@/lib/tierAnimeMapper';
 import { getPosterUrl } from '@/lib/imageUrl';
+import { useT } from '@/i18n';
 import type { AnimeCatalogItem } from '@/types/anime';
 import type { TierAnimeItem } from '@/types/tier';
 
@@ -17,6 +18,7 @@ interface AddAnimeDialogProps {
 const MIN_QUERY_LENGTH = 2;
 
 export function AddAnimeDialog({ open, onOpenChange, existingAnimeIds, onSelect }: AddAnimeDialogProps) {
+  const { t } = useT();
   const [query, setQuery] = useState('');
   const { results, isLoading, isQueryLongEnough } = useAnimeSearchQuery(query, {
     minLength: MIN_QUERY_LENGTH,
@@ -35,15 +37,15 @@ export function AddAnimeDialog({ open, onOpenChange, existingAnimeIds, onSelect 
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md p-0">
         <DialogHeader className="sr-only">
-          <DialogTitle>Добавить аниме в тир-лист</DialogTitle>
+          <DialogTitle>{t('tier.addDialogTitle')}</DialogTitle>
         </DialogHeader>
         <Command shouldFilter={false}>
-          <CommandInput placeholder="Название аниме..." value={query} onValueChange={setQuery} />
+          <CommandInput placeholder={t('tier.searchPlaceholder')} value={query} onValueChange={setQuery} />
           <CommandList>
-            {!isQueryLongEnough && <CommandEmpty>Введите минимум {MIN_QUERY_LENGTH} символа</CommandEmpty>}
-            {isQueryLongEnough && isLoading && <CommandEmpty>Поиск...</CommandEmpty>}
+            {!isQueryLongEnough && <CommandEmpty>{t('tier.minChars', { count: MIN_QUERY_LENGTH })}</CommandEmpty>}
+            {isQueryLongEnough && isLoading && <CommandEmpty>{t('tier.searching')}</CommandEmpty>}
             {isQueryLongEnough && !isLoading && results.length === 0 && (
-              <CommandEmpty>Ничего не найдено</CommandEmpty>
+              <CommandEmpty>{t('tier.nothingFound')}</CommandEmpty>
             )}
             {results.map((anime) => (
               <CommandItem

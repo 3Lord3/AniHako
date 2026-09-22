@@ -40,13 +40,13 @@ describe('constants', () => {
   });
 
   describe('STATUS_LABELS', () => {
-    it('has correct labels for all status types', () => {
-      expect(STATUS_LABELS.watching).toBe('Смотрю');
-      expect(STATUS_LABELS.completed).toBe('Просмотрено');
-      expect(STATUS_LABELS.dropped).toBe('Брошено');
-      expect(STATUS_LABELS.planned).toBe('В планах');
-      expect(STATUS_LABELS.paused).toBe('Отложено');
-      expect(STATUS_LABELS.favourite).toBe('Любимое');
+    it('has correct translation keys for all status types', () => {
+      expect(STATUS_LABELS.watching).toBe('status.watching');
+      expect(STATUS_LABELS.completed).toBe('status.completed');
+      expect(STATUS_LABELS.dropped).toBe('status.dropped');
+      expect(STATUS_LABELS.planned).toBe('status.planned');
+      expect(STATUS_LABELS.paused).toBe('status.paused');
+      expect(STATUS_LABELS.favourite).toBe('status.favourite');
     });
   });
 

@@ -1,10 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from './useAuth';
 import { getApiErrorMessage } from '@/lib/apiError';
 import { validateRegisterForm } from '@/lib/authValidation';
 
 export function useRegisterForm() {
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -25,7 +27,7 @@ export function useRegisterForm() {
       username,
       acceptRules,
       acceptPrivacy,
-    });
+    }, t);
     if (validationError) {
       setError(validationError);
       return;
@@ -38,7 +40,7 @@ export function useRegisterForm() {
           navigate('/');
         },
         onError: (err: unknown) => {
-          setError(getApiErrorMessage(err, 'Ошибка регистрации'));
+          setError(getApiErrorMessage(err, t('register.error')));
         },
       }
     );

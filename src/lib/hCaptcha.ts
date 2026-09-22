@@ -8,6 +8,11 @@ const H_CAPTCHA_API_URL =
   `https://js.hcaptcha.com/1/api.js?render=explicit&recaptchacompat=off&onload=${H_CAPTCHA_ONLOAD_CALLBACK}`;
 const H_CAPTCHA_INIT_TIMEOUT_MS = 15_000;
 
+import i18n from '@/i18n';
+
+const t = (key: Parameters<typeof i18n.t>[0], options?: Record<string, unknown>): string =>
+  String(i18n.t(key as never, options as never));
+
 export const HCAPTCHA_SITE_KEY =
   import.meta.env.VITE_HCAPTCHA_SITE_KEY || 'b1847961-208e-4a90-9671-1e6bba9e0b36';
 
@@ -31,7 +36,7 @@ export function getUnsupportedHostMessage(): string | null {
   const { hostname, protocol, port } = window.location;
   if (hostname.toLowerCase() !== 'localhost') return null;
   const url = `${protocol}//127.0.0.1${port ? `:${port}` : ''}`;
-  return `hCaptcha не поддерживает хост localhost. Откройте приложение по адресу ${url}.`;
+  return t('captcha.hostUnsupported', { url });
 }
 
 /**
@@ -44,15 +49,15 @@ export function getHCaptchaErrorMessage(code?: string): string | null {
     case 'challenge-closed':
       return null;
     case 'rate-limited':
-      return 'Слишком много попыток. Подождите немного и попробуйте снова.';
+      return t('captcha.rateLimited');
     case 'network-error':
-      return 'Нет связи с сервисом капчи. Проверьте подключение.';
+      return t('captcha.networkError');
     case 'invalid-data':
     case 'missing-captcha':
     case 'invalid-captcha-id':
-      return 'Капча недоступна на этом домене.';
+      return t('captcha.unavailable');
     default:
-      return 'Не удалось проверить капчу. Попробуйте ещё раз.';
+      return t('captcha.checkFailed');
   }
 }
 

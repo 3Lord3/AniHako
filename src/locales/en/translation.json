@@ -1,0 +1,408 @@
+{
+  "common": {
+    "cancel": "Cancel",
+    "save": "Save",
+    "clear": "Clear",
+    "apply": "Apply",
+    "confirm": "Confirm",
+    "unknown": "Unknown",
+    "back": "Back",
+    "loading": "Loading..."
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System"
+  },
+  "nav": {
+    "home": "Home",
+    "catalog": "Catalog",
+    "services": "Services",
+    "matcher": "AniMatch",
+    "tournament": "AniTour",
+    "tier": "AniTier"
+  },
+  "logo": {
+    "search": "Search"
+  },
+  "profileMenu": {
+    "profile": "Profile",
+    "myList": "My list",
+    "friends": "Friends",
+    "logout": "Log out",
+    "login": "Sign in",
+    "register": "Register",
+    "guestLabel": "Sign in",
+    "userLabel": "Profile"
+  },
+  "suspense": {
+    "loading": "Loading...",
+    "authCheck": "Checking authorization...",
+    "animeList": "Loading anime list..."
+  },
+  "dropdown": {
+    "placeholder": "Select..."
+  },
+  "confirm": {
+    "title": "Confirmation",
+    "description": "Are you sure?"
+  },
+  "loginRequired": {
+    "login": "Sign in"
+  },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "description": "An unexpected error occurred. Try refreshing the page.",
+    "retry": "Try again"
+  },
+  "animeCard": {
+    "favorite": "Favorite",
+    "rating": "Rating: {{rating}}"
+  },
+  "animeGrid": {
+    "favorite": "Favorite",
+    "rating": "Rating: {{rating}}"
+  },
+  "rating": {
+    "myRating": "My rating: {{rating}}",
+    "rate": "Rate",
+    "remove": "Remove",
+    "title": "Your rating",
+    "votes": "{{count, number}} votes",
+    "votes_one": "{{count, number}} vote",
+    "votes_other": "{{count, number}} votes",
+    "yourScore": "Your rating:",
+    "none": "none",
+    "total": "Overall rating",
+    "criteria": {
+      "plot": "Plot",
+      "world": "World",
+      "characters": "Characters",
+      "impression": "Overall impression"
+    }
+  },
+  "status": {
+    "watching": "Watching",
+    "completed": "Completed",
+    "paused": "On hold",
+    "dropped": "Dropped",
+    "planned": "Planned",
+    "favourite": "Favorite",
+    "inFavorites": "In favorites",
+    "addToFavorites": "Add to favorites"
+  },
+  "kind": {
+    "tv": "TV series",
+    "movie": "Movie",
+    "ova": "OVA",
+    "onu": "ONA",
+    "special": "Special",
+    "music": "Music video"
+  },
+  "captcha": {
+    "challengeExpired": "The time to solve the captcha has expired. Please try again.",
+    "expired": "Captcha expired. Please solve it again.",
+    "loadFailed": "Failed to load the captcha. Try again later.",
+    "suspicious": "We noticed suspicious activity. Please solve the captcha to continue.",
+    "prompt": "Solve the captcha to continue",
+    "hostUnsupported": "hCaptcha does not support the localhost host. Open the app at {{url}}.",
+    "rateLimited": "Too many attempts. Please wait a moment and try again.",
+    "networkError": "No connection to the captcha service. Check your connection.",
+    "unavailable": "Captcha is unavailable on this domain.",
+    "checkFailed": "Failed to verify the captcha. Please try again."
+  },
+  "matcher": {
+    "swipeHint": "Swipe left to skip, swipe right to add to planned",
+    "willWatch": "WILL WATCH",
+    "skipStamp": "SKIP",
+    "notFound": "No anime found",
+    "retry": "Try again",
+    "skip": "Skip",
+    "addToPlanned": "Add to planned",
+    "home": "Go home",
+    "animePage": "Anime page",
+    "description": "Description",
+    "openPage": "Open anime page",
+    "descriptionTitle": "Description",
+    "noDescription": "No description",
+    "genres": "Genres",
+    "episodes": "{{count}} ep."
+  },
+  "friends": {
+    "addFriend": "Add friend",
+    "dialogTitle": "Add friend",
+    "inputLabel": "Nickname or user ID",
+    "check": "Check",
+    "notConnected": "You are not connected yet",
+    "remove": "Remove friend",
+    "add": "Add friend",
+    "removeFollower": "Remove follower",
+    "unfollow": "Unfollow",
+    "accept": "Accept",
+    "decline": "Decline",
+    "cancelRequest": "Cancel request",
+    "sendRequest": "Send request",
+    "banned": "Banned",
+    "loadFailed": "Failed to load the list. Try refreshing the page.",
+    "mutationError": "Failed to complete the action. Please try again.",
+    "userNotFound": "User with this nickname or ID not found",
+    "cannotAddSelf": "You cannot add yourself",
+    "enterId": "Enter a nickname or user ID",
+    "categoriesAria": "Friend categories",
+    "tabs": {
+      "all": "All",
+      "friends": "Friends",
+      "followers": "Followers",
+      "following": "Following",
+      "requests": "Incoming requests",
+      "sentRequests": "Outgoing requests"
+    },
+    "empty": {
+      "all": "No one yet — find friends by ID",
+      "friends": "You have no friends yet",
+      "followers": "No one follows you yet",
+      "following": "You are not following anyone yet",
+      "requests": "No incoming friend requests",
+      "sentRequests": "No outgoing requests"
+    },
+    "pageTitle": "Friends",
+    "loginRequired": "You must be logged in to view friends"
+  },
+  "search": {
+    "animePlaceholder": "Search anime...",
+    "sheetTitle": "Search anime",
+    "enterName": "Enter a name...",
+    "clear": "Clear",
+    "startTyping": "Start typing an anime name",
+    "minChars": "Enter at least {{count}} characters to search",
+    "noResults": "Nothing found for “{{query}}”",
+    "filters": "Filters",
+    "minRating": "Minimum rating",
+    "yearRelease": "Release year",
+    "fromYear": "From year",
+    "toYear": "To year",
+    "yearsError": "Year “From” must be less than “To”",
+    "genres": "Genres",
+    "genreSearch": "Search genres...",
+    "clearFilterBadges": "Clear filters",
+    "ratingBadge": "Rating: {{rating}}+",
+    "genresBadge": "Genres: {{count}}",
+    "noResultsText": "No anime found"
+  },
+  "login": {
+    "title": "Sign in",
+    "subtitle": "Sign in to your account",
+    "loginOrEmail": "Login or email",
+    "password": "Password",
+    "loggingIn": "Signing in...",
+    "action": "Sign in",
+    "noAccount": "No account?",
+    "registerLink": "Register",
+    "error": "Login error",
+    "captchaPrompt": "Solve the captcha to continue"
+  },
+  "register": {
+    "title": "Register",
+    "subtitle": "Create a new account",
+    "email": "Email",
+    "username": "Username",
+    "password": "Password",
+    "confirmPassword": "Confirm password",
+    "agreeRules": "I agree to the",
+    "rulesLink": "site rules",
+    "agreePrivacy": "I agree to the",
+    "privacyLink": "privacy policy",
+    "registering": "Registering...",
+    "action": "Register",
+    "hasAccount": "Already have an account?",
+    "loginLink": "Sign in",
+    "error": "Registration error"
+  },
+  "validation": {
+    "passwordsMismatch": "Passwords do not match",
+    "passwordTooShort": "Password must be at least 6 characters",
+    "usernameTooShort": "Username must be at least 3 characters",
+    "mustAccept": "You must accept the site rules and the privacy policy"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "description": "The page may have been moved or deleted. Check the address or return home.",
+    "home": "Go home"
+  },
+  "editable": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit"
+  },
+  "date": {
+    "unknown": "Unknown",
+    "longAgo": "Was a while ago",
+    "justNow": "just now",
+    "minutesAgo": "{{count}} min ago",
+    "hoursAgo": "{{count}} h ago",
+    "daysAgo": "{{count}} d ago"
+  },
+  "profile": {
+    "loginRequired": "You must be logged in to view your profile",
+    "editName": "Change name",
+    "info": "Info",
+    "registerDate": "Registered",
+    "lastLogin": "Last login",
+    "linkedAccounts": "Linked accounts",
+    "about": "About",
+    "linked": {
+      "shikimori": "Shikimori: {{name}}",
+      "vk": "VK: {{id}}",
+      "telegram": "Telegram: {{name}}"
+    }
+  },
+  "userAnimeList": {
+    "favorites": "Favorites",
+    "empty": "List is empty",
+    "favoriteBadge": "Favorite"
+  },
+  "animeDetail": {
+    "notFound": "Anime not found",
+    "description": "Description"
+  },
+  "characteristics": {
+    "rating": "Rating",
+    "year": "Year",
+    "season": "Season",
+    "type": "Type",
+    "status": "Status",
+    "ongoing": "Ongoing",
+    "released": "Released",
+    "episodes": "Episodes",
+    "episodesAired": " (aired {{count}})",
+    "duration": "Duration",
+    "minutes": "{{count}} min",
+    "studio": "Studio",
+    "genres": "Genres"
+  },
+  "seasons": {
+    "winter": "Winter",
+    "spring": "Spring",
+    "summer": "Summer",
+    "autumn": "Autumn"
+  },
+  "episodes": {
+    "listAria": "Episode list",
+    "unmark": "Unmark episode {{label}}",
+    "markWatched": "Mark episode {{label}} as watched",
+    "seriesAria": "Episode {{label}}{{watched}}",
+    "watchedSuffix": ", watched",
+    "playerTitle": "{{title}} - Episode {{label}}",
+    "viewerTitle": "Watch",
+    "playerLabel": "Player",
+    "playerAria": "Player selection",
+    "translateLabel": "Dub",
+    "translatePlaceholder": "Select dub"
+  },
+  "viewingOrder": {
+    "title": "Viewing order",
+    "total": "Total {{count}} titles",
+    "total_one": "Total {{count}} title",
+    "total_other": "Total {{count}} titles",
+    "rating": "Rating: {{rating}}",
+    "announcement": "Announcement",
+    "animeAlt": "Anime"
+  },
+  "home": {
+    "noAnime": "No anime",
+    "scheduleTitle": "Airing schedule",
+    "noData": "No data",
+    "colTitle": "Title",
+    "colEpisodes": "Episodes",
+    "colPrevious": "Previous",
+    "colNext": "Next"
+  },
+  "tournament": {
+    "title": "Anime Tournament",
+    "tagline": "Pick the best anime from your list! Watch your favorites battle it out in an intense tournament bracket.",
+    "startButton": "Start tournament",
+    "minRequirement": "Select at least 4 anime to enter the tournament",
+    "toCatalog": "Go to catalog",
+    "howItWorks": "How does it work?",
+    "stepPick": "Pick the winner in each pair",
+    "stepRounds": "Anime move through rounds",
+    "stepBest": "Find the best anime",
+    "searchPlaceholder": "Search anime...",
+    "searching": "Searching...",
+    "minChars": "Enter at least {{count}} characters",
+    "nothingFound": "Nothing found",
+    "enterName": "Enter an anime name",
+    "completedButton": "Completed ({{count}})",
+    "selectedCount": "Selected: {{count}}",
+    "noCompleted": "You have no completed anime yet",
+    "participantsCount": "{{count}} participants",
+    "startRound": "Start {{name}}",
+    "exitDialogTitle": "Exit the tournament?",
+    "exitDialogDesc": "The current tournament progress will be lost.",
+    "exitConfirm": "Exit",
+    "exitCancel": "Continue",
+    "completedTitle": "🏆 Tournament complete!",
+    "completedSubtitle": "Congratulations on finding the winner",
+    "backToBracketTitle": "Return to the bracket?",
+    "backToBracketDesc": "The current round progress will be reset. All made choices will be undone.",
+    "backToBracketConfirm": "Return",
+    "backToBracketLabel": "Return to the tournament bracket (changes will not be saved)",
+    "themeLabel": "Theme: {{theme}}",
+    "backLabel": "Back",
+    "backAria": "Go home",
+    "exitAria": "Exit the tournament",
+    "selectBadge": "Select",
+    "winnerBadge": "🏆 Winner",
+    "infoAria": "Anime info",
+    "loadingDescription": "Loading description…",
+    "descriptionError": "Failed to load the description",
+    "winnersTab": "Winners bracket",
+    "winnersDesc": "Losers are sent to the losers bracket",
+    "losersTab": "Losers bracket",
+    "losersDesc": "Losers are eliminated from the tournament",
+    "finalTab": "Grand final",
+    "finalDesc": "Winner of the winners bracket vs winner of the losers bracket",
+    "bye": "BYE",
+    "grandFinal": "Grand final",
+    "final": "Final",
+    "semifinal": "Semifinal",
+    "quarterfinal": "Quarterfinal",
+    "eighthFinal": "Round of 16",
+    "round": "{{count}} rounds",
+    "round_one": "{{count}} round",
+    "round_other": "{{count}} rounds",
+    "champion": "🏆 Champion",
+    "tableTitle": "Final table",
+    "yourRating": "Your rating",
+    "othersRating": "Others' ratings",
+    "restart": "Run another tournament",
+    "home": "Go home",
+    "wbWinnerTitle": "Winners bracket winner",
+    "lbWinnerTitle": "Losers bracket winner"
+  },
+  "tier": {
+    "loginRequired": "You must be logged in to build a tier list",
+    "tiers": "Tiers",
+    "addAnime": "Add anime",
+    "reset": "Reset",
+    "resetDialogTitle": "Reset tier list?",
+    "resetDialogDesc": "Tiers will return to defaults (S, A, B, C, D) and all placed anime will go to “Unranked”.",
+    "resetConfirm": "Reset",
+    "unranked": "Unranked",
+    "emptyTiers": "There are no tiers yet. Open “Tiers” and create the first one.",
+    "noAnime": "No anime — add via search",
+    "addDialogTitle": "Add anime to the tier list",
+    "searchPlaceholder": "Anime name...",
+    "minChars": "Enter at least {{count}} characters",
+    "searching": "Searching...",
+    "nothingFound": "Nothing found",
+    "manageDialogTitle": "Manage tiers",
+    "addTier": "Add tier",
+    "moveUp": "Move tier up",
+    "moveDown": "Move tier down",
+    "chooseColor": "Choose tier color",
+    "colorName": "Color {{name}}",
+    "deleteTier": "Delete tier",
+    "moveToTier": "Move to tier"
+  }
+}

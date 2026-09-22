@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { TooltipWrap } from '@/components/ui/tooltip';
 import { X, CalendarClock, Home, ExternalLink, Info, Loader2 } from 'lucide-react';
+import { useT } from '@/i18n';
 
 interface ActionButtonsProps {
   isTransitioning: boolean;
@@ -23,6 +24,7 @@ export function ActionButtons({
   onInfo,
   variant = 'desktop',
 }: ActionButtonsProps) {
+  const { t } = useT();
   const baseSize = 'h-16 w-16';
   const iconSkipSize = variant === 'desktop' ? 'w-10 h-10' : 'w-20 h-20 sm:w-24 sm:h-24';
 
@@ -30,27 +32,27 @@ export function ActionButtons({
     return (
       <div className="flex flex-col items-center gap-5 pt-3 pb-4 w-full max-w-[360px] mx-auto px-2">
         <div className="flex justify-between gap-3 w-full">
-          <TooltipWrap content="Пропустить">
+          <TooltipWrap content={t('matcher.skip')}>
             <Button
               variant="outline"
               size="lg"
               className={`${baseSize} flex-1 aspect-square rounded-full border-2 border-red-500 p-0 hover:bg-red-500/10 hover:text-red-500`}
               onClick={onSkip}
               disabled={isTransitioning || isAdding}
-              aria-label="Пропустить"
+              aria-label={t('matcher.skip')}
             >
               <X className={iconSkipSize} style={{ color: '#ef4444' }} />
             </Button>
           </TooltipWrap>
 
-          <TooltipWrap content="В запланированное">
+          <TooltipWrap content={t('matcher.addToPlanned')}>
             <Button
               variant="outline"
               size="lg"
               className={`${baseSize} flex-1 aspect-square rounded-full border-2 border-green-500 p-0 hover:bg-green-500/10 hover:text-green-500`}
               onClick={onAdd}
               disabled={isTransitioning || isAdding}
-              aria-label="В запланированное"
+              aria-label={t('matcher.addToPlanned')}
             >
               {isAdding ? (
                 <Loader2 className={iconSkipSize} style={{ color: '#22c55e' }} />
@@ -62,26 +64,26 @@ export function ActionButtons({
         </div>
 
         <div className="flex justify-between gap-3 w-full">
-          <TooltipWrap content="На главную">
+          <TooltipWrap content={t('matcher.home')}>
             <Button
               variant="outline"
               size="lg"
               className={`${baseSize} flex-1 aspect-square rounded-full border-2 border-muted-foreground/30 p-0 hover:bg-muted`}
               onClick={onHome}
-              aria-label="На главную"
+              aria-label={t('matcher.home')}
             >
               <Home className="w-14 h-14 sm:w-16 sm:h-16" />
             </Button>
           </TooltipWrap>
 
           {onExternalLink && (
-            <TooltipWrap content="Страница аниме">
+            <TooltipWrap content={t('matcher.animePage')}>
               <Button
                 variant="outline"
                 size="lg"
                 className={`${baseSize} flex-1 aspect-square rounded-full border-2 border-muted-foreground/30 p-0 hover:bg-muted`}
                 onClick={onExternalLink}
-                aria-label="Страница аниме"
+                aria-label={t('matcher.animePage')}
               >
                 <ExternalLink className="w-14 h-14 sm:w-16 sm:h-16" />
               </Button>
@@ -89,13 +91,13 @@ export function ActionButtons({
           )}
 
           {onInfo && (
-            <TooltipWrap content="Описание">
+            <TooltipWrap content={t('matcher.description')}>
               <Button
                 variant="outline"
                 size="lg"
                 className={`${baseSize} flex-1 aspect-square rounded-full border-2 border-muted-foreground/30 p-0 hover:bg-muted`}
                 onClick={onInfo}
-                aria-label="Описание"
+                aria-label={t('matcher.description')}
               >
                 <Info className="w-14 h-14 sm:w-16 sm:h-16" />
               </Button>
@@ -108,25 +110,25 @@ export function ActionButtons({
 
   return (
     <div className="flex flex-col items-center gap-6">
-      <TooltipWrap content="Пропустить">
+      <TooltipWrap content={t('matcher.skip')}>
         <Button
           variant="outline"
           size="lg"
           className={`${baseSize} rounded-full border-2 border-red-500 hover:bg-red-500/10 hover:text-red-500`}
           onClick={onSkip}
           disabled={isTransitioning || isAdding}
-          aria-label="Пропустить"
+          aria-label={t('matcher.skip')}
         >
           <X className={iconSkipSize} style={{ color: '#ef4444' }} />
         </Button>
       </TooltipWrap>
-      <TooltipWrap content="На главную">
+      <TooltipWrap content={t('matcher.home')}>
         <Button
           variant="outline"
           size="lg"
           className={baseSize + " rounded-full border-2 border-muted-foreground/30 hover:bg-muted"}
           onClick={onHome}
-          aria-label="На главную"
+          aria-label={t('matcher.home')}
         >
           <Home className="w-10 h-10" />
         </Button>
@@ -142,15 +144,16 @@ interface AddButtonProps {
 }
 
 export function AddButton({ isTransitioning, isAdding, onAdd }: AddButtonProps) {
+  const { t } = useT();
   return (
-    <TooltipWrap content="В запланированное">
+    <TooltipWrap content={t('matcher.addToPlanned')}>
       <Button
         variant="outline"
         size="lg"
         className="h-16 w-16 rounded-full border-2 border-green-500 hover:bg-green-500/10 hover:text-green-500"
         onClick={onAdd}
         disabled={isTransitioning || isAdding}
-        aria-label="В запланированное"
+        aria-label={t('matcher.addToPlanned')}
       >
         {isAdding ? (
           <Loader2 className="w-10 h-10 animate-spin text-green-500" />
@@ -167,14 +170,15 @@ interface ExternalLinkButtonProps {
 }
 
 export function ExternalLinkButton({ onClick }: ExternalLinkButtonProps) {
+  const { t } = useT();
   return (
-    <TooltipWrap content="Открыть страницу аниме">
+    <TooltipWrap content={t('matcher.openPage')}>
       <Button
         variant="outline"
         size="lg"
         className="h-14 w-14 rounded-full border-2 border-muted-foreground/30 hover:bg-muted"
         onClick={onClick}
-        aria-label="Открыть страницу аниме"
+        aria-label={t('matcher.openPage')}
       >
         <ExternalLink className="w-8 h-8" />
       </Button>

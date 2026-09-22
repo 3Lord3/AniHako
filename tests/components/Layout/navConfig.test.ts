@@ -3,9 +3,9 @@ import { mainNavItems, servicesItems, isPathActive } from '@/components/Layout/n
 
 describe('navConfig', () => {
   describe('mainNavItems', () => {
-    it('contains Главная and Каталог', () => {
-      const labels = mainNavItems.map((i) => i.label);
-      expect(labels).toEqual(['Главная', 'Каталог']);
+    it('contains Главная and Каталог labels', () => {
+      const labels = mainNavItems.map((i) => i.labelKey);
+      expect(labels).toEqual(['nav.home', 'nav.catalog']);
     });
 
     it('routes are / and /catalog', () => {
@@ -23,9 +23,9 @@ describe('navConfig', () => {
   });
 
   describe('servicesItems', () => {
-    it('contains AniMatch, AniTour and AniTier', () => {
-      const labels = servicesItems.map((i) => i.label);
-      expect(labels).toEqual(['AniMatch', 'AniTour', 'AniTier']);
+    it('contains AniMatch, AniTour and AniTier labels', () => {
+      const labels = servicesItems.map((i) => i.labelKey);
+      expect(labels).toEqual(['nav.matcher', 'nav.tournament', 'nav.tier']);
     });
 
     it('routes are /matcher, /tournament and /tier', () => {

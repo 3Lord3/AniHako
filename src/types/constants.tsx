@@ -15,12 +15,12 @@ export const STATUS_ICONS: Record<StatusType, React.ReactNode> = {
 };
 
 export const STATUS_LABELS: Record<StatusType, string> = {
-  watching: 'Смотрю',
-  completed: 'Просмотрено',
-  paused: 'Отложено',
-  dropped: 'Брошено',
-  planned: 'В планах',
-  favourite: 'Любимое',
+  watching: 'status.watching',
+  completed: 'status.completed',
+  paused: 'status.paused',
+  dropped: 'status.dropped',
+  planned: 'status.planned',
+  favourite: 'status.favourite',
 };
 
 // Theme-adaptive status colors
@@ -42,12 +42,12 @@ export const ALL_STATUSES: StatusType[] = ['watching', 'planned', 'completed', '
 export const FAVORITE_ICON = <Heart size={24} strokeWidth={2.5} />;
 
 export const KIND_LABELS: Record<string, string> = {
-  tv: 'TV сериал',
-  movie: 'Фильм',
-  ova: 'OVA',
-  onu: 'ONA',
-  special: 'Спешл',
-  music: 'Клип',
+  tv: 'kind.tv',
+  movie: 'kind.movie',
+  ova: 'kind.ova',
+  onu: 'kind.onu',
+  special: 'kind.special',
+  music: 'kind.music',
 };
 
 export function getRatingColor(rating: number | string | null): string {

@@ -10,6 +10,9 @@ import {
   computeLbPairCounts,
 } from '@/hooks/tournament-utils';
 import type { AnimeCatalogItem } from '@/types';
+import i18n from '@/i18n';
+
+const t = i18n.t.bind(i18n);
 
 const createMockAnime = (id: number, title: string): AnimeCatalogItem => ({
   anime_id: id,
@@ -166,19 +169,19 @@ describe('tournament-utils', () => {
 
   describe('getRoundName', () => {
     it('returns Гранд-финал for final bracket', () => {
-      expect(getRoundName('final', 0, 3, 5)).toBe('Гранд-финал');
+      expect(getRoundName(t, 'final', 0, 3, 5)).toBe('Гранд-финал');
     });
 
     it('returns correct names for winners bracket', () => {
-      expect(getRoundName('winners', 2, 3, 5)).toBe('Финал');
-      expect(getRoundName('winners', 1, 3, 5)).toBe('Полуфинал');
-      expect(getRoundName('winners', 0, 3, 5)).toBe('Четвертьфинал');
+      expect(getRoundName(t, 'winners', 2, 3, 5)).toBe('Финал');
+      expect(getRoundName(t, 'winners', 1, 3, 5)).toBe('Полуфинал');
+      expect(getRoundName(t, 'winners', 0, 3, 5)).toBe('Четвертьфинал');
     });
 
     it('returns correct names for losers bracket', () => {
-      expect(getRoundName('losers', 4, 3, 5)).toBe('Финал');
-      expect(getRoundName('losers', 0, 3, 5)).toBe('1 раунд');
-      expect(getRoundName('losers', 1, 3, 5)).toBe('2 раунд');
+      expect(getRoundName(t, 'losers', 4, 3, 5)).toBe('Финал');
+      expect(getRoundName(t, 'losers', 0, 3, 5)).toBe('1 раунд');
+      expect(getRoundName(t, 'losers', 1, 3, 5)).toBe('2 раунда');
     });
   });
 });

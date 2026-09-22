@@ -1,15 +1,17 @@
 import { Sun, Moon, Monitor } from 'lucide-react';
 import { useTheme } from '@/hooks';
+import { useT } from '@/i18n';
 
 const themes = ['light', 'dark', 'system'] as const;
-const labels: Record<typeof themes[number], string> = {
-  light: 'Светлая',
-  dark: 'Тёмная',
-  system: 'Системная',
+const labelKeys: Record<typeof themes[number], 'theme.light' | 'theme.dark' | 'theme.system'> = {
+  light: 'theme.light',
+  dark: 'theme.dark',
+  system: 'theme.system',
 };
 
 export function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
+  const { t } = useT();
 
   const currentIndex = themes.indexOf(theme);
 
@@ -24,7 +26,7 @@ export function ThemeSwitcher() {
     <div className="flex items-center justify-between px-2 py-1 cursor-pointer" onClick={handleToggle}>
       <div className="flex items-center gap-2">
         <Icon className="w-4 h-4" />
-        <span className="text-sm">{labels[theme]}</span>
+        <span className="text-sm">{t(labelKeys[theme])}</span>
       </div>
       <div className="relative w-12 h-5 bg-muted rounded-full p-0.5">
         <div

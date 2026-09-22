@@ -4,6 +4,7 @@ import { useParticipantSelector, PARTICIPANT_SELECTOR_MIN_QUERY_LENGTH } from '@
 import type { YummyUserAnimeRate } from '@/types';
 import { cn } from '@/lib/utils';
 import { getPosterUrl } from '@/lib/imageUrl';
+import { useT } from '@/i18n';
 
 interface TournamentParticipantSelectorProps {
   completedAnime: YummyUserAnimeRate[];
@@ -16,6 +17,7 @@ export function TournamentParticipantSelector({
   selectedAnime,
   onSelectionChange,
 }: TournamentParticipantSelectorProps) {
+  const { t } = useT();
   const {
     searchQuery,
     showDropdown,
@@ -40,7 +42,7 @@ export function TournamentParticipantSelector({
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="Поиск аниме..."
+            placeholder={t('tournament.searchPlaceholder')}
             value={searchQuery}
             onChange={handleInputChange}
             onFocus={() => searchQuery.trim() && setShowDropdown(true)}
@@ -61,7 +63,7 @@ export function TournamentParticipantSelector({
             {isSearching ? (
               <div className="flex items-center justify-center py-4 text-muted-foreground">
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                <span className="text-sm">Поиск...</span>
+                <span className="text-sm">{t('tournament.searching')}</span>
               </div>
             ) : availableResults.length > 0 ? (
               <ul className="py-1">
@@ -94,15 +96,15 @@ export function TournamentParticipantSelector({
               </ul>
             ) : searchQuery.trim().length > 0 && searchQuery.trim().length < PARTICIPANT_SELECTOR_MIN_QUERY_LENGTH ? (
               <div className="py-4 text-center text-sm text-muted-foreground">
-                Введите минимум {PARTICIPANT_SELECTOR_MIN_QUERY_LENGTH} символа
+                {t('tournament.minChars', { count: PARTICIPANT_SELECTOR_MIN_QUERY_LENGTH })}
               </div>
             ) : debouncedSearch ? (
               <div className="py-4 text-center text-sm text-muted-foreground">
-                Ничего не найдено
+                {t('tournament.nothingFound')}
               </div>
             ) : (
               <div className="py-4 text-center text-sm text-muted-foreground">
-                Введите название аниме
+                {t('tournament.enterName')}
               </div>
             )}
           </div>
@@ -117,7 +119,7 @@ export function TournamentParticipantSelector({
               className="inline-flex items-center gap-2 px-3 py-1.5 text-sm border border-input bg-background text-foreground hover:bg-accent rounded-md transition-colors"
             >
               <Plus className="w-4 h-4" />
-              Просмотренные ({remaining.length})
+              {t('tournament.completedButton', { count: remaining.length })}
             </button>
           )}
           {selectedAnime.length > 0 && (
@@ -125,13 +127,13 @@ export function TournamentParticipantSelector({
               onClick={handleClearAll}
               className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-destructive hover:bg-destructive/10 rounded-md transition-colors"
             >
-              Очистить
+              {t('common.clear')}
             </button>
           )}
         </div>
         {selectedAnime.length > 0 && (
           <span className="text-sm text-muted-foreground">
-            Выбрано: {selectedAnime.length}
+            {t('tournament.selectedCount', { count: selectedAnime.length })}
           </span>
         )}
       </div>
@@ -167,7 +169,7 @@ export function TournamentParticipantSelector({
 
       {selectedAnime.length === 0 && completedAnime.length === 0 && (
         <div className="text-center py-8 text-muted-foreground">
-          <p className="text-sm">У вас пока нет просмотренных аниме</p>
+          <p className="text-sm">{t('tournament.noCompleted')}</p>
         </div>
       )}
     </div>

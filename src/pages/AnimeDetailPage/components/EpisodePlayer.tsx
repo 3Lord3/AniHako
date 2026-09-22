@@ -3,6 +3,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import type { AnimeVideo } from '@/types';
 import { useEpisodePlayerCompletion } from '@/hooks/useEpisodePlayerCompletion';
+import { useT } from '@/i18n';
 
 interface EpisodePlayerProps {
   video: AnimeVideo;
@@ -11,6 +12,7 @@ interface EpisodePlayerProps {
 }
 
 export function EpisodePlayer({ video, title, onEpisodeComplete }: EpisodePlayerProps) {
+  const { t } = useT();
   const [loaded, setLoaded] = useState(false);
   const { iframeRef } = useEpisodePlayerCompletion(video, onEpisodeComplete);
 
@@ -27,7 +29,7 @@ export function EpisodePlayer({ video, title, onEpisodeComplete }: EpisodePlayer
         ref={iframeRef}
         key={video.video_id}
         src={video.iframe_url}
-        title={`${title} - Серия ${episodeLabel}`}
+        title={t('episodes.playerTitle', { title, label: episodeLabel })}
         className={cn(
           'absolute inset-0 w-full h-full',
           !loaded && 'opacity-0'

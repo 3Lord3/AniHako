@@ -14,10 +14,12 @@ import { SwipeCard } from '@/components/matcher/SwipeCard';
 import { ActionButtons, AddButton, ExternalLinkButton } from '@/components/matcher/ActionButtons';
 import { DescriptionPanel } from '@/components/matcher/DescriptionView';
 import { buildAnimeUrl } from '@/lib/animeUrl';
+import { useT } from '@/i18n';
 
 export function AnimeMatcherPage() {
   const navigate = useNavigate();
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
+  const { t } = useT();
 
   const { currentAnime, isLoading, isTransitioning, isAdding, refetch, handleSwipe, handleSkip, handleAdd } =
     useAnimeMatcher(() => setShowDescriptionModal(false));
@@ -33,8 +35,8 @@ export function AnimeMatcherPage() {
   if (!currentAnime && !isLoading) {
     return (
       <div className="text-center py-12 space-y-4">
-        <p className="text-muted-foreground">Аниме не найдено</p>
-        <Button onClick={() => refetch()}>Попробовать снова</Button>
+        <p className="text-muted-foreground">{t('matcher.notFound')}</p>
+        <Button onClick={() => refetch()}>{t('matcher.retry')}</Button>
       </div>
     );
   }
@@ -42,15 +44,15 @@ export function AnimeMatcherPage() {
   return (
     <div className="md:space-y-6 flex flex-col min-h-[calc(100svh-64px)] md:min-h-0">
       <div className="hidden md:block text-center md:space-y-2">
-        <h1 className="text-4xl font-bold select-text text-foreground">AniMatch</h1>
+        <h1 className="text-4xl font-bold select-text text-foreground">{t('nav.matcher')}</h1>
         <p className="text-muted-foreground select-text">
-          Свайпайте влево чтобы пропустить, вправо чтобы добавить в запланированное
+          {t('matcher.swipeHint')}
         </p>
       </div>
 
       <div className="md:hidden text-center mb-2">
         <p className="text-xs text-muted-foreground select-text">
-          Свайпайте влево чтобы пропустить, вправо чтобы добавить в запланированное
+          {t('matcher.swipeHint')}
         </p>
       </div>
 
@@ -133,7 +135,7 @@ export function AnimeMatcherPage() {
             )}
             {currentAnime?.genres && currentAnime.genres.length > 0 && (
               <div className="space-y-2">
-                <h4 className="text-sm font-medium text-foreground">Жанры</h4>
+                <h4 className="text-sm font-medium text-foreground">{t('matcher.genres')}</h4>
                 <div className="flex flex-wrap gap-1.5">
                   {currentAnime.genres.slice(0, 2).map((g: { title: string }) => (
                     <Badge key={g.title} variant="outline" className="text-xs">

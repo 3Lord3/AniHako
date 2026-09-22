@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n';
 
 interface PlayerSelectorProps {
   players: string[];
@@ -12,14 +13,15 @@ export function stripPlayerPrefix(player: string): string {
 }
 
 export function PlayerSelector({ players, value, onChange }: PlayerSelectorProps) {
+  const { t } = useT();
   if (players.length <= 1) return null;
 
   return (
     <div className="space-y-1.5">
       <div className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-        Плеер
+        {t('episodes.playerLabel')}
       </div>
-      <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Выбор плеера">
+      <div className="flex flex-wrap gap-2" role="radiogroup" aria-label={t('episodes.playerAria')}>
         {players.map((player) => {
           const isActive = player === value;
           return (

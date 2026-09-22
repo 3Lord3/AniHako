@@ -2,6 +2,11 @@ import '@testing-library/jest-dom';
 import { cleanup } from '@testing-library/react';
 import { afterEach, vi } from 'vitest';
 
+// jsdom defaults to en-US; force ru so language detection stays deterministic
+// and tests render Russian strings via t().
+Object.defineProperty(navigator, 'language', { value: 'ru-RU', configurable: true });
+Object.defineProperty(navigator, 'languages', { value: ['ru-RU', 'ru'], configurable: true });
+
 // Cleanup after each test
 afterEach(() => {
   cleanup();
@@ -78,3 +83,6 @@ vi.mock('react-router-dom', async () => {
     useNavigate: () => vi.fn(),
   };
 });
+// Initialize i18n AFTER navigator.language has been forced to ru (imports are
+// hoisted in ES modules, so a static import would initialize it too early).
+await import('@/i18n');

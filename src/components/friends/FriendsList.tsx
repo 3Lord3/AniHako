@@ -1,5 +1,6 @@
 import { FriendRow } from './FriendRow';
 import { FriendsListSkeleton } from './FriendsListSkeleton';
+import { useT } from '@/i18n';
 import type { YummyFriend } from '@/types/friend';
 
 interface FriendsListProps {
@@ -21,6 +22,7 @@ export function FriendsList({
   onRemove,
   pendingFriendIds,
 }: FriendsListProps) {
+  const { t } = useT();
   if (isLoading) {
     return <FriendsListSkeleton />;
   }
@@ -28,7 +30,7 @@ export function FriendsList({
   if (isError) {
     return (
       <p className="py-8 text-center text-destructive">
-        Не удалось загрузить список. Попробуйте обновить страницу.
+        {t('friends.loadFailed')}
       </p>
     );
   }

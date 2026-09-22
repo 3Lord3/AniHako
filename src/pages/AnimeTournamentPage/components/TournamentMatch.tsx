@@ -5,6 +5,7 @@ import { MatchHeader } from './MatchHeader';
 import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import type { TournamentParticipant, BracketType } from '@/hooks/useTournament';
 import { getRoundName } from '@/hooks/useTournament';
+import { useT } from '@/i18n';
 
 interface TournamentMatchProps {
   match: {
@@ -39,11 +40,12 @@ export function TournamentMatch({
   totalMatchesInRound,
   currentMatchNumber,
 }: TournamentMatchProps) {
+  const { t } = useT();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isSelecting, setIsSelecting] = useState(false);
   const [showBackDialog, setShowBackDialog] = useState(false);
 
-  const roundName = getRoundName(bracket, roundNumber - 1, totalRounds, totalLbRounds);
+  const roundName = getRoundName(t, bracket, roundNumber - 1, totalRounds, totalLbRounds);
   // With no losers bracket at all (a 2-participant tournament), there's no
   // 'final' bracket either — the sole winners-bracket round IS the final.
   const isFinal = bracket === 'final' || (bracket === 'winners' && totalLbRounds === 0 && roundNumber === totalRounds);
@@ -129,10 +131,10 @@ export function TournamentMatch({
         open={showBackDialog}
         onOpenChange={setShowBackDialog}
         onConfirm={() => onBackToBracket?.()}
-        title="Вернуться к сетке?"
-        description="Прогресс текущего раунда будет сброшен. Все сделанные выборы будут отменены."
-        confirmText="Вернуться"
-        cancelText="Отмена"
+        title={t('tournament.backToBracketTitle')}
+        description={t('tournament.backToBracketDesc')}
+        confirmText={t('tournament.backToBracketConfirm')}
+        cancelText={t('common.cancel')}
       />
     </div>
   );

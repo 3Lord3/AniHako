@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { LogoButton } from './LogoButton';
 import { ProfileDropdown } from './ProfileDropdown';
+import { useT, type TranslationKey } from '@/i18n';
 import { mainNavItems, servicesItems, isPathActive, type NavItem } from './navConfig';
 
 interface DesktopHeaderProps {
@@ -8,14 +9,15 @@ interface DesktopHeaderProps {
 }
 
 export function DesktopHeader({ pathname }: DesktopHeaderProps) {
+  const { t } = useT();
   return (
     <header className="border-b border-border hidden md:block">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <LogoButton variant="desktop" />
 
         <nav className="flex items-center gap-6 text-foreground">
-          {renderNavLinks(mainNavItems, pathname)}
-          {renderNavLinks(servicesItems, pathname)}
+          {renderNavLinks(mainNavItems, pathname, t)}
+          {renderNavLinks(servicesItems, pathname, t)}
           <ProfileDropdown variant="desktop" />
         </nav>
       </div>
@@ -23,7 +25,7 @@ export function DesktopHeader({ pathname }: DesktopHeaderProps) {
   );
 }
 
-function renderNavLinks(items: readonly NavItem[], pathname: string) {
+function renderNavLinks(items: readonly NavItem[], pathname: string, t: (key: TranslationKey) => string) {
   return items.map((item) => {
     const Icon = item.icon;
     const active = isPathActive(pathname, item.to);
@@ -36,7 +38,7 @@ function renderNavLinks(items: readonly NavItem[], pathname: string) {
         }`}
       >
         <Icon className="w-4 h-4" />
-        {item.label}
+        {t(item.labelKey as TranslationKey)}
       </Link>
     );
   });

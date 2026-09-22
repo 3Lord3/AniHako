@@ -8,6 +8,7 @@ import {
   renderHCaptcha,
   resetHCaptcha,
 } from '@/lib/hCaptcha';
+import { useT } from '@/i18n';
 
 interface CaptchaFieldProps {
   onSolved: (token: string) => void;
@@ -28,6 +29,7 @@ export function CaptchaField({ onSolved, className }: CaptchaFieldProps) {
   const widgetIdRef = useRef<number | null>(null);
   const onSolvedRef = useRef(onSolved);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useT();
 
   useEffect(() => {
     onSolvedRef.current = onSolved;
@@ -62,11 +64,11 @@ export function CaptchaField({ onSolved, className }: CaptchaFieldProps) {
             resetWidget();
           },
           'chalexpired-callback': () => {
-            setError('Время на решение капчи истекло. Попробуйте ещё раз.');
+            setError(t('captcha.challengeExpired'));
             resetWidget();
           },
           'expired-callback': () => {
-            setError('Капча истекла. Пройдите её ещё раз.');
+            setError(t('captcha.expired'));
             resetWidget();
           },
         });
@@ -80,7 +82,7 @@ export function CaptchaField({ onSolved, className }: CaptchaFieldProps) {
         setError(
           err instanceof HCaptchaHostError
             ? err.message
-            : 'Не удалось загрузить капчу. Попробуйте позже.'
+            : t('captcha.loadFailed')
         );
       }
     };

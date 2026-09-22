@@ -2,19 +2,19 @@ import { Home, LayoutGrid, Sparkles, Trophy, LayoutList, type LucideIcon } from 
 
 export interface NavItem {
   to: string;
-  label: string;
+  labelKey: string;
   icon: LucideIcon;
 }
 
 export const mainNavItems: readonly NavItem[] = [
-  { to: '/', label: 'Главная', icon: Home },
-  { to: '/catalog', label: 'Каталог', icon: LayoutGrid },
+  { to: '/', labelKey: 'nav.home', icon: Home },
+  { to: '/catalog', labelKey: 'nav.catalog', icon: LayoutGrid },
 ];
 
 export const servicesItems: readonly NavItem[] = [
-  { to: '/matcher', label: 'AniMatch', icon: Sparkles },
-  { to: '/tournament', label: 'AniTour', icon: Trophy },
-  { to: '/tier', label: 'AniTier', icon: LayoutList },
+  { to: '/matcher', labelKey: 'nav.matcher', icon: Sparkles },
+  { to: '/tournament', labelKey: 'nav.tournament', icon: Trophy },
+  { to: '/tier', labelKey: 'nav.tier', icon: LayoutList },
 ];
 
 export function isPathActive(currentPath: string, target: string): boolean {

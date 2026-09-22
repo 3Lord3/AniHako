@@ -7,6 +7,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { FilterDialogContent } from '@/components/search/FilterDialog';
+import { useT } from '@/i18n';
 
 interface FilterButtonProps {
   hasActiveFilters: boolean;
@@ -32,6 +33,7 @@ export function FilterButton({
   onClearFilters,
 }: FilterButtonProps) {
   const [open, setOpen] = useState(false);
+  const { t } = useT();
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -41,7 +43,7 @@ export function FilterButton({
         onClick={() => setOpen(true)}
       >
         <Filter className="w-4 h-4 sm:mr-2" />
-        <span className="hidden sm:inline">Фильтры</span>
+        <span className="hidden sm:inline">{t('search.filters')}</span>
         {hasActiveFilters && (
           <span className="absolute -top-1 -right-1 w-2 h-2 bg-primary rounded-full" />
         )}
@@ -52,7 +54,7 @@ export function FilterButton({
         showCloseButton={false}
       >
         <div className="flex justify-between items-center">
-          <DialogTitle className="text-lg font-semibold">Фильтры</DialogTitle>
+          <DialogTitle className="text-lg font-semibold">{t('search.filters')}</DialogTitle>
           <Button
             variant="ghost"
             size="icon-sm"

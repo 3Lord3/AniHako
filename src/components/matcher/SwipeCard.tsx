@@ -3,6 +3,7 @@ import { Star, Calendar, Clock, Film } from 'lucide-react';
 import { getImageUrl, getPosterUrl } from '@/lib/imageUrl';
 import { cn } from '@/lib/utils';
 import { useSwipeGesture } from '@/hooks/useSwipeGesture';
+import { useT } from '@/i18n';
 import type { AnimeDetail } from '@/types';
 
 interface SwipeCardProps {
@@ -12,6 +13,7 @@ interface SwipeCardProps {
 }
 
 export function SwipeCard({ anime, onSwipe, isActive }: SwipeCardProps) {
+  const { t } = useT();
   const { cardRef, translateX, translateY, rotation, isDragging, swipeDirection, swipeOpacity, handlers } =
     useSwipeGesture(onSwipe, isActive);
 
@@ -57,7 +59,7 @@ export function SwipeCard({ anime, onSwipe, isActive }: SwipeCardProps) {
             style={{ opacity: swipeOpacity }}
           >
             <span className="text-white text-2xl font-bold text-center px-4">
-              {swipeDirection === 'right' ? 'БУДУ СМОТРЕТЬ' : 'ПРОПУСК'}
+              {swipeDirection === 'right' ? t('matcher.willWatch') : t('matcher.skipStamp')}
             </span>
           </div>
         )}
@@ -94,7 +96,7 @@ export function SwipeCard({ anime, onSwipe, isActive }: SwipeCardProps) {
             {anime.episodes?.count && (
               <div className="flex items-center gap-1">
                 <Clock className="w-4 h-4" />
-                <span>{anime.episodes.count} эп.</span>
+                <span>{t('matcher.episodes', { count: anime.episodes.count })}</span>
               </div>
             )}
           </div>

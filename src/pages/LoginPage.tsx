@@ -5,8 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { CaptchaField } from '@/components/CaptchaField';
+import { useT } from '@/i18n';
 
 export function LoginPage() {
+  const { t } = useT();
   const {
     login,
     setLogin,
@@ -24,8 +26,8 @@ export function LoginPage() {
     <div className="flex items-center justify-center min-h-[calc(100dvh-10rem)] py-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Вход</CardTitle>
-          <CardDescription>Войдите в свой аккаунт</CardDescription>
+          <CardTitle>{t('login.title')}</CardTitle>
+          <CardDescription>{t('login.subtitle')}</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4 pb-4">
@@ -35,7 +37,7 @@ export function LoginPage() {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="login">Логин или email</Label>
+              <Label htmlFor="login">{t('login.loginOrEmail')}</Label>
               <Input
                 id="login"
                 type="text"
@@ -46,7 +48,7 @@ export function LoginPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Пароль</Label>
+              <Label htmlFor="password">{t('login.password')}</Label>
               <Input
                 id="password"
                 type="password"
@@ -62,12 +64,12 @@ export function LoginPage() {
           </CardContent>
           <CardFooter className="flex flex-col gap-4 border-border">
             <Button type="submit" className="w-full" disabled={isLoggingIn}>
-              {isLoggingIn ? 'Вход...' : 'Войти'}
+              {isLoggingIn ? t('login.loggingIn') : t('login.action')}
             </Button>
             <p className="text-sm text-muted-foreground">
-              Нет аккаунта?{' '}
+              {t('login.noAccount')}{' '}
               <Link to="/register" className="text-primary hover:underline">
-                Зарегистрироваться
+                {t('login.registerLink')}
               </Link>
             </p>
           </CardFooter>

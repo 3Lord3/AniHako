@@ -10,18 +10,20 @@ import { getImageUrl } from '@/lib/imageUrl';
 import { buildAnimeUrl } from '@/lib/animeUrl';
 import { getRateStatus, isRateFavorite } from '@/lib/listRate';
 import { STATUS_ICONS, STATUS_COLORS, STATUS_LABELS, FAVORITE_ICON, ALL_STATUSES, type StatusType } from '@/types/constants';
+import { useT, type TranslationKey } from '@/i18n';
 import type { YummyUserAnimeRate } from '@/types';
 
 export function UserAnimeListPage() {
   const { statusParam, isFavorites, isLoading, stats, displayList, selectStatus, selectFavorites } = useUserAnimeListPage();
+  const { t } = useT();
 
   const statCards = [
-    { label: STATUS_LABELS.watching, count: stats.watching },
-    { label: STATUS_LABELS.planned, count: stats.planned },
-    { label: STATUS_LABELS.completed, count: stats.completed },
-    { label: STATUS_LABELS.paused, count: stats.paused },
-    { label: STATUS_LABELS.dropped, count: stats.dropped },
-    { label: 'Любимое', count: stats.favorites },
+    { label: t(STATUS_LABELS.watching as TranslationKey) as string, count: stats.watching },
+    { label: t(STATUS_LABELS.planned as TranslationKey) as string, count: stats.planned },
+    { label: t(STATUS_LABELS.completed as TranslationKey) as string, count: stats.completed },
+    { label: t(STATUS_LABELS.paused as TranslationKey) as string, count: stats.paused },
+    { label: t(STATUS_LABELS.dropped as TranslationKey) as string, count: stats.dropped },
+    { label: t('userAnimeList.favorites'), count: stats.favorites },
   ];
 
   return (
@@ -66,14 +68,14 @@ export function UserAnimeListPage() {
                 variant={statusParam === s ? 'default' : 'outline'}
                 onClick={() => selectStatus(s)}
               >
-                {STATUS_LABELS[s as keyof typeof STATUS_LABELS] || s}
+                {t(STATUS_LABELS[s as keyof typeof STATUS_LABELS] as TranslationKey) || s}
               </Button>
             ))}
             <Button
               variant={isFavorites ? 'default' : 'outline'}
               onClick={selectFavorites}
             >
-              Любимое
+              {t('userAnimeList.favorites')}
             </Button>
           </>
         )}
@@ -87,13 +89,13 @@ export function UserAnimeListPage() {
         </div>
       ) : displayList.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">
-          Список пуст
+          {t('userAnimeList.empty')}
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
           {displayList.map((item: YummyUserAnimeRate) => {
             const rate = item as YummyUserAnimeRate;
-            const displayTitle = rate.title || 'Unknown';
+            const displayTitle = rate.title || t('common.unknown');
             const isFavorite = isRateFavorite(rate);
             const status = getRateStatus(rate);
 
@@ -106,9 +108,9 @@ export function UserAnimeListPage() {
                   loading="lazy"
                 />
                 <div className="absolute top-2 left-2 right-2 flex justify-between items-start gap-1">
-                  <TooltipWrap content={STATUS_LABELS[status as keyof typeof STATUS_LABELS] || status}>
+                  <TooltipWrap content={t(STATUS_LABELS[status as keyof typeof STATUS_LABELS] as TranslationKey) || status}>
                     <Badge
-                      aria-label={STATUS_LABELS[status as keyof typeof STATUS_LABELS] || status}
+                      aria-label={t(STATUS_LABELS[status as keyof typeof STATUS_LABELS] as TranslationKey) || status}
                       className={`h-9 w-9 p-0 rounded-full cursor-pointer ${status ? STATUS_COLORS[status as StatusType] : 'bg-gray-500'}`}
                     >
                       <span className="flex items-center justify-center w-full h-full">
@@ -117,8 +119,8 @@ export function UserAnimeListPage() {
                     </Badge>
                   </TooltipWrap>
                   {isFavorite && (
-                    <TooltipWrap content="Избранное">
-                      <Badge aria-label="Избранное" className="bg-pink-500 text-white h-9 w-9 p-0 rounded-full cursor-pointer">
+                    <TooltipWrap content={t('userAnimeList.favoriteBadge')}>
+                      <Badge aria-label={t('userAnimeList.favoriteBadge')} className="bg-pink-500 text-white h-9 w-9 p-0 rounded-full cursor-pointer">
                         <span className="flex items-center justify-center w-full h-full text-white">
                           {FAVORITE_ICON}
                         </span>

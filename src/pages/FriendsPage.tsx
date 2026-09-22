@@ -7,9 +7,11 @@ import { FriendsSidebar } from '@/components/friends/FriendsSidebar';
 import type { FriendsTab } from '@/components/friends/FriendsSidebar';
 import { FriendsTabPanel } from '@/components/friends/FriendsTabPanel';
 import { FriendsPageSkeleton } from '@/components/loaders/PageSkeletons';
+import { useT } from '@/i18n';
 
 export function FriendsPage() {
   const { data: user, isLoading: isUserLoading } = useUser();
+  const { t } = useT();
   const [tab, setTab] = useState<FriendsTab>('all');
   const { addFriend, removeFriend, pendingFriendIds, error: actionError } = useFriendActions(user?.id);
 
@@ -18,12 +20,12 @@ export function FriendsPage() {
   }
 
   if (!user) {
-    return <LoginRequired message="Для просмотра друзей необходимо войти" />;
+    return <LoginRequired message={t('friends.loginRequired')} />;
   }
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-foreground">Друзья</h1>
+      <h1 className="text-2xl font-bold text-foreground">{t('friends.pageTitle')}</h1>
       {actionError && <p className="text-sm text-destructive">{actionError}</p>}
 
       <div className="flex flex-col gap-6 md:flex-row md:items-start">

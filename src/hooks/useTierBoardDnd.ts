@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
   MouseSensor,
   TouchSensor,
@@ -17,6 +18,7 @@ export function useTierBoardDnd(
   state: TierListState,
   moveAnime: (animeId: number, toTierId: string, toIndex: number) => void
 ) {
+  const { t } = useTranslation();
   const [activeAnimeId, setActiveAnimeId] = useState<number | null>(null);
 
   const sensors = useSensors(
@@ -28,7 +30,7 @@ export function useTierBoardDnd(
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })
   );
 
-  const moveTargets = useMemo(() => buildMoveTargets(state.tiers), [state.tiers]);
+  const moveTargets = useMemo(() => buildMoveTargets(state.tiers, t), [state.tiers, t]);
 
   const handleDragStart = (event: DragStartEvent) => {
     setActiveAnimeId(Number(event.active.id));

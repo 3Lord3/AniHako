@@ -9,9 +9,11 @@ import { ConfirmationDialog } from '@/components/ConfirmationDialog';
 import { TierBoard } from './components/TierBoard';
 import { AddAnimeDialog } from './components/AddAnimeDialog';
 import { ManageTiersDialog } from './components/ManageTiersDialog';
+import { useT } from '@/i18n';
 
 export function AniTierPage() {
   const { data: user, isLoading: isUserLoading } = useUser();
+  const { t } = useT();
   const [isAddAnimeOpen, setIsAddAnimeOpen] = useState(false);
   const [isResetOpen, setIsResetOpen] = useState(false);
   const [isManageTiersOpen, setIsManageTiersOpen] = useState(false);
@@ -22,7 +24,7 @@ export function AniTierPage() {
   }
 
   if (!user) {
-    return <LoginRequired message="Для составления тир-листа необходимо войти" />;
+    return <LoginRequired message={t('tier.loginRequired')} />;
   }
 
   const existingAnimeIds = new Set(Object.keys(tierList.state.items).map(Number));
@@ -32,20 +34,20 @@ export function AniTierPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="flex items-center gap-2 text-xl font-bold text-foreground sm:text-2xl md:text-3xl">
           <LayoutList className="size-6 sm:size-7" />
-          AniTier
+          {t('nav.tier')}
         </h1>
         <div className="flex flex-wrap gap-2">
           <Button variant="outline" size="sm" onClick={() => setIsManageTiersOpen(true)}>
             <SlidersHorizontal className="size-4" />
-            Тиры
+            {t('tier.tiers')}
           </Button>
           <Button variant="outline" size="sm" onClick={() => setIsAddAnimeOpen(true)}>
             <ListPlus className="size-4" />
-            Добавить аниме
+            {t('tier.addAnime')}
           </Button>
           <Button variant="ghost" size="sm" onClick={() => setIsResetOpen(true)}>
             <RotateCcw className="size-4" />
-            Сбросить
+            {t('tier.reset')}
           </Button>
         </div>
       </div>
@@ -63,10 +65,10 @@ export function AniTierPage() {
         open={isResetOpen}
         onOpenChange={setIsResetOpen}
         onConfirm={tierList.reset}
-        title="Сбросить тир-лист?"
-        description="Тиры вернутся к значениям по умолчанию (S, A, B, C, D), а всё разложенное аниме окажется в «Не оценено»."
-        confirmText="Сбросить"
-        cancelText="Отмена"
+        title={t('tier.resetDialogTitle')}
+        description={t('tier.resetDialogDesc')}
+        confirmText={t('tier.resetConfirm')}
+        cancelText={t('common.cancel')}
         confirmVariant="destructive"
       />
 

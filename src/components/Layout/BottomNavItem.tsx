@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
+import { useT, type TranslationKey } from '@/i18n';
 import type { NavItem } from './navConfig';
 
 interface BottomNavItemProps {
@@ -8,6 +9,7 @@ interface BottomNavItemProps {
 }
 
 export function BottomNavItem({ item, active }: BottomNavItemProps) {
+  const { t } = useT();
   const Icon = item.icon;
   return (
     <Link
@@ -18,7 +20,7 @@ export function BottomNavItem({ item, active }: BottomNavItemProps) {
       )}
     >
       <Icon className={cn('w-5 h-5', active && 'stroke-[2.5]')} />
-      <span className="truncate max-w-full px-1">{item.label}</span>
+      <span className="truncate max-w-full px-1">{t(item.labelKey as TranslationKey)}</span>
     </Link>
   );
 }
