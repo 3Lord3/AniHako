@@ -10,6 +10,7 @@ import { TierRow } from './TierRow';
 import { UnrankedPool } from './UnrankedPool';
 import { TIER_CARD_SIZE_CLASSES } from './TierCard';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n';
 
 interface TierBoardProps {
   tierList: ReturnType<typeof useTierList>;
@@ -20,6 +21,7 @@ interface TierBoardProps {
 const EMPTY_ORDER: number[] = [];
 
 export function TierBoard({ tierList }: TierBoardProps) {
+  const { t } = useT();
   const { state, moveAnime } = tierList;
   const { sensors, activeItem, moveTargets, handleDragStart, handleDragEnd, handleDragCancel } =
     useTierBoardDnd(state, moveAnime);
@@ -35,7 +37,7 @@ export function TierBoard({ tierList }: TierBoardProps) {
       <div className="space-y-2">
         {state.tiers.length === 0 && (
           <div className="rounded-lg border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
-            Нет ни одного тира. Откройте «Тиры» и создайте первый.
+            {t('tier.emptyTiers')}
           </div>
         )}
 

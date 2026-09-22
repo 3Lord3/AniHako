@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useFriendActions } from './useFriendActions';
 import { useFriends, useFriendStatus } from './useFriends';
 import { useUserByNickname } from './useUsers';
@@ -20,6 +21,7 @@ const NUMERIC_ID = /^\d+$/;
  *   3. Только подтверждённый ID уходит в эндпоинт статуса.
  */
 export function useAddFriendDialog(userId: number, userNickname?: string) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [idInput, setIdInput] = useState('');
   const [submitted, setSubmitted] = useState<string | null>(null);
@@ -62,9 +64,9 @@ export function useAddFriendDialog(userId: number, userNickname?: string) {
     error ??
     mutationError ??
     (notFound
-      ? 'Пользователь с таким никнеймом или ID не найден'
+      ? t('friends.userNotFound')
       : resolvedIsSelf
-        ? 'Нельзя добавить самого себя'
+        ? t('friends.cannotAddSelf')
         : null);
 
   const reset = () => {
@@ -89,7 +91,7 @@ export function useAddFriendDialog(userId: number, userNickname?: string) {
   const handleCheck = () => {
     const trimmed = idInput.trim();
     if (!trimmed) {
-      setError('Введите никнейм или ID пользователя');
+      setError(t('friends.enterId'));
       setSubmitted(null);
       return;
     }
@@ -98,7 +100,7 @@ export function useAddFriendDialog(userId: number, userNickname?: string) {
       ? Number(trimmed) === userId
       : !!userNickname && trimmed.toLowerCase() === userNickname.toLowerCase();
     if (isSelf) {
-      setError('Нельзя добавить самого себя');
+      setError(t('friends.cannotAddSelf'));
       setSubmitted(null);
       return;
     }
@@ -114,9 +116,9 @@ export function useAddFriendDialog(userId: number, userNickname?: string) {
   };
 
   const actions = status
-    ? getFriendActions(status)
+    ? getFriendActions(status, t)
     : hasResult
-      ? [{ key: 'add' as const, label: 'Отправить заявку', method: 'add' as const, variant: 'default' as const }]
+      ? [{ key: 'add' as const, label: t('friends.sendRequest'), method: 'add' as const, variant: 'default' as const }]
       : [];
 
   return {

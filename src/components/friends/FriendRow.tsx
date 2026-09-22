@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { FriendStatusBadge } from './FriendStatusBadge';
 import { formatLastOnline } from '@/lib/dateUtils';
 import { getFriendActions } from '@/lib/friendActions';
+import { useT } from '@/i18n';
 import type { YummyFriend } from '@/types/friend';
 
 interface FriendRowProps {
@@ -15,7 +16,8 @@ interface FriendRowProps {
 }
 
 export function FriendRow({ friend, onAdd, onRemove, isPending }: FriendRowProps) {
-  const actions = getFriendActions(friend.friend_status);
+  const { t } = useT();
+  const actions = getFriendActions(friend.friend_status, t);
   const disabled = isPending || friend.banned;
 
   return (
@@ -30,9 +32,9 @@ export function FriendRow({ friend, onAdd, onRemove, isPending }: FriendRowProps
           <div className="flex flex-wrap items-center gap-1.5">
             <p className="truncate font-medium">{friend.nickname}</p>
             <FriendStatusBadge status={friend.friend_status} />
-            {friend.banned && <Badge variant="destructive">Заблокирован</Badge>}
+            {friend.banned && <Badge variant="destructive">{t('friends.banned')}</Badge>}
           </div>
-          <p className="text-xs text-muted-foreground">{formatLastOnline(friend.last_online)}</p>
+          <p className="text-xs text-muted-foreground">{formatLastOnline(friend.last_online, t)}</p>
           <RoleBadges roles={friend.roles} />
         </div>
       </div>

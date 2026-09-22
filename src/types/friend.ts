@@ -22,11 +22,11 @@ export const FRIEND_STATUSES: FriendStatus[] = [
 ];
 
 export const FRIEND_STATUS_LABELS: Record<FriendStatus, string> = {
-  friends: 'Друзья',
-  followers: 'Подписчики',
-  following: 'Подписки',
-  requests: 'Входящие заявки',
-  'sent-requests': 'Исходящие заявки',
+  friends: 'friends.tabs.friends',
+  followers: 'friends.tabs.followers',
+  following: 'friends.tabs.following',
+  requests: 'friends.tabs.requests',
+  'sent-requests': 'friends.tabs.sentRequests',
 };
 
 interface YummyFriendIds {

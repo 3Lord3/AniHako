@@ -17,6 +17,7 @@ import {
   removeHCaptcha,
   resetHCaptcha,
 } from '@/lib/hCaptcha';
+import { useT } from '@/i18n';
 
 /**
  * Renders the global captcha dialog and exposes a solver to the axios
@@ -27,6 +28,7 @@ import {
 export function CaptchaProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useT();
   const containerRef = useRef<HTMLDivElement>(null);
   const openRef = useRef(false);
   const widgetIdRef = useRef<number | null>(null);
@@ -79,14 +81,14 @@ export function CaptchaProvider({ children }: { children: ReactNode }) {
   );
 
   const handleChallengeExpired = useCallback(() => {
-    setError('Время на решение капчи истекло. Попробуйте ещё раз.');
+    setError(t('captcha.challengeExpired'));
     resetWidget();
-  }, [resetWidget]);
+  }, [resetWidget, t]);
 
   const handleExpired = useCallback(() => {
-    setError('Капча истекла. Пройдите её ещё раз.');
+    setError(t('captcha.expired'));
     resetWidget();
-  }, [resetWidget]);
+  }, [resetWidget, t]);
 
   const renderWidget = useCallback(async () => {
     const container = containerRef.current;
@@ -203,7 +205,7 @@ export function CaptchaProvider({ children }: { children: ReactNode }) {
               <ShieldCheck className="h-5 w-5 text-primary" />
             </DialogTitle>
             <DialogDescription>
-              Мы заметили подозрительную активность. Решите капчу, чтобы продолжить.
+              {t('captcha.suspicious')}
             </DialogDescription>
           </DialogHeader>
           <div
@@ -214,7 +216,7 @@ export function CaptchaProvider({ children }: { children: ReactNode }) {
           {error && <p className="text-center text-sm text-destructive">{error}</p>}
           <DialogFooter>
             <Button variant="outline" onClick={() => handleOpenChange(false)}>
-              Отмена
+              {t('common.cancel')}
             </Button>
           </DialogFooter>
         </DialogContent>

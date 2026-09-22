@@ -7,6 +7,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { cn } from '@/lib/utils';
+import { useT, type TranslationKey } from '@/i18n';
 import type { NavItem } from './navConfig';
 
 interface ServicesDropdownProps {
@@ -15,6 +16,7 @@ interface ServicesDropdownProps {
 }
 
 export function ServicesDropdown({ items, active }: ServicesDropdownProps) {
+  const { t } = useT();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -24,7 +26,7 @@ export function ServicesDropdown({ items, active }: ServicesDropdownProps) {
         )}
       >
         <Wand2 className={cn('w-5 h-5', active && 'stroke-[2.5]')} />
-        <span className="truncate max-w-full px-1">Сервисы</span>
+        <span className="truncate max-w-full px-1">{t('nav.services')}</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" side="top" className="mb-2 w-48">
         {items.map((item) => {
@@ -33,7 +35,7 @@ export function ServicesDropdown({ items, active }: ServicesDropdownProps) {
             <DropdownMenuItem key={item.to} className="cursor-pointer">
               <Link to={item.to} className="flex items-center w-full">
                 <Icon className="w-4 h-4 mr-2" />
-                {item.label}
+                {t(item.labelKey as TranslationKey)}
               </Link>
             </DropdownMenuItem>
           );

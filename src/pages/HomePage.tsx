@@ -12,13 +12,15 @@ import type { AnimeCatalogItem } from '@/types/anime';
 import { getRatingColor } from '@/types/constants';
 import { buildAnimeUrl } from '@/lib/animeUrl';
 import { formatDayMonth } from '@/lib/schedule';
+import { useT } from '@/i18n';
 
 interface CarouselCardProps {
   anime: AnimeCatalogItem;
 }
 
 function CarouselCard({ anime }: CarouselCardProps) {
-  const displayTitle = anime.title || 'Unknown';
+  const { t } = useT();
+  const displayTitle = anime.title || t('common.unknown');
   const rating = anime.rating?.average ?? null;
   const isAnnouncement = anime.anime_status?.alias === 'announcement';
   const validRating = rating !== null && !isNaN(rating) && !isAnnouncement;
@@ -38,9 +40,9 @@ function CarouselCard({ anime }: CarouselCardProps) {
           <AnimeTitle title={displayTitle} className="font-semibold text-sm text-white" />
         </div>
         {validRating && (
-          <TooltipWrap content={`Рейтинг: ${rating.toFixed(1)}`}>
+          <TooltipWrap content={t('animeCard.rating', { rating: rating.toFixed(1) })}>
             <div
-              aria-label={`Рейтинг: ${rating.toFixed(1)}`}
+              aria-label={t('animeCard.rating', { rating: rating.toFixed(1) })}
               className={cn(
                 'absolute top-2 right-2 h-8 px-1.5 rounded flex items-center gap-0.5',
                 getRatingColor(rating)
@@ -101,6 +103,7 @@ function AnimeCarousel({ anime }: { anime: AnimeCatalogItem[] }) {
 }
 
 export function HomePage() {
+  const { t } = useT();
   const {
     currentYear,
     seasonName,
@@ -123,18 +126,18 @@ export function HomePage() {
         {seasonalLoading ? (
           <CarouselSkeleton />
         ) : !seasonalData?.data?.length ? (
-          <div className="text-center py-8 text-muted-foreground">Нет аниме</div>
+          <div className="text-center py-8 text-muted-foreground">{t('home.noAnime')}</div>
         ) : (
           <AnimeCarousel anime={seasonalData.data} />
         )}
       </section>
 
       <section>
-        <h2 className="text-2xl font-bold text-foreground mb-6">Расписание онгоингов</h2>
+        <h2 className="text-2xl font-bold text-foreground mb-6">{t('home.scheduleTitle')}</h2>
         {scheduleLoading ? (
           <ScheduleSkeleton />
         ) : !scheduleData?.length ? (
-          <div className="text-center py-8 text-muted-foreground">Нет данных</div>
+          <div className="text-center py-8 text-muted-foreground">{t('home.noData')}</div>
         ) : (
           <>
             <div className="flex gap-2 mb-6 overflow-x-auto px-1 pt-1 pb-2">
@@ -162,10 +165,10 @@ export function HomePage() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">Название</th>
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground hidden sm:table-cell">Эпизоды</th>
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground hidden md:table-cell">Предыдущий</th>
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground hidden lg:table-cell">Следующий</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">{t('home.colTitle')}</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground hidden sm:table-cell">{t('home.colEpisodes')}</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground hidden md:table-cell">{t('home.colPrevious')}</th>
+                    <th className="text-left py-3 px-4 font-medium text-muted-foreground hidden lg:table-cell">{t('home.colNext')}</th>
                   </tr>
                 </thead>
                 <tbody>

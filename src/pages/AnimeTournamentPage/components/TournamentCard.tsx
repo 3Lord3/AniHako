@@ -14,6 +14,7 @@ import { getImageUrl, getHeroPosterUrl } from '@/lib/imageUrl';
 import { getAnimeUrlSlug } from '@/lib/animeUrl';
 import { cn } from '@/lib/utils';
 import { useAnimeDetail } from '@/hooks';
+import { useT } from '@/i18n';
 
 interface TournamentCardProps {
   anime: AnimeCatalogItem;
@@ -36,6 +37,7 @@ export function TournamentCard({
   compact = false,
   className = ''
 }: TournamentCardProps) {
+  const { t } = useT();
   const posterUrl = getHeroPosterUrl(anime);
   const [infoOpen, setInfoOpen] = useState(false);
   // Tournament participants are built from the user's anime list, which
@@ -85,7 +87,7 @@ export function TournamentCard({
               "bg-yellow-500 text-black font-bold",
               compact ? "px-2 py-1 text-xs sm:text-sm" : "px-3 py-1 text-sm"
             )}>
-              🏆 Победитель
+              {t('tournament.winnerBadge')}
             </Badge>
           </div>
         )}
@@ -124,7 +126,7 @@ export function TournamentCard({
               e.stopPropagation();
               setInfoOpen(true);
             }}
-            aria-label="Информация об аниме"
+            aria-label={t('tournament.infoAria')}
             className={cn(
               "absolute z-30 flex items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm transition-colors hover:bg-black/80",
               compact ? "top-2 left-2 w-9 h-9 sm:top-3 sm:left-3 sm:w-11 sm:h-11" : "top-3 left-3 w-10 h-10"
@@ -156,7 +158,7 @@ export function TournamentCard({
             "bg-white/90 text-black rounded-full font-semibold",
             compact ? "px-4 py-2 text-sm sm:text-base" : "px-4 py-2 text-sm"
           )}>
-            Выбрать
+            {t('tournament.selectBadge')}
           </div>
         </div>
       )}
@@ -199,11 +201,11 @@ export function TournamentCard({
                 {description}
               </p>
             ) : isDetailLoading ? (
-              <p className="text-sm text-muted-foreground">Загрузка описания…</p>
+              <p className="text-sm text-muted-foreground">{t('tournament.loadingDescription')}</p>
             ) : isDetailError ? (
-              <p className="text-sm text-muted-foreground">Не удалось загрузить описание</p>
+              <p className="text-sm text-muted-foreground">{t('tournament.descriptionError')}</p>
             ) : (
-              <p className="text-sm text-muted-foreground">Описание отсутствует</p>
+              <p className="text-sm text-muted-foreground">{t('matcher.noDescription')}</p>
             )}
           </div>
         </DialogContent>

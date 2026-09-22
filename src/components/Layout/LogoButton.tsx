@@ -1,6 +1,7 @@
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { SearchSheet } from './SearchSheet';
 import { useState } from 'react';
+import { useT } from '@/i18n';
 
 interface LogoButtonProps {
   variant: 'desktop' | 'mobile';
@@ -10,6 +11,7 @@ export function LogoButton({ variant }: LogoButtonProps) {
   const [searchOpen, setSearchOpen] = useState(false);
   const location = useLocation();
   const [, setSearchParams] = useSearchParams();
+  const { t } = useT();
 
   const handleLogoClick = () => {
     if (location.pathname === '/' && location.search) {
@@ -37,7 +39,7 @@ export function LogoButton({ variant }: LogoButtonProps) {
       <button
         type="button"
         onClick={() => setSearchOpen(true)}
-        aria-label="Поиск"
+        aria-label={t('logo.search')}
         className="relative -mt-10 w-16 h-16 rounded-full bg-card border-2 border-primary shadow-lg flex items-center justify-center transition-transform active:scale-95"
       >
         <img src="/favicon.svg" alt="" className="h-9 w-9" />

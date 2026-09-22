@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { User, List, Users, LogOut } from 'lucide-react';
 import { useUser, useAuth } from '@/hooks';
+import { useT } from '@/i18n';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,6 +20,7 @@ interface ProfileDropdownProps {
 export function ProfileDropdown({ variant }: ProfileDropdownProps) {
   const { data: user } = useUser();
   const { logout } = useAuth();
+  const { t } = useT();
 
   const isMobile = variant === 'mobile';
 
@@ -52,7 +54,7 @@ export function ProfileDropdown({ variant }: ProfileDropdownProps) {
       <DropdownMenuTrigger className={triggerClassName}>
         {trigger}
         {isMobile && (
-          <span className="truncate max-w-full px-1">{user ? 'Профиль' : 'Войти'}</span>
+          <span className="truncate max-w-full px-1">{user ? t('profileMenu.userLabel') : t('profileMenu.guestLabel')}</span>
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent
@@ -71,19 +73,19 @@ export function ProfileDropdown({ variant }: ProfileDropdownProps) {
             <DropdownMenuItem className="cursor-pointer">
               <Link to="/profile" className="flex items-center w-full">
                 <User className="w-4 h-4 mr-2" />
-                Профиль
+                {t('profileMenu.profile')}
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer">
               <Link to="/profile/anime" className="flex items-center w-full">
                 <List className="w-4 h-4 mr-2" />
-                Мой список
+                {t('profileMenu.myList')}
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer">
               <Link to="/profile/friends" className="flex items-center w-full">
                 <Users className="w-4 h-4 mr-2" />
-                Друзья
+                {t('profileMenu.friends')}
               </Link>
             </DropdownMenuItem>
             <ThemeSwitcher />
@@ -93,19 +95,19 @@ export function ProfileDropdown({ variant }: ProfileDropdownProps) {
               className="cursor-pointer text-destructive focus:text-destructive"
             >
               <LogOut className="w-4 h-4 mr-2" />
-              Выйти
+              {t('profileMenu.logout')}
             </DropdownMenuItem>
           </>
         ) : (
           <>
             <DropdownMenuItem className="cursor-pointer">
               <Link to="/login" className="flex items-center w-full">
-                Вход
+                {t('profileMenu.login')}
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem className="cursor-pointer">
               <Link to="/register" className="flex items-center w-full">
-                Регистрация
+                {t('profileMenu.register')}
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />

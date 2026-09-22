@@ -7,10 +7,10 @@
  */
 
 export const SEASONS = {
-  1: { alias: 'winter', label: 'Зима' },
-  2: { alias: 'spring', label: 'Весна' },
-  3: { alias: 'summer', label: 'Лето' },
-  4: { alias: 'autumn', label: 'Осень' },
+  1: { alias: 'winter', labelKey: 'seasons.winter' },
+  2: { alias: 'spring', labelKey: 'seasons.spring' },
+  3: { alias: 'summer', labelKey: 'seasons.summer' },
+  4: { alias: 'autumn', labelKey: 'seasons.autumn' },
 } as const;
 
 export type Season = keyof typeof SEASONS;

@@ -1,9 +1,11 @@
 import { useCallback, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from './useAuth';
 import { getApiErrorMessage, isCaptchaChallenge } from '@/lib/apiError';
 
 export function useLoginForm() {
+  const { t } = useTranslation();
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -25,14 +27,14 @@ export function useLoginForm() {
           setCaptchaNonce((n) => n + 1);
           if (isCaptchaChallenge(err)) {
             setCaptchaRequired(true);
-            setError('Пройдите капчу, чтобы продолжить');
+            setError(t('login.captchaPrompt'));
           } else {
-            setError(getApiErrorMessage(err, 'Ошибка входа'));
+            setError(getApiErrorMessage(err, t('login.error')));
           }
         },
       });
     },
-    [doLogin, navigate]
+    [doLogin, navigate, t]
   );
 
   const handleSubmit = (e: React.FormEvent) => {

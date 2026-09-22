@@ -5,8 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { useT } from '@/i18n';
 
 export function RegisterPage() {
+  const { t } = useT();
   const {
     email,
     setEmail,
@@ -29,8 +31,8 @@ export function RegisterPage() {
     <div className="flex items-center justify-center min-h-[calc(100dvh-10rem)] py-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>Регистрация</CardTitle>
-          <CardDescription>Создайте новый аккаунт</CardDescription>
+          <CardTitle>{t('register.title')}</CardTitle>
+          <CardDescription>{t('register.subtitle')}</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
@@ -40,7 +42,7 @@ export function RegisterPage() {
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('register.email')}</Label>
               <Input
                 id="email"
                 type="email"
@@ -51,7 +53,7 @@ export function RegisterPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="username">Имя пользователя</Label>
+              <Label htmlFor="username">{t('register.username')}</Label>
               <Input
                 id="username"
                 type="text"
@@ -63,7 +65,7 @@ export function RegisterPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Пароль</Label>
+              <Label htmlFor="password">{t('register.password')}</Label>
               <Input
                 id="password"
                 type="password"
@@ -75,7 +77,7 @@ export function RegisterPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Подтвердите пароль</Label>
+              <Label htmlFor="confirmPassword">{t('register.confirmPassword')}</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -93,7 +95,7 @@ export function RegisterPage() {
                   checked={acceptRules}
                   onCheckedChange={setAcceptRules}
                 />
-                <span className="text-sm font-normal leading-tight">Я согласен с <a href="https://ru.yummyani.me/pages/about-yummy?tab=rules" target="_blank" rel="noopener noreferrer" className="text-primary underline">правилами сайта</a></span>
+                <span className="text-sm font-normal leading-tight">{t('register.agreeRules')} <a href="https://ru.yummyani.me/pages/about-yummy?tab=rules" target="_blank" rel="noopener noreferrer" className="text-primary underline">{t('register.rulesLink')}</a></span>
               </div>
               <div className="flex items-center gap-2 pb-4">
                 <Checkbox
@@ -101,18 +103,18 @@ export function RegisterPage() {
                   checked={acceptPrivacy}
                   onCheckedChange={setAcceptPrivacy}
                 />
-                <span className="text-sm font-normal leading-tight">Я согласен с <a href="https://ru.yummyani.me/pages/privacy" target="_blank" rel="noopener noreferrer" className="text-primary underline">политикой конфиденциальности</a></span>
+                <span className="text-sm font-normal leading-tight">{t('register.agreePrivacy')} <a href="https://ru.yummyani.me/pages/privacy" target="_blank" rel="noopener noreferrer" className="text-primary underline">{t('register.privacyLink')}</a></span>
               </div>
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-4 border-border">
             <Button type="submit" className="w-full" disabled={isRegistering}>
-              {isRegistering ? 'Регистрация...' : 'Зарегистрироваться'}
+              {isRegistering ? t('register.registering') : t('register.action')}
             </Button>
             <p className="text-sm text-muted-foreground">
-              Уже есть аккаунт?{' '}
+              {t('register.hasAccount')}{' '}
               <Link to="/login" className="text-primary hover:underline">
-                Войти
+                {t('register.loginLink')}
               </Link>
             </p>
           </CardFooter>

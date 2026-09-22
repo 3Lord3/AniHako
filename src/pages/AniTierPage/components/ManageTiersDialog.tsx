@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import type { TierDefinition, TierColorId } from '@/types/tier';
 import { ManageTierRow } from './ManageTierRow';
+import { useT } from '@/i18n';
 
 interface ManageTiersDialogProps {
   open: boolean;
@@ -25,6 +26,7 @@ export function ManageTiersDialog({
   onRemoveTier,
   onReorderTiers,
 }: ManageTiersDialogProps) {
+  const { t } = useT();
   const swap = (index: number, delta: number) => {
     const target = index + delta;
     if (target < 0 || target >= tiers.length) return;
@@ -37,7 +39,7 @@ export function ManageTiersDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg">
         <DialogHeader>
-          <DialogTitle>Управление тирами</DialogTitle>
+          <DialogTitle>{t('tier.manageDialogTitle')}</DialogTitle>
         </DialogHeader>
 
         <div className="max-h-[60vh] space-y-2 overflow-y-auto">
@@ -58,7 +60,7 @@ export function ManageTiersDialog({
 
         <Button variant="outline" onClick={onAddTier} className="w-full">
           <Plus className="size-4" />
-          Добавить тир
+          {t('tier.addTier')}
         </Button>
       </DialogContent>
     </Dialog>

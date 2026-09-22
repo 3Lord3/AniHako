@@ -7,6 +7,7 @@ import type { AnimeCatalogItem } from '@/types';
 import { getImageUrl, getPosterUrl } from '@/lib/imageUrl';
 import { buildAnimeUrl } from '@/lib/animeUrl';
 import { STATUS_ICONS, STATUS_COLORS, STATUS_LABELS, FAVORITE_ICON, getRatingColor, type StatusType } from '@/types/constants';
+import { useT, type TranslationKey } from '@/i18n';
 
 interface AnimeCardProps {
   anime: AnimeCatalogItem;
@@ -16,7 +17,8 @@ interface AnimeCardProps {
 }
 
 export function AnimeCard({ anime, showRating = true, userStatus, isFavorite }: AnimeCardProps) {
-  const displayTitle = anime.title || 'Unknown';
+  const { t } = useT();
+  const displayTitle = anime.title || t('common.unknown');
 
   const rating = anime.rating?.average ?? null;
   const isAnnouncement = anime.anime_status?.alias === 'announcement';
@@ -24,8 +26,8 @@ export function AnimeCard({ anime, showRating = true, userStatus, isFavorite }: 
 
   const url = buildAnimeUrl(anime);
 
-  const statusLabel = userStatus ? STATUS_LABELS[userStatus] : '';
-  const ratingLabel = validRating ? `Рейтинг: ${rating.toFixed(1)}` : '';
+  const statusLabel = userStatus ? t(STATUS_LABELS[userStatus] as TranslationKey) : '';
+  const ratingLabel = validRating ? t('animeCard.rating', { rating: rating.toFixed(1) }) : '';
 
   return (
     <Link to={url} className="group block">
@@ -49,8 +51,8 @@ export function AnimeCard({ anime, showRating = true, userStatus, isFavorite }: 
               </TooltipWrap>
             )}
             {isFavorite && (
-              <TooltipWrap content="Избранное">
-                <Badge aria-label="Избранное" className="bg-pink-500 h-9 w-9 p-0 rounded-full cursor-pointer">
+              <TooltipWrap content={t('animeCard.favorite')}>
+                <Badge aria-label={t('animeCard.favorite')} className="bg-pink-500 h-9 w-9 p-0 rounded-full cursor-pointer">
                   <span className="flex items-center justify-center w-full h-full text-white">
                     {FAVORITE_ICON}
                   </span>

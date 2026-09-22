@@ -11,6 +11,7 @@ import {
 import type { TierAnimeItem } from '@/types/tier';
 import type { MoveTarget } from '@/lib/tierMoveTargets';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n';
 
 export type TierCardSize = 'compact' | 'large';
 
@@ -28,6 +29,7 @@ interface TierCardProps {
 }
 
 export function TierCard({ anime, tierId, moveTargets, onMoveToTier, size = 'large' }: TierCardProps) {
+  const { t } = useT();
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: String(anime.animeId),
     data: { type: 'card', tierId },
@@ -56,7 +58,7 @@ export function TierCard({ anime, tierId, moveTargets, onMoveToTier, size = 'lar
 
       <DropdownMenu>
         <DropdownMenuTrigger
-          aria-label="Переместить в тир"
+          aria-label={t('tier.moveToTier')}
           className="absolute bottom-1 right-1 flex size-8 items-center justify-center rounded-full bg-background/90 text-foreground shadow-md transition-opacity sm:opacity-0 sm:group-hover:opacity-100"
         >
           <ArrowRightLeft className="size-4" />

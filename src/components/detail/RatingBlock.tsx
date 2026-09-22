@@ -5,12 +5,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { cn } from '@/lib/utils';
 import { getRatingColor } from '@/types/constants';
 import { useRateAnime, useUnrateAnime } from '@/hooks/useAnime';
+import { useT, type TranslationKey } from '@/i18n';
 
 const CRITERIA = [
-  { key: 'plot', label: 'Сюжет' },
-  { key: 'world', label: 'Мир' },
-  { key: 'characters', label: 'Персонажи' },
-  { key: 'impression', label: 'Общее впечатление' },
+  { key: 'plot', labelKey: 'rating.criteria.plot' },
+  { key: 'world', labelKey: 'rating.criteria.world' },
+  { key: 'characters', labelKey: 'rating.criteria.characters' },
+  { key: 'impression', labelKey: 'rating.criteria.impression' },
 ] as const;
 
 /** Вычисляет округлённое до целого среднее четырёх критериев (1–10). */
@@ -87,6 +88,7 @@ export function RatingBlock({
 }: RatingBlockProps) {
   const { mutate: rate } = useRateAnime();
   const { mutate: unrate } = useUnrateAnime();
+  const { t } = useT();
 
   const [open, setOpen] = useState(false);
 
@@ -153,13 +155,13 @@ export function RatingBlock({
         variant={myRating !== undefined ? 'default' : 'outline'}
       >
         <Star className={cn('w-4 h-4', myRating !== undefined && 'fill-current')} />
-        {myRating !== undefined ? `Моя оценка: ${myRating}` : 'Оценить'}
+        {myRating !== undefined ? t('rating.myRating', { rating: myRating }) : t('rating.rate')}
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-lg">Оценка</DialogTitle>
+            <DialogTitle className="text-lg">{t('rating.title')}</DialogTitle>
           </DialogHeader>
 
           {/* Текущий средний рейтинг с цветом бейджа + число голосов */}
@@ -177,13 +179,13 @@ export function RatingBlock({
             </span>
             <span className="inline-flex items-center gap-1 text-muted-foreground text-sm">
               <Vote className="w-4 h-4" />
-              {counter !== undefined ? counter.toLocaleString('ru-RU') : '—'} голосов
+              {counter !== undefined ? t('rating.votes', { count: counter }) : '—'}
             </span>
           </div>
 
           {/* Ваша оценка */}
           <div className="text-sm">
-            Ваша оценка:{' '}
+            {t('rating.yourScore')}{' '}
             {myRating ? (
               <span
                 className={cn(
@@ -194,7 +196,7 @@ export function RatingBlock({
                 {myRating}
               </span>
             ) : (
-              <span className="text-muted-foreground">нет</span>
+              <span className="text-muted-foreground">{t('rating.none')}</span>
             )}
           </div>
 
@@ -210,8 +212,8 @@ export function RatingBlock({
                       key={c.key}
                       className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between sm:gap-2"
                     >
-                      <span className="text-sm text-muted-foreground shrink-0">{c.label}</span>
-                      <StarSelector value={value} onChange={setValue} ariaLabel={c.label} />
+                      <span className="text-sm text-muted-foreground shrink-0">{t(c.labelKey as TranslationKey)}</span>
+                      <StarSelector value={value} onChange={setValue} ariaLabel={t(c.labelKey as TranslationKey)} />
                     </div>
                   );
                 })}
@@ -219,7 +221,7 @@ export function RatingBlock({
 
               {/* Итоговая оценка = среднее арифметическое четырёх критериев */}
               <div className="flex items-center justify-between rounded-md bg-muted/50 px-3 py-2">
-                <span className="text-sm font-medium">Итоговая оценка</span>
+                <span className="text-sm font-medium">{t('rating.total')}</span>
                 <span
                   className={cn(
                     getRatingColor(overall),
@@ -235,7 +237,7 @@ export function RatingBlock({
                 disabled={overall === null || pending}
                 className="cursor-pointer w-full"
               >
-                Оценить
+                {t('rating.rate')}
               </Button>
             </>
           ) : (
@@ -247,7 +249,7 @@ export function RatingBlock({
                 className="cursor-pointer w-full"
               >
                 <X className="w-4 h-4" />
-                Убрать
+                {t('rating.remove')}
               </Button>
             </>
           )}

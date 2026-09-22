@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { FriendStatusBadge } from './FriendStatusBadge';
 import { useAddFriendDialog } from '@/hooks';
+import { useT } from '@/i18n';
 
 interface AddFriendDialogProps {
   userId: number;
@@ -12,6 +13,7 @@ interface AddFriendDialogProps {
 }
 
 export function AddFriendDialog({ userId, userNickname }: AddFriendDialogProps) {
+  const { t } = useT();
   const {
     open,
     handleOpenChange,
@@ -34,16 +36,16 @@ export function AddFriendDialog({ userId, userNickname }: AddFriendDialogProps) 
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <Button className="h-9" onClick={openDialog}>
         <UserPlus className="w-4 h-4 mr-2" />
-        Добавить в друзья
+        {t('friends.addFriend')}
       </Button>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Добавить в друзья</DialogTitle>
+          <DialogTitle>{t('friends.dialogTitle')}</DialogTitle>
         </DialogHeader>
 
         <div className="space-y-3">
           <div className="space-y-1.5">
-            <Label htmlFor="friend-id-input">Никнейм или ID пользователя</Label>
+            <Label htmlFor="friend-id-input">{t('friends.inputLabel')}</Label>
             <div className="flex gap-2">
               <div className="relative flex-1">
                 <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -60,7 +62,7 @@ export function AddFriendDialog({ userId, userNickname }: AddFriendDialogProps) 
                 />
               </div>
               <Button variant="outline" onClick={handleCheck} disabled={isChecking}>
-                Проверить
+                {t('friends.check')}
               </Button>
             </div>
             {displayError && <p className="text-xs text-destructive">{displayError}</p>}
@@ -73,7 +75,7 @@ export function AddFriendDialog({ userId, userNickname }: AddFriendDialogProps) 
                 {status ? (
                   <FriendStatusBadge status={status} />
                 ) : (
-                  <p className="text-xs text-muted-foreground">Вы ещё не связаны</p>
+                  <p className="text-xs text-muted-foreground">{t('friends.notConnected')}</p>
                 )}
               </div>
               <div className="flex gap-2">

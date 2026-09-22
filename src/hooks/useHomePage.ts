@@ -1,13 +1,15 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useSchedule, useAnimeList } from './useAnime';
 import { groupByDate } from '@/lib/schedule';
 import { SEASONS, getCurrentSeason } from '@/lib/seasons';
 import type { AnimeScheduleItem } from '@/types/anime';
 
 export function useHomePage() {
+  const { t } = useTranslation();
   const currentYear = new Date().getFullYear();
   const currentSeason = getCurrentSeason();
-  const seasonName = SEASONS[currentSeason].label;
+  const seasonName = t(SEASONS[currentSeason].labelKey);
 
   const [selectedDateKey, setSelectedDateKey] = useState<string | null>(new Date().toDateString());
 

@@ -1,6 +1,7 @@
 import { Trophy, Swords, ArrowLeft, Sun, Moon, Monitor } from 'lucide-react';
 import { useTheme } from '@/hooks';
 import { TooltipWrap } from '@/components/ui/tooltip';
+import { useT } from '@/i18n';
 
 interface MatchHeaderProps {
   roundName: string;
@@ -21,12 +22,13 @@ export function MatchHeader({
   onBackToBracket,
 }: MatchHeaderProps) {
   const { theme, setTheme } = useTheme();
+  const { t } = useT();
 
   const themes = ['light', 'dark', 'system'] as const;
   const themeIcons = { light: Sun, dark: Moon, system: Monitor };
   const ThemeIcon = themeIcons[theme];
-  const themeLabel = `Тема: ${theme === 'light' ? 'Светлая' : theme === 'dark' ? 'Тёмная' : 'Системная'}`;
-  const backLabel = 'Вернуться к турнирной сетке (изменения не сохранятся)';
+  const themeLabel = t('tournament.themeLabel', { theme: t(theme === 'light' ? 'theme.light' : theme === 'dark' ? 'theme.dark' : 'theme.system') });
+  const backLabel = t('tournament.backToBracketLabel');
 
   return (
     <div className="flex items-center justify-between p-1.5 sm:p-3 md:p-4 border-b border-border bg-card shrink-0">
@@ -36,7 +38,7 @@ export function MatchHeader({
           className="flex items-center gap-1 sm:gap-2 text-muted-foreground hover:text-foreground transition-colors text-xs sm:text-sm"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span className="hidden sm:inline">Назад</span>
+          <span className="hidden sm:inline">{t('common.back')}</span>
         </button>
       )}
 
@@ -66,7 +68,7 @@ export function MatchHeader({
               className="flex items-center gap-1 sm:gap-2 text-muted-foreground hover:text-foreground transition-colors text-xs sm:text-sm"
             >
               <ArrowLeft className="w-4 h-4" />
-              <span>Назад</span>
+              <span>{t('common.back')}</span>
             </button>
           </TooltipWrap>
         )}

@@ -10,6 +10,7 @@ import { Input } from '@/components/ui/input';
 import { useSearchSheet, SEARCH_SHEET_MIN_QUERY_LENGTH } from '@/hooks';
 import { getImageUrl, getPosterUrl } from '@/lib/imageUrl';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n';
 
 interface SearchSheetProps {
   open: boolean;
@@ -17,6 +18,7 @@ interface SearchSheetProps {
 }
 
 export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
+  const { t } = useT();
   const {
     query,
     setQuery,
@@ -47,7 +49,7 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
         style={sheetStyle}
       >
         <SheetHeader className="p-4 pb-2">
-          <SheetTitle>Поиск аниме</SheetTitle>
+          <SheetTitle>{t('search.sheetTitle')}</SheetTitle>
         </SheetHeader>
 
         <div className="px-4 pb-2">
@@ -55,7 +57,7 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
             <Input
               ref={inputRef}
-              placeholder="Введите название..."
+              placeholder={t('search.enterName')}
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               className="pl-10 pr-10 h-11"
@@ -64,7 +66,7 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
               <button
                 type="button"
                 onClick={clearQuery}
-                aria-label="Очистить"
+                aria-label={t('search.clear')}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
                 <X className="w-4 h-4" />
@@ -81,19 +83,19 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
         >
           {showEmpty && (
             <p className="text-sm text-muted-foreground text-center py-8">
-              Начните вводить название аниме
+              {t('search.startTyping')}
             </p>
           )}
 
           {isTooShort && (
             <p className="text-sm text-muted-foreground text-center py-8">
-              Введите минимум {SEARCH_SHEET_MIN_QUERY_LENGTH} символа для поиска
+              {t('search.minChars', { count: SEARCH_SHEET_MIN_QUERY_LENGTH })}
             </p>
           )}
 
           {showNoResults && (
             <p className="text-sm text-muted-foreground text-center py-8">
-              По запросу «{trimmedQuery}» ничего не найдено
+              {t('search.noResults', { query: trimmedQuery })}
             </p>
           )}
 

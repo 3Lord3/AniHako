@@ -6,6 +6,7 @@ import { ChevronUp, ChevronDown, Trash2 } from 'lucide-react';
 import { TIER_COLOR_PRESETS, getTierColorPreset } from '@/types/tier';
 import type { TierDefinition, TierColorId } from '@/types/tier';
 import { cn } from '@/lib/utils';
+import { useT } from '@/i18n';
 
 interface ManageTierRowProps {
   tier: TierDefinition;
@@ -28,6 +29,7 @@ export function ManageTierRow({
   onMoveUp,
   onMoveDown,
 }: ManageTierRowProps) {
+  const { t } = useT();
   const [label, setLabel] = useState(tier.label);
   const color = getTierColorPreset(tier.color);
 
@@ -43,7 +45,7 @@ export function ManageTierRow({
           size="icon-sm"
           disabled={!canMoveUp}
           onClick={onMoveUp}
-          aria-label="Переместить тир вверх"
+          aria-label={t('tier.moveUp')}
         >
           <ChevronUp className="size-4" />
         </Button>
@@ -52,7 +54,7 @@ export function ManageTierRow({
           size="icon-sm"
           disabled={!canMoveDown}
           onClick={onMoveDown}
-          aria-label="Переместить тир вниз"
+          aria-label={t('tier.moveDown')}
         >
           <ChevronDown className="size-4" />
         </Button>
@@ -67,7 +69,7 @@ export function ManageTierRow({
 
       <DropdownMenu>
         <DropdownMenuTrigger
-          aria-label="Выбрать цвет тира"
+          aria-label={t('tier.chooseColor')}
           className={cn('size-8 shrink-0 rounded-full ring-1 ring-border', color.bg)}
         />
         <DropdownMenuContent>
@@ -76,7 +78,7 @@ export function ManageTierRow({
               <button
                 key={preset.id}
                 type="button"
-                aria-label={`Цвет ${preset.id}`}
+                aria-label={t('tier.colorName', { name: preset.id })}
                 onClick={() => onRecolor(preset.id)}
                 className={cn(
                   'size-6 rounded-full',
@@ -89,7 +91,7 @@ export function ManageTierRow({
         </DropdownMenuContent>
       </DropdownMenu>
 
-      <Button variant="ghost" size="icon-sm" onClick={onRemove} aria-label="Удалить тир" className="ml-auto">
+      <Button variant="ghost" size="icon-sm" onClick={onRemove} aria-label={t('tier.deleteTier')} className="ml-auto">
         <Trash2 className="size-4 text-destructive" />
       </Button>
     </div>

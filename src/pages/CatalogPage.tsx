@@ -2,8 +2,10 @@ import { useCatalogPage } from '@/hooks';
 import { AnimeGrid } from '@/components/AnimeGrid';
 import { CatalogControls } from '@/components/search/CatalogControls';
 import { FilterBadges } from '@/components/search/FilterBadges';
+import { useT } from '@/i18n';
 
 export function CatalogPage() {
+  const { t } = useT();
   const {
     searchInput,
     setSearchInput,
@@ -58,7 +60,7 @@ export function CatalogPage() {
         <AnimeGrid anime={[]} isLoading={true} view={view} />
       ) : animeData?.data.length === 0 ? (
         <div className="text-center py-12 text-muted-foreground">
-          Аниме не найдены
+          {t('search.noResultsText')}
         </div>
       ) : (
         <AnimeGrid anime={animeData?.data || []} userAnimeList={userAnimeList} view={view} />

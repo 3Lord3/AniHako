@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useT } from '@/i18n';
 
 interface EditableFieldProps {
   value: string;
@@ -9,7 +10,8 @@ interface EditableFieldProps {
   placeholder?: string;
 }
 
-export function EditableField({ value, onSave, label, placeholder = "Имя пользователя" }: EditableFieldProps) {
+export function EditableField({ value, onSave, label, placeholder }: EditableFieldProps) {
+  const { t } = useT();
   const [isEditing, setIsEditing] = useState(false);
   const [editValue, setEditValue] = useState(value);
 
@@ -29,11 +31,11 @@ export function EditableField({ value, onSave, label, placeholder = "Имя по
         <Input
           value={editValue}
           onChange={(e) => setEditValue(e.target.value)}
-          placeholder={placeholder}
+          placeholder={placeholder ?? t('register.username')}
         />
-        <Button onClick={handleSave}>Сохранить</Button>
+        <Button onClick={handleSave}>{t('editable.save')}</Button>
         <Button variant="ghost" onClick={handleCancel}>
-          Отмена
+          {t('editable.cancel')}
         </Button>
       </div>
     );
@@ -46,7 +48,7 @@ export function EditableField({ value, onSave, label, placeholder = "Имя по
       onClick={() => setIsEditing(true)}
       className="mt-2"
     >
-      {label || 'Изменить'}
+      {label ?? t('editable.edit')}
     </Button>
   );
 }

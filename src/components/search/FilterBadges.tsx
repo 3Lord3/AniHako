@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
+import { useT } from '@/i18n';
 
 interface FilterBadgesProps {
   fromYear?: string;
@@ -18,6 +19,7 @@ export function FilterBadges({
   onUpdateParams,
   onClearFilters,
 }: FilterBadgesProps) {
+  const { t } = useT();
   const hasActiveFilters = genres || minRating || fromYear || toYear;
 
   if (!hasActiveFilters) return null;
@@ -32,19 +34,19 @@ export function FilterBadges({
       )}
       {minRating && (
         <Button variant="secondary" size="sm" onClick={() => onUpdateParams('rating', '')}>
-          Рейтинг: {minRating}+
+          {t('search.ratingBadge', { rating: minRating })}
           <X className="w-3 h-3 ml-1" />
         </Button>
       )}
       {genres && (
         <Button variant="secondary" size="sm" onClick={() => onUpdateParams('genres', '')}>
-          Жанры: {genres.split(',').length}
+          {t('search.genresBadge', { count: genres.split(',').length })}
           <X className="w-3 h-3 ml-1" />
         </Button>
       )}
       {hasActiveFilters && (
         <Button variant="secondary" size="sm" onClick={onClearFilters}>
-          Очистить фильтры
+          {t('search.clearFilterBadges')}
         </Button>
       )}
     </div>

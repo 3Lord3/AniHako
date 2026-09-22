@@ -8,6 +8,7 @@ import { isRateFavorite } from '@/lib/listRate';
 import { getImageUrl, getPosterUrl } from '@/lib/imageUrl';
 import { buildAnimeUrl } from '@/lib/animeUrl';
 import { STATUS_ICONS, STATUS_COLORS, STATUS_LABELS, FAVORITE_ICON, getRatingColor } from '@/types/constants';
+import { useT, type TranslationKey } from '@/i18n';
 
 interface AnimeGridProps {
   anime: AnimeCatalogItem[];
@@ -17,13 +18,14 @@ interface AnimeGridProps {
   view?: 'grid' | 'list';
 }
 
-function getStatusLabel(status: string | undefined): string {
+function getStatusLabel(status: string | undefined, t: (key: TranslationKey) => string): string {
   if (!status) return '';
-  return STATUS_LABELS[status as keyof typeof STATUS_LABELS] || '';
+  return t(STATUS_LABELS[status as keyof typeof STATUS_LABELS] as TranslationKey) || '';
 }
 
 function AnimeListItem({ anime, userAnime }: { anime: AnimeCatalogItem; userAnime?: YummyUserAnimeRate }) {
-  const displayTitle = anime.title || 'Unknown';
+  const { t } = useT();
+  const displayTitle = anime.title || t('common.unknown');
   const rating = anime.rating?.average ?? null;
   const isAnnouncement = anime.anime_status?.alias === 'announcement';
   const validRating = rating !== null && !isNaN(rating) && !isAnnouncement;
@@ -61,9 +63,9 @@ function AnimeListItem({ anime, userAnime }: { anime: AnimeCatalogItem; userAnim
       </div>
       <div className="flex items-start gap-1 sm:gap-1.5 shrink-0">
         {userStatus && STATUS_COLORS[userStatus] && (
-          <TooltipWrap content={getStatusLabel(userStatus)}>
+          <TooltipWrap content={getStatusLabel(userStatus, t)}>
             <span
-              aria-label={getStatusLabel(userStatus)}
+              aria-label={getStatusLabel(userStatus, t)}
               className={`inline-flex items-center justify-center h-7 w-7 sm:h-9 sm:w-9 rounded-full [&>svg]:!w-3.5 [&>svg]:!h-3.5 sm:[&>svg]:!w-5 sm:[&>svg]:!h-5 ${STATUS_COLORS[userStatus]}`}
             >
               {STATUS_ICONS[userStatus]}
@@ -71,9 +73,9 @@ function AnimeListItem({ anime, userAnime }: { anime: AnimeCatalogItem; userAnim
           </TooltipWrap>
         )}
         {isFavorite && (
-          <TooltipWrap content="Любимое">
+          <TooltipWrap content={t('animeGrid.favorite')}>
             <span
-              aria-label="Любимое"
+              aria-label={t('animeGrid.favorite')}
               className="inline-flex items-center justify-center h-7 w-7 sm:h-9 sm:w-9 rounded-full bg-pink-500 text-white [&>svg]:!w-3.5 [&>svg]:!h-3.5 sm:[&>svg]:!w-5 sm:[&>svg]:!h-5"
             >
               {FAVORITE_ICON}
@@ -81,9 +83,9 @@ function AnimeListItem({ anime, userAnime }: { anime: AnimeCatalogItem; userAnim
           </TooltipWrap>
         )}
         {validRating && (
-          <TooltipWrap content={`Рейтинг: ${rating.toFixed(1)}`}>
+          <TooltipWrap content={t('animeGrid.rating', { rating: rating.toFixed(1) })}>
             <span
-              aria-label={`Рейтинг: ${rating.toFixed(1)}`}
+              aria-label={t('animeGrid.rating', { rating: rating.toFixed(1) })}
               className={`inline-flex items-center gap-0.5 sm:gap-1 h-7 sm:h-9 px-1 sm:px-1.5 rounded ${getRatingColor(rating)}`}
             >
               <Star className="w-3 h-3 sm:w-4 sm:h-4 fill-white text-white" />

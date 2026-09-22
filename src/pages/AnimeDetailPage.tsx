@@ -3,6 +3,7 @@ import { useAnimeDetailPage } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
+import { useT } from '@/i18n';
 import { getImageUrl } from '@/lib/imageUrl';
 import { AnimeDetailPageSkeleton } from '@/components/loaders/PageSkeletons';
 import { AnimeCharacteristics } from './AnimeDetailPage/components/AnimeCharacteristics';
@@ -13,6 +14,7 @@ import { RatingBlock } from '@/components/detail/RatingBlock';
 
 export function AnimeDetailPage() {
   const { url } = useParams<{ url: string }>();
+  const { t } = useT();
   const {
     user,
     anime,
@@ -33,7 +35,7 @@ export function AnimeDetailPage() {
   }
 
   if (!anime) {
-    return <div className="text-center py-12">Аниме не найдено</div>;
+    return <div className="text-center py-12">{t('animeDetail.notFound')}</div>;
   }
 
   const displayTitle = anime.title;
@@ -49,7 +51,7 @@ export function AnimeDetailPage() {
         className="cursor-pointer text-foreground hover:bg-muted"
       >
         <ArrowLeft className="w-4 h-4 mr-2" />
-        Назад
+        {t('common.back')}
       </Button>
 
       {anime.poster && (
@@ -103,7 +105,7 @@ export function AnimeDetailPage() {
       {anime.description && (
         <Card>
           <CardHeader>
-            <CardTitle className="select-text">Описание</CardTitle>
+            <CardTitle className="select-text">{t('animeDetail.description')}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="whitespace-pre-wrap select-text">{anime.description}</p>

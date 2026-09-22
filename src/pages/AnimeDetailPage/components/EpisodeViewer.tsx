@@ -5,6 +5,7 @@ import { EpisodePlayer } from './EpisodePlayer';
 import { EpisodeList } from './EpisodeList';
 import { PlayerSelector } from './PlayerSelector';
 import { TranslateSelector } from './TranslateSelector';
+import { useT } from '@/i18n';
 
 interface EpisodeViewerProps {
   videos: AnimeVideo[];
@@ -25,6 +26,7 @@ export function EpisodeViewer({
   onEpisodeComplete,
   canMarkWatched = false,
 }: EpisodeViewerProps) {
+  const { t } = useT();
   const {
     translatesList,
     translateValue,
@@ -45,7 +47,7 @@ export function EpisodeViewer({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="select-text">Просмотр</CardTitle>
+        <CardTitle className="select-text">{t('episodes.viewerTitle')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <PlayerSelector

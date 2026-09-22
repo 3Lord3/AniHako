@@ -4,6 +4,7 @@ import type { Round, BracketType } from '@/hooks/useTournament';
 import { cn } from '@/lib/utils';
 import { getRoundName } from '@/hooks/useTournament';
 import { PairSlot } from './PairSlot';
+import { useT } from '@/i18n';
 
 interface TournamentBracketProps {
   rounds: Round[];
@@ -22,6 +23,7 @@ export function TournamentBracket({
   winnersRounds,
   losersRounds,
 }: TournamentBracketProps) {
+  const { t } = useT();
   const [activeTab, setActiveTab] = useState<BracketType>('winners');
   const wbRounds = rounds.filter(r => r.bracket === 'winners');
   const lbRounds = rounds.filter(r => r.bracket === 'losers');
@@ -73,7 +75,7 @@ export function TournamentBracket({
                   ) : (
                     <Swords className="w-3 h-3 sm:w-4 sm:h-4" />
                   )}
-                  {getRoundName(bracket, round.roundInBracket, winnersRounds, losersRounds)}
+                  {getRoundName(t, bracket, round.roundInBracket, winnersRounds, losersRounds)}
                 </div>
                 <div className="text-[10px] sm:text-xs text-muted-foreground mt-1">
                   {completedCount}/{round.pairs.length}
@@ -134,7 +136,7 @@ export function TournamentBracket({
                             <PairSlot participant={pair.winner} isWinner={true} isBye={true} />
                             <div className="h-px bg-border" />
                             <div className="h-[22px] sm:h-[24px] md:h-[32px] flex items-center justify-center bg-yellow-500/20 text-[10px] sm:text-xs text-yellow-600 font-medium">
-                              BYE
+                              {t('tournament.bye')}
                             </div>
                           </div>
                         ) : (
@@ -175,10 +177,10 @@ export function TournamentBracket({
   };
 
   const tabs: Array<{ id: BracketType; label: string; description: string; available: boolean }> = [
-    { id: 'winners' as const, label: 'Сетка победителей', description: 'Проигравшие отправляются в сетку проигравших', available: wbRounds.length > 0 },
-    { id: 'losers' as const, label: 'Сетка проигравших', description: 'Проигравшие выбывают из турнира', available: lbRounds.length > 0 },
-    { id: 'final' as const, label: 'Гранд-финал', description: 'Победитель сетки победителей против победителя сетки проигравших', available: !!finalRound },
-  ].filter(t => t.available);
+    { id: 'winners' as const, label: t('tournament.winnersTab'), description: t('tournament.winnersDesc'), available: wbRounds.length > 0 },
+    { id: 'losers' as const, label: t('tournament.losersTab'), description: t('tournament.losersDesc'), available: lbRounds.length > 0 },
+    { id: 'final' as const, label: t('tournament.finalTab'), description: t('tournament.finalDesc'), available: !!finalRound },
+  ].filter(tab => tab.available);
 
   return (
     <div className="space-y-4">

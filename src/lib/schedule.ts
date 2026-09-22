@@ -1,8 +1,11 @@
 import type { AnimeScheduleItem } from '@/types/anime';
+import i18n from '@/i18n';
+
+const locale = () => i18n.resolvedLanguage ?? 'ru-RU';
 
 export function formatDayMonth(timestamp: number | undefined): string {
   if (!timestamp) return '';
-  return new Date(timestamp * 1000).toLocaleDateString('ru-RU', {
+  return new Date(timestamp * 1000).toLocaleDateString(locale(), {
     day: 'numeric',
     month: 'short',
   });
