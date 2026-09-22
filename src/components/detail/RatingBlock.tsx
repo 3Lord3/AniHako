@@ -152,10 +152,10 @@ export function RatingBlock({
         onClick={() => setOpen(true)}
         disabled={!enabled}
         className="w-full cursor-pointer"
-        variant={myRating !== undefined ? 'default' : 'outline'}
+        variant={myRating ? 'default' : 'outline'}
       >
-        <Star className={cn('w-4 h-4', myRating !== undefined && 'fill-current')} />
-        {myRating !== undefined ? t('rating.myRating', { rating: myRating }) : t('rating.rate')}
+        <Star className={cn('w-4 h-4', myRating && 'fill-current')} />
+        {myRating ? t('rating.myRating', { rating: myRating }) : t('rating.rate')}
       </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
