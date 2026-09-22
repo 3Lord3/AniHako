@@ -2,6 +2,9 @@ import '@testing-library/jest-dom';
 import { cleanup } from '@testing-library/react';
 import { afterEach, vi } from 'vitest';
 
+// Initialize i18n (ru) so components render real Russian strings via t().
+import '@/i18n';
+
 // Cleanup after each test
 afterEach(() => {
   cleanup();

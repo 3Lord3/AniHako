@@ -6,6 +6,9 @@ import { UnrankedPool } from '@/pages/AniTierPage/components/UnrankedPool';
 import type { TierAnimeItem } from '@/types/tier';
 import { DEFAULT_TIERS } from '@/types/tier';
 import { buildMoveTargets } from '@/lib/tierMoveTargets';
+import i18n from '@/i18n';
+
+const t = i18n.t.bind(i18n);
 
 const items: Record<number, TierAnimeItem> = {
   1: { animeId: 1, title: 'One', posterUrl: 'one.jpg', url: 'one' },
@@ -18,7 +21,7 @@ function renderPool(animeIds: number[]) {
         <UnrankedPool
           animeIds={animeIds}
           items={items}
-          moveTargets={buildMoveTargets(DEFAULT_TIERS)}
+          moveTargets={buildMoveTargets(DEFAULT_TIERS, t)}
           onMoveAnimeToTier={vi.fn()}
         />
       </DndContext>
