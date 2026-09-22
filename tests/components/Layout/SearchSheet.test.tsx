@@ -63,12 +63,12 @@ describe('SearchSheet', () => {
 
   it('does not show the sheet content when closed', () => {
     render(<SearchSheet open={false} onOpenChange={vi.fn()} />, { wrapper: createWrapper() });
-    expect(screen.queryByText('Поиск аниме')).not.toBeInTheDocument();
+    expect(screen.queryByPlaceholderText(/введите название/i)).not.toBeInTheDocument();
   });
 
-  it('shows title and empty hint when open with no query', () => {
+  it('shows search input and empty hint when open with no query', () => {
     render(<SearchSheet open={true} onOpenChange={vi.fn()} />, { wrapper: createWrapper() });
-    expect(screen.getByText('Поиск аниме')).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/введите название/i)).toBeInTheDocument();
     expect(screen.getByText(/начните вводить/i)).toBeInTheDocument();
   });
 

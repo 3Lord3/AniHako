@@ -26,6 +26,9 @@
   --color-ring: oklch(0.708 0 0);
   --color-radius: 0.625rem;
 
+  /* Desktop header offset (used by the top search sheet) */
+  --header-height: 6rem;
+
   /* Brand color */
   --color-brand: #7855d0;
   --color-brand-foreground: #ffffff;
