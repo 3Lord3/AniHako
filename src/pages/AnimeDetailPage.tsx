@@ -22,7 +22,7 @@ export function AnimeDetailPage() {
     isFavorite,
     userListId,
     canMarkWatched,
-    viewedVideoSet,
+    viewedEpisodeSet,
     handleAddToList,
     handleToggleFavorite,
     handleToggleWatched,
@@ -126,7 +126,7 @@ export function AnimeDetailPage() {
           videos={anime.videos}
           translates={anime.translates}
           title={displayTitle}
-          viewedVideoIds={viewedVideoSet}
+          viewedEpisodeNumbers={viewedEpisodeSet}
           canMarkWatched={canMarkWatched}
           onToggleWatched={handleToggleWatched}
           onEpisodeComplete={handleEpisodeComplete}

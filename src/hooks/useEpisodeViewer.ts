@@ -10,7 +10,7 @@ import {
 export function useEpisodeViewer(
   videos: AnimeVideo[],
   translates: AnimeTranslate[] | undefined,
-  onEpisodeComplete?: (videoId: number) => void
+  onEpisodeComplete?: (video: AnimeVideo) => void
 ) {
   const translatesList = useMemo(() => {
     const synthesized = filterGenericTranslates(synthesizeTranslatesFromVideos(videos));
@@ -70,8 +70,8 @@ export function useEpisodeViewer(
   }, [filteredVideos.length, selectedIndex]);
 
   const handleEpisodeComplete = useCallback(
-    (videoId: number) => {
-      onEpisodeComplete?.(videoId);
+    (video: AnimeVideo) => {
+      onEpisodeComplete?.(video);
       setSelectedIndex((current) =>
         current + 1 < filteredVideos.length ? current + 1 : current
       );
