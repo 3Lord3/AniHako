@@ -4,9 +4,22 @@ import LanguageDetector from 'i18next-browser-languagedetector'
 import type { TOptions } from 'i18next'
 import ru from '@/locales/ru/translation.json'
 
-export const resources = {
-  ru: { translation: ru },
-} as const
+/** Все локали из `src/locales/<lang>/translation.json` подгружаются динамически. */
+const localeModules = import.meta.glob('../locales/*/translation.json', {
+  eager: true,
+  import: 'default',
+}) as Record<string, Record<string, unknown>>
+
+export const resources = Object.fromEntries(
+  Object.entries(localeModules).map(([path, translation]) => {
+    const lang = path.match(/locales\/([^/]+)\/translation\.json$/)?.[1]
+    if (!lang) throw new Error(`Could not infer language code from locale path: ${path}`)
+    return [lang, { translation }]
+  }),
+) as Record<string, { translation: Record<string, unknown> }>
+
+/** Языки, реально присутствующие в `src/locales/*` (источник для Weblate-компонента). */
+export const supportedLanguages = Object.keys(resources) as string[]
 
 void i18n
   .use(LanguageDetector)
@@ -14,7 +27,9 @@ void i18n
   .init({
     resources,
     fallbackLng: 'ru',
-    supportedLngs: ['ru'],
+    supportedLngs: supportedLanguages,
+    load: 'languageOnly',
+    nonExplicitSupportedLngs: true,
     interpolation: { escapeValue: false },
   })
 
