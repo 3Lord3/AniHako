@@ -189,7 +189,8 @@
     "clearFilterBadges": "Очистить фильтры",
     "ratingBadge": "Рейтинг: {{rating}}+",
     "genresBadge": "Жанры: {{count}}",
-    "noResultsText": "Аниме не найдены"
+    "noResultsText": "Аниме не найдены",
+    "advancedSearch": "Расширенный поиск"
   },
   "login": {
     "title": "Вход",

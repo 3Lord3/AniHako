@@ -1,13 +1,13 @@
-import { Link } from 'react-router-dom';
-import { Search, X, Loader2, Calendar, Star } from 'lucide-react';
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
+import { Link, useNavigate } from 'react-router-dom';
+import { Search, X, Loader2, Calendar, Star, ArrowRight } from 'lucide-react';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { Input } from '@/components/ui/input';
-import { useSearchSheet, SEARCH_SHEET_MIN_QUERY_LENGTH } from '@/hooks';
+import {
+  useSearchSheet,
+  SEARCH_SHEET_MIN_QUERY_LENGTH,
+  useMediaQuery,
+  DESKTOP_MEDIA_QUERY,
+} from '@/hooks';
 import { getImageUrl, getPosterUrl } from '@/lib/imageUrl';
 import { cn } from '@/lib/utils';
 import { useT } from '@/i18n';
@@ -19,6 +19,8 @@ interface SearchSheetProps {
 
 export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
   const { t } = useT();
+  const navigate = useNavigate();
+  const isDesktop = useMediaQuery(DESKTOP_MEDIA_QUERY);
   const {
     query,
     setQuery,
@@ -33,26 +35,25 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
     showNoResults,
   } = useSearchSheet(open);
 
-  const sheetStyle = keyboardInset > 0
-    ? {
-        bottom: keyboardInset,
-        maxHeight: `calc(100dvh - ${keyboardInset}px)`,
-      }
-    : undefined;
-
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
-        side="bottom"
+        side={isDesktop ? 'top' : 'bottom'}
         showCloseButton={false}
-        className="rounded-t-2xl max-h-[85dvh] p-0"
-        style={sheetStyle}
+        className={
+          isDesktop
+            ? 'p-0 mx-auto w-[min(94%,42rem)] rounded-2xl shadow-none ring-1 ring-border border-b-0!'
+            : 'rounded-t-2xl max-h-[85dvh] p-0'
+        }
+        style={isDesktop
+          ? { top: 'var(--header-height)' }
+          : keyboardInset === 0
+            ? undefined
+            : { bottom: keyboardInset, maxHeight: `calc(100dvh - ${keyboardInset}px)` }}
       >
-        <SheetHeader className="p-4 pb-2">
-          <SheetTitle>{t('search.sheetTitle')}</SheetTitle>
-        </SheetHeader>
+        <SheetTitle className="sr-only">{t('search.sheetTitle')}</SheetTitle>
 
-        <div className="px-4 pb-2">
+        <div className="px-4 pt-4 pb-2">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
             <Input
@@ -77,9 +78,24 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
           </div>
         </div>
 
+        <div className="px-4 pb-2">
+          <button
+            type="button"
+            onClick={() => {
+              onOpenChange(false);
+              navigate(`/catalog${trimmedQuery ? `?search=${encodeURIComponent(trimmedQuery)}` : ''}`);
+            }}
+            className="w-full text-left text-sm text-primary hover:underline py-1 cursor-pointer"
+          >
+            {t('search.advancedSearch')}
+            {trimmedQuery ? `: ${trimmedQuery}` : null}
+            <ArrowRight className="inline w-3.5 h-3.5 ml-1" />
+          </button>
+        </div>
+
         <div
           className="overflow-y-auto px-2 pb-6 pt-2"
-          style={{ maxHeight: 'calc(85dvh - 130px)' }}
+          style={{ maxHeight: isDesktop ? 'min(55vh, 480px)' : 'calc(85dvh - 130px)' }}
         >
           {showEmpty && (
             <p className="text-sm text-muted-foreground text-center py-8">

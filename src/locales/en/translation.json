@@ -187,7 +187,8 @@
     "clearFilterBadges": "Clear filters",
     "ratingBadge": "Rating: {{rating}}+",
     "genresBadge": "Genres: {{count}}",
-    "noResultsText": "No anime found"
+    "noResultsText": "No anime found",
+    "advancedSearch": "Advanced search"
   },
   "login": {
     "title": "Sign in",

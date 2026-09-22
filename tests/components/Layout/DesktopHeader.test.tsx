@@ -13,6 +13,16 @@ vi.mock('@/components/Layout/ProfileDropdown', () => ({
   ),
 }));
 
+vi.mock('@/components/Layout/SearchSheet', () => ({
+  SearchSheet: () => <div data-testid="search-sheet" />,
+}));
+
+vi.mock('@/components/Layout/ServicesDropdown', () => ({
+  ServicesDropdown: ({ variant, active }: { variant?: string; active: boolean }) => (
+    <div data-testid={`services-${variant}`} data-active={String(active)} />
+  ),
+}));
+
 const renderComponent = (pathname: string) =>
   render(
     <MemoryRouter initialEntries={[pathname]}>
@@ -37,10 +47,26 @@ describe('DesktopHeader', () => {
     expect(screen.getByText('Каталог')).toBeInTheDocument();
   });
 
-  it('renders services nav links: AniMatch, AniTour', () => {
+  it('renders services dropdown (desktop variant, inactive by default)', () => {
     renderComponent('/');
-    expect(screen.getByText('AniMatch')).toBeInTheDocument();
-    expect(screen.getByText('AniTour')).toBeInTheDocument();
+    const services = screen.getByTestId('services-desktop');
+    expect(services).toBeInTheDocument();
+    expect(services.getAttribute('data-active')).toBe('false');
+  });
+
+  it('marks services dropdown as active on /matcher', () => {
+    renderComponent('/matcher');
+    expect(screen.getByTestId('services-desktop').getAttribute('data-active')).toBe('true');
+  });
+
+  it('marks services dropdown as active on /tournament', () => {
+    renderComponent('/tournament');
+    expect(screen.getByTestId('services-desktop').getAttribute('data-active')).toBe('true');
+  });
+
+  it('marks services dropdown as active on /tier', () => {
+    renderComponent('/tier');
+    expect(screen.getByTestId('services-desktop').getAttribute('data-active')).toBe('true');
   });
 
   it('marks "Главная" as active on /', () => {
@@ -53,20 +79,6 @@ describe('DesktopHeader', () => {
   it('marks "Каталог" as active on /catalog', () => {
     renderComponent('/catalog');
     const link = screen.getByText('Каталог').closest('a');
-    expect(link?.className).toContain('text-primary');
-    expect(link?.className).toContain('font-medium');
-  });
-
-  it('marks "AniMatch" as active on /matcher', () => {
-    renderComponent('/matcher');
-    const link = screen.getByText('AniMatch').closest('a');
-    expect(link?.className).toContain('text-primary');
-    expect(link?.className).toContain('font-medium');
-  });
-
-  it('marks "AniTour" as active on /tournament', () => {
-    renderComponent('/tournament');
-    const link = screen.getByText('AniTour').closest('a');
     expect(link?.className).toContain('text-primary');
     expect(link?.className).toContain('font-medium');
   });
