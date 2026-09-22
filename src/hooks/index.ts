@@ -22,6 +22,7 @@ export * from './useTournamentPage';
 export * from './useDebouncedMinLengthQuery';
 export * from './useAnimeSearchQuery';
 export * from './useKeyboardInset';
+export * from './useMediaQuery';
 export * from './useSearchSheet';
 export * from './useParticipantSelector';
 export * from './useTierBoardDnd';
