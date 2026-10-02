@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import { EpisodePlayer } from '@/pages/AnimeDetailPage/components/EpisodePlayer';
 import type { AnimeVideo } from '@/types';
 
@@ -22,7 +22,79 @@ const mockVideo2: AnimeVideo = {
   index: 2,
 };
 
+// A longer video whose duration enables the wall-clock fallback timer.
+const longVideo: AnimeVideo = { ...mockVideo, duration: 600 }; // 10 minutes
+
+function postProgress(video: AnimeVideo, currentTime: number) {
+  window.dispatchEvent(
+    new MessageEvent('message', {
+      data: { event: 'kdProgress', currentTime },
+      source: video
+        ? (screen.getByTitle('Test Anime - Серия 1') as HTMLIFrameElement).contentWindow
+        : null,
+    })
+  );
+}
+
 describe('EpisodePlayer', () => {
+  it('does not mark a video watched when playback stays idle (no progress, paused/never started)', () => {
+    const onEpisodeComplete = vi.fn();
+    render(
+      <EpisodePlayer
+        video={longVideo}
+        title="Test Anime"
+        onEpisodeComplete={onEpisodeComplete}
+      />
+    );
+    expect(onEpisodeComplete).not.toHaveBeenCalled();
+  });
+
+  it('marks a video watched once playback actually reaches the end (near duration)', () => {
+    const onEpisodeComplete = vi.fn();
+    render(
+      <EpisodePlayer
+        video={longVideo}
+        title="Test Anime"
+        onEpisodeComplete={onEpisodeComplete}
+      />
+    );
+    act(() => {
+      postProgress(longVideo, 595); // within END_MARGIN (5s) of duration 600
+    });
+    expect(onEpisodeComplete).toHaveBeenCalledWith(longVideo);
+  });
+
+  it('does not mark a short-duration video on zero/initial progress', () => {
+    const shortVideo: AnimeVideo = { ...mockVideo, duration: 3 }; // duration <= END_MARGIN
+    const onEpisodeComplete = vi.fn();
+    render(
+      <EpisodePlayer
+        video={shortVideo}
+        title="Test Anime"
+        onEpisodeComplete={onEpisodeComplete}
+      />
+    );
+    act(() => {
+      postProgress(shortVideo, 0); // initial currentTime on load
+    });
+    expect(onEpisodeComplete).not.toHaveBeenCalled();
+  });
+
+  it('does not mark a video watched when progress is still far from the end', () => {
+    const onEpisodeComplete = vi.fn();
+    render(
+      <EpisodePlayer
+        video={longVideo}
+        title="Test Anime"
+        onEpisodeComplete={onEpisodeComplete}
+      />
+    );
+    act(() => {
+      postProgress(longVideo, 300); // halfway, e.g. paused mid-episode
+    });
+    expect(onEpisodeComplete).not.toHaveBeenCalled();
+  });
+
   it('renders iframe with video iframe_url', () => {
     render(<EpisodePlayer video={mockVideo} title="Test Anime" />);
     const iframe = screen.getByTitle('Test Anime - Серия 1') as HTMLIFrameElement;
