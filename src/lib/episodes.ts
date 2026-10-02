@@ -51,14 +51,24 @@ export function getUniquePlayers(videos: AnimeVideo[]): string[] {
   return result.sort(comparePlayersByPriority);
 }
 
+function eventStrings(data: unknown): string[] {
+  if (!data || typeof data !== 'object') return [];
+  const payload = data as Record<string, unknown>;
+  return [payload.event, payload.type].filter((v): v is string => typeof v === 'string');
+}
+
 const ENDED_EVENT_PATTERN = /ended|finish|complete/i;
 
 export function isPlayerEndedEvent(data: unknown): boolean {
-  if (!data || typeof data !== 'object') return false;
+  return eventStrings(data).some((s) => ENDED_EVENT_PATTERN.test(s));
+}
+
+// Playback position in seconds, or null when the message doesn't report one.
+export function getPlayerProgressSeconds(data: unknown): number | null {
+  if (!data || typeof data !== 'object') return null;
   const payload = data as Record<string, unknown>;
-  const event = payload.event;
-  const type = payload.type;
-  if (typeof event === 'string' && ENDED_EVENT_PATTERN.test(event)) return true;
-  if (typeof type === 'string' && ENDED_EVENT_PATTERN.test(type)) return true;
-  return false;
+  const raw = payload.currentTime ?? payload.position;
+  if (typeof raw !== 'number' && typeof raw !== 'string') return null;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null;
 }
