@@ -22,27 +22,21 @@ describe('ThemeSwitcher', () => {
     expect(screen.getByText('Системная')).toBeInTheDocument();
   });
 
-  it('renders toggle button', () => {
+  it('renders three theme buttons', () => {
     render(<ThemeSwitcher />);
-    const slider = document.querySelector('.transition-transform');
-    expect(slider).toBeInTheDocument();
+    const buttons = document.querySelectorAll('button[aria-pressed]');
+    expect(buttons.length).toBe(3);
   });
 
-  it('has clickable area', () => {
+  it('marks the current theme as pressed', () => {
     render(<ThemeSwitcher />);
-    const container = document.querySelector('.cursor-pointer');
-    expect(container).toBeInTheDocument();
+    const systemBtn = screen.getByRole('button', { name: 'Системная' });
+    expect(systemBtn).toHaveAttribute('aria-pressed', 'true');
   });
 
-  it('renders theme icon', () => {
+  it('renders theme icons for each option', () => {
     render(<ThemeSwitcher />);
-    const icon = document.querySelector('svg');
-    expect(icon).toBeInTheDocument();
-  });
-
-  it('renders all three theme options in toggle', () => {
-    render(<ThemeSwitcher />);
-    const toggle = document.querySelector('.bg-muted');
-    expect(toggle).toBeInTheDocument();
+    const icons = document.querySelectorAll('button[aria-pressed] svg');
+    expect(icons.length).toBe(3);
   });
 });

@@ -15,6 +15,7 @@ const useLoginFormMock = vi.fn();
 vi.mock('@/hooks', () => ({
   useLoginForm: (...args: unknown[]) => useLoginFormMock(...args),
   useUser: () => ({ data: null, isLoading: false }),
+  usePageTitle: () => undefined,
 }));
 
 const defaultForm = {

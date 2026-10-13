@@ -59,7 +59,7 @@ describe('AniTierPage', () => {
     vi.mocked(hooks.useUser).mockReturnValue({ data: undefined, isLoading: true } as any);
 
     const { container } = renderPage();
-    expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
+    expect(container.querySelector('.animate-shimmer')).toBeInTheDocument();
   });
 
   it('shows a login prompt when there is no authenticated user', () => {

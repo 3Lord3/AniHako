@@ -5,7 +5,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 describe('Skeleton', () => {
   it('renders skeleton element', () => {
     render(<Skeleton />);
-    expect(document.querySelector('.animate-pulse')).toBeInTheDocument();
+    expect(document.querySelector('.animate-shimmer')).toBeInTheDocument();
   });
 
   it('applies custom className', () => {

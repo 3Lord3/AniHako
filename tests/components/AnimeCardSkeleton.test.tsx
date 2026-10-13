@@ -3,9 +3,9 @@ import { render } from '@testing-library/react';
 import { AnimeCardSkeleton, CarouselSkeleton, ScheduleSkeleton } from '@/components/loaders/AnimeCardSkeleton';
 
 describe('AnimeCardSkeleton', () => {
-  it('renders skeleton with animate-pulse class', () => {
+  it('renders skeleton with animate-shimmer class', () => {
     render(<AnimeCardSkeleton />);
-    const pulses = document.querySelectorAll('.animate-pulse');
+    const pulses = document.querySelectorAll('.animate-shimmer');
     expect(pulses.length).toBeGreaterThan(0);
   });
 
@@ -27,9 +27,9 @@ describe('AnimeCardSkeleton', () => {
     expect(ratingSkeletons.length).toBe(0);
   });
 
-  it('renders with rounded-lg class', () => {
+  it('renders with rounded-xl class', () => {
     const { container } = render(<AnimeCardSkeleton />);
-    const roundedElements = container.querySelectorAll('.rounded-lg');
+    const roundedElements = container.querySelectorAll('.rounded-xl');
     expect(roundedElements.length).toBeGreaterThan(0);
   });
 });
@@ -37,7 +37,7 @@ describe('AnimeCardSkeleton', () => {
 describe('CarouselSkeleton', () => {
   it('renders multiple skeleton cards', () => {
     const { container } = render(<CarouselSkeleton />);
-    const skeletons = container.querySelectorAll('.animate-pulse');
+    const skeletons = container.querySelectorAll('.animate-shimmer');
     expect(skeletons.length).toBeGreaterThan(6);
   });
 
@@ -57,13 +57,13 @@ describe('ScheduleSkeleton', () => {
 
   it('renders table skeleton structure', () => {
     const { container } = render(<ScheduleSkeleton />);
-    const table = container.querySelector('.rounded-lg');
+    const table = container.querySelector('.rounded-2xl');
     expect(table).toBeInTheDocument();
   });
 
   it('renders schedule row skeletons', () => {
     const { container } = render(<ScheduleSkeleton />);
-    const skeletons = container.querySelectorAll('.animate-pulse');
+    const skeletons = container.querySelectorAll('.animate-shimmer');
     expect(skeletons.length).toBeGreaterThan(4);
   });
 
