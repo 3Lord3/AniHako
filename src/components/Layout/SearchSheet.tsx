@@ -42,8 +42,8 @@ export function SearchSheet({ open, onOpenChange }: SearchSheetProps) {
         showCloseButton={false}
         className={
           isDesktop
-            ? 'p-0 mx-auto w-[min(94%,42rem)] rounded-2xl shadow-none ring-1 ring-border border-b-0!'
-            : 'rounded-t-2xl max-h-[85dvh] p-0'
+            ? 'p-0 mx-auto w-[min(94%,42rem)] rounded-2xl shadow-soft-lg border-b-0!'
+            : 'rounded-t-2xl max-h-[85dvh] p-0 border-t'
         }
         style={isDesktop
           ? { top: 'var(--header-height)' }

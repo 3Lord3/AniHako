@@ -15,10 +15,10 @@ export function MobileBottomNav({ pathname }: MobileBottomNavProps) {
     isPathActive(pathname, '/tier');
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 md:hidden" aria-label="Main">
       <div className="relative">
         <div
-          className="absolute inset-x-0 bottom-0 h-16 bg-card/95 backdrop-blur border-t border-border shadow-[0_-2px_10px_rgba(0,0,0,0.05)]"
+          className="absolute inset-x-0 bottom-0 h-16 bg-background border-t border-border shadow-[0_-2px_10px_oklch(0.2_0.02_295/0.06)] dark:shadow-[0_-2px_10px_oklch(0_0_0/0.35)]"
           style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
         />
         <div className="relative grid grid-cols-5 h-16 items-center">

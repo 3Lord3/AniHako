@@ -15,11 +15,18 @@ export function BottomNavItem({ item, active }: BottomNavItemProps) {
     <Link
       to={item.to}
       className={cn(
-        'flex flex-col items-center justify-center h-full gap-0.5 text-[10px] font-medium transition-colors',
+        'group relative flex flex-col items-center justify-center h-full gap-0.5 text-[10px] font-medium transition-colors',
         active ? 'text-primary' : 'text-muted-foreground'
       )}
     >
-      <Icon className={cn('w-5 h-5', active && 'stroke-[2.5]')} />
+      <span
+        className={cn(
+          'inline-flex items-center justify-center size-9 rounded-xl transition-all',
+          active ? 'bg-brand-tint' : 'group-hover:bg-muted'
+        )}
+      >
+        <Icon className={cn('w-5 h-5', active && 'stroke-[2.5]')} />
+      </span>
       <span className="truncate max-w-full px-1">{t(item.labelKey as TranslationKey)}</span>
     </Link>
   );
