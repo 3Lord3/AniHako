@@ -1,7 +1,8 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, Star } from 'lucide-react';
+import { Heart, Star, ChevronDown, ChevronUp } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { TooltipWrap } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { getImageUrl, getPosterUrl } from '@/lib/imageUrl';
@@ -190,25 +191,39 @@ function OrderRow({ order }: { order: OrderItem }) {
 
 export function ViewingOrder({ items, currentAnimeId }: ViewingOrderProps) {
   const { t } = useT();
+  const [open, setOpen] = useState(false);
   if (!items || items.length === 0) return null;
 
   const ordered = buildOrderItems(items, currentAnimeId);
+  const contentId = 'viewing-order-content';
 
   return (
     <Card>
-      <CardHeader>
-        <div className="flex items-baseline justify-between gap-2 flex-wrap">
-          <CardTitle className="select-text">{t('viewingOrder.title')}</CardTitle>
-          <span className="text-xs text-muted-foreground select-text">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        aria-controls={contentId}
+        aria-label={open ? t('viewingOrder.collapse') : t('viewingOrder.expand')}
+        className="w-full flex items-center justify-between gap-3 px-5 py-3 text-left cursor-pointer hover:bg-muted/40 active:bg-muted/60 transition-colors"
+      >
+        <div className="flex flex-col min-w-0">
+          <div className="font-heading text-base leading-snug font-semibold tracking-tight select-text">
+            {t('viewingOrder.title')}
+          </div>
+          <div className="text-sm text-muted-foreground select-text">
             {t('viewingOrder.total', { count: ordered.length })}
-          </span>
+          </div>
         </div>
-      </CardHeader>
-      <CardContent className="space-y-1">
-        {ordered.map((order) => (
-          <OrderRow key={order.item.anime_id} order={order} />
-        ))}
-      </CardContent>
+        {open ? <ChevronUp className="w-5 h-5 text-muted-foreground shrink-0" /> : <ChevronDown className="w-5 h-5 text-muted-foreground shrink-0" />}
+      </button>
+      {open && (
+        <CardContent id={contentId} className="space-y-1">
+          {ordered.map((order) => (
+            <OrderRow key={order.item.anime_id} order={order} />
+          ))}
+        </CardContent>
+      )}
     </Card>
   );
 }
