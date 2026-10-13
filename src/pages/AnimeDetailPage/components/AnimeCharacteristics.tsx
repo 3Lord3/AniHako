@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, Film, Building2, Tag } from 'lucide-react';
+import { Calendar, Clock, Film, Building2, Tag, Tv, CircleDot } from 'lucide-react';
 import { KIND_LABELS } from '@/types/constants';
 import { SEASONS, type Season } from '@/lib/seasons';
 import { useT, type TranslationKey } from '@/i18n';
@@ -72,6 +72,7 @@ export function AnimeCharacteristics({ anime, className }: AnimeCharacteristicsP
       />
       <CharacteristicItem
         label={t('characteristics.type')}
+        icon={<Tv className="w-3.5 h-3.5" />}
         value={
           kindLabel ? (
             <Badge variant="secondary">
@@ -82,6 +83,7 @@ export function AnimeCharacteristics({ anime, className }: AnimeCharacteristicsP
       />
       <CharacteristicItem
         label={t('characteristics.status')}
+        icon={<CircleDot className="w-3.5 h-3.5" />}
         value={
           statusTitle ? (
             <Badge variant={status === 'ongoing' ? 'default' : 'secondary'}>
