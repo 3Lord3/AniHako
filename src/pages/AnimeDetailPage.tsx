@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useAnimeDetailPage } from '@/hooks';
+import { useAnimeDetailPage, useMediaQuery } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
@@ -15,6 +15,7 @@ import { RatingBlock } from '@/components/detail/RatingBlock';
 export function AnimeDetailPage() {
   const { url } = useParams<{ url: string }>();
   const { t } = useT();
+  const isDesktop = useMediaQuery();
   const {
     user,
     anime,
@@ -44,15 +45,17 @@ export function AnimeDetailPage() {
 
   return (
     <div className="space-y-8">
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={handleBack}
-        className="cursor-pointer text-foreground hover:bg-muted"
-      >
-        <ArrowLeft className="w-4 h-4 mr-2" />
-        {t('common.back')}
-      </Button>
+      {isDesktop && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleBack}
+          className="cursor-pointer text-foreground hover:bg-muted"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          {t('common.back')}
+        </Button>
+      )}
 
       {anime.poster && (
         <div className="fixed inset-0 -z-10">
