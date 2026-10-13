@@ -10,6 +10,7 @@
     "loading": "Loading..."
   },
   "theme": {
+    "title": "Color theme",
     "light": "Light",
     "dark": "Dark",
     "system": "System"
@@ -83,7 +84,7 @@
   },
   "status": {
     "watching": "Watching",
-    "completed": "Completed",
+    "completed": "Watched",
     "paused": "On hold",
     "dropped": "Dropped",
     "planned": "Planned",
@@ -228,7 +229,8 @@
   "notFound": {
     "title": "Page not found",
     "description": "The page may have been moved or deleted. Check the address or return home.",
-    "home": "Go home"
+    "home": "Go home",
+    "suggestions": "Popular sections"
   },
   "editable": {
     "save": "Save",
@@ -251,6 +253,8 @@
     "lastLogin": "Last login",
     "linkedAccounts": "Linked accounts",
     "about": "About",
+    "saved": "Saved",
+    "saveError": "Could not save",
     "linked": {
       "shikimori": "Shikimori: {{name}}",
       "vk": "VK: {{id}}",
@@ -264,10 +268,15 @@
   },
   "animeDetail": {
     "notFound": "Anime not found",
-    "description": "Description"
+    "description": "Description",
+    "toast": {
+      "statusError": "Could not change status",
+      "removeError": "Could not remove from list"
+    }
   },
   "characteristics": {
     "rating": "Rating",
+    "ratings": "Ratings",
     "year": "Year",
     "season": "Season",
     "type": "Type",
@@ -307,7 +316,12 @@
     "total_other": "Total {{count}} titles",
     "rating": "Rating: {{rating}}",
     "announcement": "Announcement",
-    "animeAlt": "Anime"
+    "animeAlt": "Anime",
+    "expand": "Expand viewing order",
+    "collapse": "Collapse viewing order"
+  },
+  "ratings": {
+    "title": "Ratings"
   },
   "home": {
     "noAnime": "No anime",
@@ -333,9 +347,9 @@
     "minChars": "Enter at least {{count}} characters",
     "nothingFound": "Nothing found",
     "enterName": "Enter an anime name",
-    "completedButton": "Completed ({{count}})",
+    "completedButton": "Watched ({{count}})",
     "selectedCount": "Selected: {{count}}",
-    "noCompleted": "You have no completed anime yet",
+    "noCompleted": "You haven't watched any anime yet",
     "participantsCount": "{{count}} participants",
     "startRound": "Start {{name}}",
     "exitDialogTitle": "Exit the tournament?",
