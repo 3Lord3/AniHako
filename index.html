@@ -4,26 +4,33 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#7855d0" />
     <title>AniHako</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    />
     <script>
       (function() {
         try {
           var stored = localStorage.getItem('anihako-theme');
-          
+
           if (stored === 'light') {
             document.documentElement.classList.remove('dark');
-            document.body.style.setProperty('--fouc-bg', 'oklch(1 0 0)');
-            document.body.style.setProperty('--fouc-fg', 'oklch(0.145 0 0)');
+            document.body.style.setProperty('--fouc-bg', 'oklch(0.992 0.004 300)');
+            document.body.style.setProperty('--fouc-fg', 'oklch(0.205 0.020 295)');
           } else if (stored === 'dark') {
-            document.body.style.setProperty('--fouc-bg', 'oklch(0.145 0 0)');
-            document.body.style.setProperty('--fouc-fg', 'oklch(0.985 0 0)');
+            document.body.style.setProperty('--fouc-bg', 'oklch(0.155 0.014 295)');
+            document.body.style.setProperty('--fouc-fg', 'oklch(0.965 0.005 300)');
           } else if (!window.matchMedia('(prefers-color-scheme: dark)').matches) {
             document.documentElement.classList.remove('dark');
-            document.body.style.setProperty('--fouc-bg', 'oklch(1 0 0)');
-            document.body.style.setProperty('--fouc-fg', 'oklch(0.145 0 0)');
+            document.body.style.setProperty('--fouc-bg', 'oklch(0.992 0.004 300)');
+            document.body.style.setProperty('--fouc-fg', 'oklch(0.205 0.020 295)');
           } else {
-            document.body.style.setProperty('--fouc-bg', 'oklch(0.145 0 0)');
-            document.body.style.setProperty('--fouc-fg', 'oklch(0.985 0 0)');
+            document.body.style.setProperty('--fouc-bg', 'oklch(0.155 0.014 295)');
+            document.body.style.setProperty('--fouc-fg', 'oklch(0.965 0.005 300)');
           }
         } catch(e) {}
       })();

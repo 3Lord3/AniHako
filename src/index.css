@@ -1,59 +1,91 @@
 @import "tailwindcss";
 
 @theme {
-  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", "Segoe UI Mono", monospace;
 
-  /* Shadcn default theme colors */
-  --color-background: oklch(1 0 0);
-  --color-foreground: oklch(0.145 0 0);
+  /* === Brand palette (AniHako) === */
+  --color-background: oklch(0.992 0.004 300);
+  --color-foreground: oklch(0.205 0.020 295);
+
   --color-card: oklch(1 0 0);
-  --color-card-foreground: oklch(0.145 0 0);
+  --color-card-foreground: oklch(0.205 0.020 295);
+
   --color-popover: oklch(1 0 0);
-  --color-popover-foreground: oklch(0.145 0 0);
-  --color-primary: oklch(0.205 0 0);
+  --color-popover-foreground: oklch(0.205 0.020 295);
+
+  --color-primary: oklch(0.550 0.182 292.5);
   --color-primary-foreground: oklch(0.985 0 0);
-  --color-secondary: oklch(0.97 0 0);
-  --color-secondary-foreground: oklch(0.205 0 0);
-  --color-muted: oklch(0.97 0 0);
-  --color-muted-foreground: oklch(0.556 0 0);
-  --color-accent: oklch(0.97 0 0);
-  --color-accent-foreground: oklch(0.205 0 0);
-  --color-destructive: oklch(0.577 0.245 27.325);
+  --color-primary-hover: oklch(0.503 0.188 291.6);
+
+  --color-secondary: oklch(0.968 0.006 300);
+  --color-secondary-foreground: oklch(0.245 0.020 295);
+
+  --color-muted: oklch(0.968 0.006 300);
+  --color-muted-foreground: oklch(0.515 0.018 295);
+
+  --color-accent: oklch(0.969 0.014 299.8);
+  --color-accent-foreground: oklch(0.350 0.120 293);
+
+  --color-destructive: oklch(0.577 0.215 27.325);
   --color-destructive-foreground: oklch(0.985 0 0);
-  --color-border: oklch(0.922 0 0);
-  --color-input: oklch(0.922 0 0);
-  --color-ring: oklch(0.708 0 0);
+
+  --color-border: oklch(0.922 0.012 300);
+  --color-input: oklch(0.940 0.014 300);
+  --color-ring: oklch(0.550 0.182 292.5 / 0.45);
+
+  /* Brand extra */
+  --color-brand: oklch(0.550 0.182 292.5);
+  --color-brand-foreground: oklch(0.985 0 0);
+  --color-brand-tint: oklch(0.969 0.014 299.8);
+  --color-brand-tint-foreground: oklch(0.350 0.120 293);
+
+  /* Surfaces / shape */
   --color-radius: 0.625rem;
+  --shadow-soft: 0 1px 2px oklch(0.20 0.02 295 / 0.04), 0 4px 12px oklch(0.20 0.02 295 / 0.05);
+  --shadow-soft-lg: 0 2px 4px oklch(0.20 0.02 295 / 0.05), 0 12px 28px oklch(0.20 0.02 295 / 0.07);
 
   /* Desktop header offset (used by the top search sheet) */
   --header-height: 6rem;
-
-  /* Brand color */
-  --color-brand: #7855d0;
-  --color-brand-foreground: #ffffff;
 }
 
 .dark {
-  --color-background: oklch(0.145 0 0);
-  --color-foreground: oklch(0.985 0 0);
-  --color-card: oklch(0.205 0 0);
-  --color-card-foreground: oklch(0.985 0 0);
-  --color-popover: oklch(0.205 0 0);
-  --color-popover-foreground: oklch(0.985 0 0);
-  --color-primary: oklch(0.922 0 0);
-  --color-primary-foreground: oklch(0.205 0 0);
-  --color-secondary: oklch(0.269 0 0);
-  --color-secondary-foreground: oklch(0.985 0 0);
-  --color-muted: oklch(0.269 0 0);
-  --color-muted-foreground: oklch(0.708 0 0);
-  --color-accent: oklch(0.269 0 0);
-  --color-accent-foreground: oklch(0.985 0 0);
-  --color-destructive: oklch(0.704 0.191 22.216);
+  --color-background: oklch(0.165 0.014 295);
+  --color-foreground: oklch(0.965 0.005 300);
+
+  --color-card: oklch(0.215 0.016 295);
+  --color-card-foreground: oklch(0.965 0.005 300);
+
+  --color-popover: oklch(0.230 0.018 295);
+  --color-popover-foreground: oklch(0.965 0.005 300);
+
+  --color-primary: oklch(0.680 0.158 293);
+  --color-primary-foreground: oklch(0.160 0.030 295);
+  --color-primary-hover: oklch(0.735 0.150 293);
+
+  --color-secondary: oklch(0.260 0.016 295);
+  --color-secondary-foreground: oklch(0.965 0.005 300);
+
+  --color-muted: oklch(0.250 0.016 295);
+  --color-muted-foreground: oklch(0.720 0.018 295);
+
+  --color-accent: oklch(0.300 0.060 293);
+  --color-accent-foreground: oklch(0.940 0.020 293);
+
+  --color-destructive: oklch(0.650 0.200 22);
   --color-destructive-foreground: oklch(0.985 0 0);
-  --color-border: oklch(1 0 0 / 0.1);
-  --color-input: oklch(1 0 0 / 0.15);
-  --color-ring: oklch(0.556 0 0);
+
+  --color-border: oklch(1 0 0 / 0.09);
+  --color-input: oklch(1 0 0 / 0.12);
+  --color-ring: oklch(0.680 0.158 293 / 0.55);
+
+  --color-brand: oklch(0.680 0.158 293);
+  --color-brand-foreground: oklch(0.160 0.030 295);
+  --color-brand-tint: oklch(0.300 0.060 293);
+  --color-brand-tint-foreground: oklch(0.940 0.020 293);
+
+  --shadow-soft: 0 1px 2px oklch(0 0 0 / 0.30), 0 4px 12px oklch(0 0 0 / 0.30);
+  --shadow-soft-lg: 0 2px 4px oklch(0 0 0 / 0.35), 0 12px 28px oklch(0 0 0 / 0.40);
 }
 
 @layer base {
@@ -72,13 +104,44 @@
     border-color: oklch(var(--color-border));
   }
 
-  /* Use border color for ring elements too */
   [class*="ring-foreground"] {
     --tw-ring-color: oklch(var(--color-border));
   }
 
-  /* Allow text selection by default (anime titles, descriptions).
-     Disable it on interactive chrome to keep tap targets comfortable. */
+  body {
+    background-color: var(--fouc-bg, oklch(var(--color-background)));
+    color: var(--fouc-fg, oklch(var(--color-foreground)));
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* === Repeating background pattern ===
+     Layered: subtle dot grid + larger crosses at intersections,
+     faded at the edges with a soft mask so it never competes with content. */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+      radial-gradient(circle at center, oklch(0.55 0.182 292.5 / 0.10) 1px, transparent 1.5px),
+      linear-gradient(90deg, oklch(0.55 0.182 292.5 / 0.06) 1px, transparent 1px),
+      linear-gradient(0deg, oklch(0.55 0.182 292.5 / 0.06) 1px, transparent 1px);
+    background-size: 24px 24px, 96px 96px, 96px 96px;
+    background-position: 0 0, 0 0, 0 0;
+    -webkit-mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, black 30%, transparent 100%);
+            mask-image: radial-gradient(ellipse 90% 70% at 50% 0%, black 30%, transparent 100%);
+  }
+  .dark body::before {
+    background-image:
+      radial-gradient(circle at center, oklch(0.70 0.165 293 / 0.14) 1px, transparent 1.5px),
+      linear-gradient(90deg, oklch(0.70 0.165 293 / 0.07) 1px, transparent 1px),
+      linear-gradient(0deg, oklch(0.70 0.165 293 / 0.07) 1px, transparent 1px);
+  }
+
+  /* Text selection */
   button,
   nav,
   header,
@@ -88,14 +151,86 @@
     -webkit-user-select: none;
   }
 
-  /* Cursor pointer for interactive elements */
   button, [role="button"], a, [role="tab"], [data-slot="dropdown-menu-item"] {
     cursor: pointer;
   }
 
-  /* FOUC prevention - use values from inline script, fallback to shadcn variables */
-  body {
-    background-color: var(--fouc-bg, oklch(var(--color-background))) !important;
-    color: var(--fouc-fg, oklch(var(--color-foreground))) !important;
+  /* Stronger visible focus for keyboard users (visually hidden otherwise) */
+  :focus-visible {
+    outline: none;
+  }
+}
+
+@layer components {
+  /* Section heading with brand accent bar */
+  .heading-brand {
+    position: relative;
+    padding-left: 0.85rem;
+  }
+  .heading-brand::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.18em;
+    bottom: 0.18em;
+    width: 0.32rem;
+    border-radius: 9999px;
+    background: var(--color-primary);
+  }
+}
+
+@layer utilities {
+  /* Shimmer animation for skeletons (functional, not decorative) */
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(200%); }
+  }
+  .animate-shimmer {
+    animation: shimmer 1.6s linear infinite;
+  }
+
+  /* Screen-reader only */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* Visually hidden until focused — for skip link */
+  .skip-target {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 100;
+  }
+  .skip-target:focus {
+    left: 1rem;
+    top: 1rem;
+    width: auto;
+    height: auto;
+    padding: 0.5rem 0.875rem;
+    background: var(--color-primary);
+    color: var(--color-primary-foreground);
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    box-shadow: 0 4px 12px oklch(0 0 0 / 0.15);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
   }
 }

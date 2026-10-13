@@ -1,4 +1,4 @@
-import { useUser, useUpdateProfile } from '@/hooks';
+import { useUser, useUpdateProfile, usePageTitle } from '@/hooks';
 import { Card, CardContent } from '@/components/ui/card';
 import { LoginRequired } from '@/components/LoginRequired';
 import { ProfilePageSkeleton } from '@/components/loaders/PageSkeletons';
@@ -6,6 +6,7 @@ import { ProfileAvatar } from '@/components/profile/ProfileAvatar';
 import { RoleBadges } from '@/components/profile/RoleBadge';
 import { EditableField } from '@/components/profile/EditableField';
 import { LinkedAccounts } from '@/components/profile/LinkedAccounts';
+import { useToast } from '@/components/Toaster';
 import { formatDate, formatLastOnline } from '@/lib/dateUtils';
 import { useT } from '@/i18n';
 
@@ -13,6 +14,8 @@ export function ProfilePage() {
   const { data: user, isLoading } = useUser();
   const { mutate: updateProfile } = useUpdateProfile();
   const { t } = useT();
+  const toast = useToast();
+  usePageTitle(t('profileMenu.profile'));
 
   if (isLoading) {
     return <ProfilePageSkeleton />;
@@ -26,13 +29,18 @@ export function ProfilePage() {
     updateProfile(
       { nickname },
       {
-        onSuccess: () => {},
+        onSuccess: () => {
+          toast.success(t('profile.saved'));
+        },
+        onError: () => {
+          toast.error(t('profile.saveError'));
+        },
       }
     );
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       <Card>
         <CardContent>
           <div className="flex items-center gap-6">
@@ -62,7 +70,7 @@ export function ProfilePage() {
 
       <Card>
         <CardContent className="space-y-4 pt-6">
-          <h2 className="text-lg font-semibold text-foreground">{t('profile.info')}</h2>
+          <h2 className="text-lg font-semibold text-foreground tracking-tight">{t('profile.info')}</h2>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>

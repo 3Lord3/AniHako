@@ -1,11 +1,19 @@
 import { Link } from 'react-router-dom';
-import { User, List, Users, LogOut } from 'lucide-react';
+import {
+  User,
+  ListChecks,
+  Users,
+  LogOut,
+  LogIn,
+  UserPlus,
+} from 'lucide-react';
 import { useUser, useAuth } from '@/hooks';
 import { useT } from '@/i18n';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
@@ -31,86 +39,101 @@ export function ProfileDropdown({ variant }: ProfileDropdownProps) {
         <AvatarFallback>{user.nickname?.[0]?.toUpperCase()}</AvatarFallback>
       </Avatar>
     ) : (
-      <span className="cursor-pointer">
-        <Avatar className="h-10 w-10">
-          <AvatarImage src={user.avatars?.big || undefined} alt={user.nickname} />
-          <AvatarFallback>{user.nickname?.[0]?.toUpperCase()}</AvatarFallback>
-        </Avatar>
-      </span>
+      <Avatar className="h-10 w-10 cursor-pointer">
+        <AvatarImage src={user.avatars?.big || undefined} alt={user.nickname} />
+        <AvatarFallback>{user.nickname?.[0]?.toUpperCase()}</AvatarFallback>
+      </Avatar>
     )
   ) : (
-    <User className={isMobile ? 'w-5 h-5' : 'w-6 h-6'} />
+    <User className={isMobile ? 'w-5 h-5' : 'w-4 h-4'} />
+  );
+
+  const mobileTrigger = isMobile ? (
+    <span
+      data-active={false}
+      className="inline-flex items-center justify-center size-9 rounded-xl transition-all bg-transparent"
+    >
+      {trigger}
+    </span>
+  ) : (
+    trigger
   );
 
   const triggerClassName = isMobile
     ? cn(
-        'flex flex-col items-center justify-center h-full gap-0.5 text-[10px] font-medium transition-colors cursor-pointer',
+        'group relative flex flex-col items-center justify-center h-full gap-0.5 text-[10px] font-medium transition-colors cursor-pointer',
         'text-muted-foreground data-[state=open]:text-primary'
       )
-    : 'cursor-pointer';
+    : cn(
+        'inline-flex items-center justify-center rounded-full transition-colors cursor-pointer',
+        'data-[state=open]:ring-2 data-[state=open]:ring-brand-tint hover:ring-2 hover:ring-brand-tint'
+      );
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger className={triggerClassName}>
-        {trigger}
+      <DropdownMenuTrigger className={triggerClassName} aria-label={user ? t('profileMenu.userLabel') : t('profileMenu.guestLabel')}>
+        {mobileTrigger}
         {isMobile && (
-          <span className="truncate max-w-full px-1">{user ? t('profileMenu.userLabel') : t('profileMenu.guestLabel')}</span>
+          <span className="truncate max-w-full px-1">
+            {user ? t('profileMenu.userLabel') : t('profileMenu.guestLabel')}
+          </span>
         )}
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
-        side={isMobile ? 'top' : undefined}
-        className={cn('w-56', isMobile && 'mb-2')}
+        side={isMobile ? 'top' : 'bottom'}
+        sideOffset={isMobile ? 8 : 10}
+        alignOffset={-4}
+        className={cn('w-64 p-1.5', isMobile && 'mb-2')}
       >
         {user ? (
           <>
-            <div className="flex items-center gap-2 p-2">
-              <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium leading-none">{user.nickname}</p>
+            <DropdownMenuLabel className="flex items-center gap-3 px-2 py-2.5">
+              <Avatar className="h-9 w-9 shrink-0">
+                <AvatarImage src={user.avatars?.big || undefined} alt={user.nickname} />
+                <AvatarFallback>{user.nickname?.[0]?.toUpperCase()}</AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col min-w-0">
+                <p className="text-sm font-semibold leading-tight truncate">
+                  {user.nickname}
+                </p>
               </div>
-            </div>
+            </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer">
-              <Link to="/profile" className="flex items-center w-full">
-                <User className="w-4 h-4 mr-2" />
-                {t('profileMenu.profile')}
-              </Link>
+            <DropdownMenuItem render={<Link to="/profile" />}>
+              <User className="size-4" />
+              {t('profileMenu.profile')}
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">
-              <Link to="/profile/anime" className="flex items-center w-full">
-                <List className="w-4 h-4 mr-2" />
-                {t('profileMenu.myList')}
-              </Link>
+            <DropdownMenuItem render={<Link to="/profile/anime" />}>
+              <ListChecks className="size-4" />
+              {t('profileMenu.myList')}
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">
-              <Link to="/profile/friends" className="flex items-center w-full">
-                <Users className="w-4 h-4 mr-2" />
-                {t('profileMenu.friends')}
-              </Link>
+            <DropdownMenuItem render={<Link to="/profile/friends" />}>
+              <Users className="size-4" />
+              {t('profileMenu.friends')}
             </DropdownMenuItem>
+            <DropdownMenuSeparator className="my-1.5" />
             <ThemeSwitcher />
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator className="my-1.5" />
             <DropdownMenuItem
+              variant="destructive"
               onClick={logout}
-              className="cursor-pointer text-destructive focus:text-destructive"
             >
-              <LogOut className="w-4 h-4 mr-2" />
+              <LogOut className="size-4" />
               {t('profileMenu.logout')}
             </DropdownMenuItem>
           </>
         ) : (
           <>
-            <DropdownMenuItem className="cursor-pointer">
-              <Link to="/login" className="flex items-center w-full">
-                {t('profileMenu.login')}
-              </Link>
+            <DropdownMenuItem render={<Link to="/login" />}>
+              <LogIn className="size-4" />
+              {t('profileMenu.login')}
             </DropdownMenuItem>
-            <DropdownMenuItem className="cursor-pointer">
-              <Link to="/register" className="flex items-center w-full">
-                {t('profileMenu.register')}
-              </Link>
+            <DropdownMenuItem render={<Link to="/register" />}>
+              <UserPlus className="size-4" />
+              {t('profileMenu.register')}
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
+            <DropdownMenuSeparator className="my-1.5" />
             <ThemeSwitcher />
           </>
         )}

@@ -22,6 +22,7 @@ vi.mock('@/hooks', () => ({
     handleSubmit: vi.fn(),
   }),
   useUser: () => ({ data: null, isLoading: false }),
+  usePageTitle: () => undefined,
 }));
 
 describe('RegisterPage vertical centering', () => {

@@ -7,9 +7,12 @@
     "confirm": "Подтвердить",
     "unknown": "Неизвестно",
     "back": "Назад",
-    "loading": "Загрузка..."
+    "loading": "Загрузка...",
+    "search": "Найти",
+    "retry": "Повторить"
   },
   "theme": {
+    "title": "Тема оформления",
     "light": "Светлая",
     "dark": "Тёмная",
     "system": "Системная"
@@ -85,7 +88,7 @@
   },
   "status": {
     "watching": "Смотрю",
-    "completed": "Просмотрено",
+    "completed": "Смотрел",
     "paused": "Отложено",
     "dropped": "Брошено",
     "planned": "В планах",
@@ -230,7 +233,8 @@
   "notFound": {
     "title": "Страница не найдена",
     "description": "Возможно, страница была перемещена или удалена. Проверьте адрес или вернитесь на главную.",
-    "home": "На главную"
+    "home": "На главную",
+    "suggestions": "Популярные разделы"
   },
   "editable": {
     "save": "Сохранить",
@@ -253,6 +257,8 @@
     "lastLogin": "Последний вход",
     "linkedAccounts": "Связанные аккаунты",
     "about": "О себе",
+    "saved": "Сохранено",
+    "saveError": "Не удалось сохранить",
     "linked": {
       "shikimori": "Shikimori: {{name}}",
       "vk": "VK: {{id}}",
@@ -266,10 +272,15 @@
   },
   "animeDetail": {
     "notFound": "Аниме не найдено",
-    "description": "Описание"
+    "description": "Описание",
+    "toast": {
+      "statusError": "Не удалось изменить статус",
+      "removeError": "Не удалось убрать из списка"
+    }
   },
   "characteristics": {
     "rating": "Рейтинг",
+    "ratings": "Оценки",
     "year": "Год",
     "season": "Сезон",
     "type": "Тип",
@@ -311,7 +322,12 @@
     "total_other": "Всего {{count}} тайтлов",
     "rating": "Оценка: {{rating}}",
     "announcement": "Анонс",
-    "animeAlt": "Аниме"
+    "animeAlt": "Аниме",
+    "expand": "Развернуть порядок просмотра",
+    "collapse": "Свернуть порядок просмотра"
+  },
+  "ratings": {
+    "title": "Оценки"
   },
   "home": {
     "noAnime": "Нет аниме",
@@ -337,9 +353,9 @@
     "minChars": "Введите минимум {{count}} символа",
     "nothingFound": "Ничего не найдено",
     "enterName": "Введите название аниме",
-    "completedButton": "Просмотренные ({{count}})",
+    "completedButton": "Смотрел ({{count}})",
     "selectedCount": "Выбрано: {{count}}",
-    "noCompleted": "У вас пока нет просмотренных аниме",
+    "noCompleted": "Вы пока не смотрели ни одного аниме",
     "participantsCount": "{{count}} участников",
     "startRound": "Начать {{name}}",
     "exitDialogTitle": "Выйти из турнира?",

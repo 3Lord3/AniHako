@@ -19,7 +19,7 @@ describe('FriendsList', () => {
         onRemove={vi.fn()}
       />
     );
-    expect(container.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0);
+    expect(container.querySelectorAll('.animate-shimmer').length).toBeGreaterThan(0);
   });
 
   it('renders the empty message when there are no friends', () => {

@@ -110,6 +110,7 @@ export function EpisodeList({
                   'md:absolute md:-top-1.5 md:-right-1.5 md:size-4 md:rounded-full',
                   // Generous hit-area for the small desktop dot.
                   'md:before:absolute md:before:inset-[-6px] md:before:content-[""]',
+                  'md:z-10',
                   isWatched
                     ? isActive
                       // Watched + active on mobile: invert to white fill /
@@ -153,7 +154,7 @@ export function EpisodeList({
                   // guaranteed to win against these utilities.
                   '!bg-primary-foreground !text-primary hover:!bg-primary-foreground/90',
                 isActive && !isWatched && 'font-semibold',
-                isWatched && !isActive && 'opacity-70'
+                isWatched && !isActive && 'bg-muted text-muted-foreground border-border hover:bg-muted/80'
               )}
               aria-label={t('episodes.seriesAria', { label, watched: isWatched ? t('episodes.watchedSuffix') : '' })}
             >

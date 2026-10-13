@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAnimeMatcher } from '@/hooks';
-import { Button } from '@/components/ui/button';
+import { useAnimeMatcher, usePageTitle } from '@/hooks';
 import { Badge } from '@/components/ui/badge';
 import {
   Dialog,
@@ -13,6 +12,7 @@ import { Loader2 } from 'lucide-react';
 import { SwipeCard } from '@/components/matcher/SwipeCard';
 import { ActionButtons, AddButton, ExternalLinkButton } from '@/components/matcher/ActionButtons';
 import { DescriptionPanel } from '@/components/matcher/DescriptionView';
+import { EmptyState } from '@/components/States';
 import { buildAnimeUrl } from '@/lib/animeUrl';
 import { useT } from '@/i18n';
 
@@ -20,6 +20,7 @@ export function AnimeMatcherPage() {
   const navigate = useNavigate();
   const [showDescriptionModal, setShowDescriptionModal] = useState(false);
   const { t } = useT();
+  usePageTitle(t('nav.matcher'));
 
   const { currentAnime, isLoading, isTransitioning, isAdding, refetch, handleSwipe, handleSkip, handleAdd } =
     useAnimeMatcher(() => setShowDescriptionModal(false));
@@ -34,9 +35,11 @@ export function AnimeMatcherPage() {
 
   if (!currentAnime && !isLoading) {
     return (
-      <div className="text-center py-12 space-y-4">
-        <p className="text-muted-foreground">{t('matcher.notFound')}</p>
-        <Button onClick={() => refetch()}>{t('matcher.retry')}</Button>
+      <div className="py-12">
+        <EmptyState
+          title={t('matcher.notFound')}
+          action={{ label: t('common.retry'), onClick: () => refetch() }}
+        />
       </div>
     );
   }
@@ -44,7 +47,7 @@ export function AnimeMatcherPage() {
   return (
     <div className="md:space-y-6 flex flex-col min-h-[calc(100svh-64px)] md:min-h-0">
       <div className="hidden md:block text-center md:space-y-2">
-        <h1 className="text-4xl font-bold select-text text-foreground">{t('nav.matcher')}</h1>
+        <h1 className="text-4xl font-bold select-text text-foreground tracking-tight heading-brand inline-block">{t('nav.matcher')}</h1>
         <p className="text-muted-foreground select-text">
           {t('matcher.swipeHint')}
         </p>

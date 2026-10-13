@@ -63,7 +63,7 @@ export function Dropdown({
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
         className={cn(
-          'inline-flex items-center justify-between gap-2 w-full h-8 px-2.5 rounded-lg border border-border bg-background text-sm font-medium text-foreground hover:bg-muted aria-expanded:bg-muted aria-expanded:text-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 outline-none transition-all cursor-pointer',
+          'inline-flex items-center justify-between gap-2 w-full h-9 px-3 rounded-xl border border-border bg-background text-sm font-medium text-foreground hover:bg-muted aria-expanded:bg-muted aria-expanded:text-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 outline-none transition-all cursor-pointer',
           triggerClassName
         )}
       >
@@ -80,7 +80,7 @@ export function Dropdown({
         <ul
           role="listbox"
           className={cn(
-            'absolute z-50 mt-1 w-full max-h-72 overflow-auto rounded-md border border-border bg-popover text-popover-foreground shadow-md py-1',
+            'absolute z-50 mt-1 w-full max-h-72 overflow-auto rounded-xl border border-border bg-popover text-popover-foreground shadow-soft-lg py-1',
             contentClassName
           )}
         >
@@ -103,8 +103,8 @@ export function Dropdown({
                   }
                 }}
                 className={cn(
-                  'cursor-pointer px-2 py-1.5 text-sm hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-none',
-                  isSelected && 'bg-accent/50 font-medium'
+                  'cursor-pointer px-3 py-1.5 text-sm hover:bg-muted focus:bg-muted outline-none first:rounded-t-lg last:rounded-b-lg',
+                  isSelected && 'bg-brand-tint text-brand-tint-foreground font-medium'
                 )}
               >
                 {option.label}

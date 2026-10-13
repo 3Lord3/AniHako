@@ -1,5 +1,5 @@
 import { useParams } from 'react-router-dom';
-import { useAnimeDetailPage } from '@/hooks';
+import { useAnimeDetailPage, useMediaQuery } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowLeft } from 'lucide-react';
@@ -9,12 +9,14 @@ import { AnimeDetailPageSkeleton } from '@/components/loaders/PageSkeletons';
 import { AnimeCharacteristics } from './AnimeDetailPage/components/AnimeCharacteristics';
 import { EpisodeViewer } from './AnimeDetailPage/components/EpisodeViewer';
 import { ViewingOrder } from './AnimeDetailPage/components/ViewingOrder';
+import { RatingsBar } from './AnimeDetailPage/components/RatingsBar';
 import { StatusButtonGroup } from '@/components/detail/StatusButtonGroup';
 import { RatingBlock } from '@/components/detail/RatingBlock';
 
 export function AnimeDetailPage() {
   const { url } = useParams<{ url: string }>();
   const { t } = useT();
+  const isDesktop = useMediaQuery();
   const {
     user,
     anime,
@@ -44,15 +46,17 @@ export function AnimeDetailPage() {
 
   return (
     <div className="space-y-8">
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={handleBack}
-        className="cursor-pointer text-foreground hover:bg-muted"
-      >
-        <ArrowLeft className="w-4 h-4 mr-2" />
-        {t('common.back')}
-      </Button>
+      {isDesktop && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={handleBack}
+          className="cursor-pointer text-foreground hover:bg-muted"
+        >
+          <ArrowLeft className="w-4 h-4 mr-2" />
+          {t('common.back')}
+        </Button>
+      )}
 
       {anime.poster && (
         <div className="fixed inset-0 -z-10">
@@ -65,6 +69,12 @@ export function AnimeDetailPage() {
         </div>
       )}
 
+      <h1 className="md:hidden text-2xl font-bold text-foreground select-text tracking-tight">
+        {displayTitle}
+      </h1>
+      {englishTitle && englishTitle !== displayTitle && (
+        <p className="md:hidden text-base text-muted-foreground select-text">{englishTitle}</p>
+      )}
       <div className="flex flex-col md:flex-row gap-8">
         <div className="flex-shrink-0 flex flex-col items-center self-center md:self-auto">
           <img
@@ -72,33 +82,33 @@ export function AnimeDetailPage() {
             alt={displayTitle}
             className="w-64 rounded-lg shadow-lg"
           />
-          {user && (
-            <div className="mt-4 flex flex-col items-center gap-3 w-full">
-              <StatusButtonGroup
-                isFavorite={isFavorite}
-                userListId={userListId}
-                onToggleFavorite={handleToggleFavorite}
-                onAddToList={handleAddToList}
+          <div className="mt-4 flex flex-col items-center gap-3 w-full">
+            <StatusButtonGroup
+              isFavorite={isFavorite}
+              userListId={userListId}
+              onToggleFavorite={handleToggleFavorite}
+              onAddToList={handleAddToList}
+              disabled={!user}
+            />
+            {anime.anime_id > 0 && (
+              <RatingBlock
+                key={anime.anime_id}
+                animeId={anime.anime_id}
+                currentUserRating={anime.user?.rating}
+                overallRating={anime.rating?.average}
+                votes={anime.rating?.counters}
+                enabled={!!user}
               />
-              {anime.anime_id > 0 && (
-                <RatingBlock
-                  key={anime.anime_id}
-                  animeId={anime.anime_id}
-                  currentUserRating={anime.user?.rating}
-                  overallRating={anime.rating?.average}
-                  votes={anime.rating?.counters}
-                  enabled
-                />
-              )}
-            </div>
-          )}
+            )}
+          </div>
         </div>
         <div className="flex-1 space-y-4">
-          <h1 className="text-3xl font-bold text-foreground select-text">{displayTitle}</h1>
+          <h1 className="hidden md:block text-3xl font-bold text-foreground select-text">{displayTitle}</h1>
           {englishTitle && englishTitle !== displayTitle && (
-            <p className="text-xl text-muted-foreground select-text">{englishTitle}</p>
+            <p className="hidden md:block text-xl text-muted-foreground select-text">{englishTitle}</p>
           )}
 
+          <RatingsBar rating={anime.rating} />
           <AnimeCharacteristics anime={anime} />
         </div>
       </div>

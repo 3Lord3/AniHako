@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import { Star, Calendar, Clock, Film, Building2, Tag } from 'lucide-react';
+import { Calendar, Clock, Film, Building2, Tag, Tv, CircleDot } from 'lucide-react';
 import { KIND_LABELS } from '@/types/constants';
 import { SEASONS, type Season } from '@/lib/seasons';
 import { useT, type TranslationKey } from '@/i18n';
@@ -9,13 +9,14 @@ interface CharacteristicItemProps {
   label: string;
   value: React.ReactNode;
   icon?: React.ReactNode;
+  className?: string;
 }
 
-function CharacteristicItem({ label, value, icon }: CharacteristicItemProps) {
+function CharacteristicItem({ label, value, icon, className }: CharacteristicItemProps) {
   if (!value) return null;
 
   return (
-    <div className="flex flex-col gap-1 py-2 px-2 rounded-md hover:bg-muted/50 transition-colors min-w-0">
+    <div className={`flex flex-col gap-1 py-2 px-2 rounded-md hover:bg-muted/50 transition-colors min-w-0 ${className || ''}`}>
       <div className="flex items-center gap-1.5 text-muted-foreground text-sm font-medium select-text">
         {icon}
         <span>{label}</span>
@@ -44,8 +45,6 @@ export function AnimeCharacteristics({ anime, className }: AnimeCharacteristicsP
   const genres = anime.genres?.map(g => g.title) || [];
   const studios = anime.studios?.map(s => s.title) || anime.creators?.map(c => c.title) || [];
 
-  const rating = anime.rating?.average;
-
   const status = anime.anime_status?.alias;
   const statusTitle = anime.anime_status?.title;
 
@@ -63,15 +62,6 @@ export function AnimeCharacteristics({ anime, className }: AnimeCharacteristicsP
   return (
     <div className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-1 ${className || ''}`}>
       <CharacteristicItem
-        label={t('characteristics.rating')}
-        icon={<Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />}
-        value={
-          rating && !isNaN(rating) ? (
-            <span className="font-medium text-foreground">{rating.toFixed(2)}</span>
-          ) : null
-        }
-      />
-      <CharacteristicItem
         label={t('characteristics.year')}
         icon={<Calendar className="w-3.5 h-3.5" />}
         value={year ? <span className="text-foreground">{year}</span> : null}
@@ -83,6 +73,7 @@ export function AnimeCharacteristics({ anime, className }: AnimeCharacteristicsP
       />
       <CharacteristicItem
         label={t('characteristics.type')}
+        icon={<Tv className="w-3.5 h-3.5" />}
         value={
           kindLabel ? (
             <Badge variant="secondary">
@@ -93,6 +84,7 @@ export function AnimeCharacteristics({ anime, className }: AnimeCharacteristicsP
       />
       <CharacteristicItem
         label={t('characteristics.status')}
+        icon={<CircleDot className="w-3.5 h-3.5" />}
         value={
           statusTitle ? (
             <Badge variant={status === 'ongoing' ? 'default' : 'secondary'}>
@@ -130,6 +122,7 @@ export function AnimeCharacteristics({ anime, className }: AnimeCharacteristicsP
       <CharacteristicItem
         label={t('characteristics.genres')}
         icon={<Tag className="w-3.5 h-3.5" />}
+        className="col-span-2"
         value={
           genres.length > 0 ? (
             <div className="flex flex-wrap gap-1">

@@ -26,3 +26,5 @@ export * from './useMediaQuery';
 export * from './useSearchSheet';
 export * from './useParticipantSelector';
 export * from './useTierBoardDnd';
+export * from './usePageTitle';
+export * from './useScrollRestoration';

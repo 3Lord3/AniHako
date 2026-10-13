@@ -27,8 +27,8 @@ export function LogoButton({ variant }: LogoButtonProps) {
         className="flex items-center gap-3 text-2xl font-bold text-foreground cursor-pointer"
       >
         <img src="/favicon.svg" alt="" className="h-10 w-10 shrink-0" />
-        <span className="flex gap-0">
-          Ani<span className="text-brand">Hako</span>
+        <span className="flex gap-0 tracking-tight">
+          Ani<span className="text-primary">Hako</span>
         </span>
       </Link>
     );
@@ -40,7 +40,7 @@ export function LogoButton({ variant }: LogoButtonProps) {
         type="button"
         onClick={() => setSearchOpen(true)}
         aria-label={t('logo.search')}
-        className="relative -mt-10 w-16 h-16 rounded-full bg-card border-2 border-primary shadow-lg flex items-center justify-center transition-transform active:scale-95"
+        className="relative -mt-10 w-16 h-16 rounded-full bg-card border-2 border-primary shadow-soft ring-4 ring-background flex items-center justify-center transition-transform active:scale-95"
       >
         <img src="/favicon.svg" alt="" className="h-9 w-9" />
       </button>

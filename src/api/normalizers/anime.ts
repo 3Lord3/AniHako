@@ -35,6 +35,11 @@ interface RawPoster {
 interface RawRating {
   average?: number;
   counters?: number;
+  kp_rating?: number;
+  anidub_rating?: number;
+  myanimelist_rating?: number;
+  shikimori_rating?: number;
+  worldart_rating?: number;
 }
 
 interface RawType {
@@ -186,11 +191,16 @@ function normalizePoster(poster: RawPoster | string | undefined | null): AnimePo
   };
 }
 
-function normalizeRating(rating: RawRating | undefined | null): { average: number; counters: number } {
+function normalizeRating(rating: RawRating | undefined | null): { average: number; counters: number; kp_rating?: number; anidub_rating?: number; myanimelist_rating?: number; shikimori_rating?: number; worldart_rating?: number } {
   if (!rating) return { average: 0, counters: 0 };
   return {
     average: Number(rating.average ?? 0),
     counters: Number(rating.counters ?? 0),
+    kp_rating: rating.kp_rating != null ? Number(rating.kp_rating) : undefined,
+    anidub_rating: rating.anidub_rating != null ? Number(rating.anidub_rating) : undefined,
+    myanimelist_rating: rating.myanimelist_rating != null ? Number(rating.myanimelist_rating) : undefined,
+    shikimori_rating: rating.shikimori_rating != null ? Number(rating.shikimori_rating) : undefined,
+    worldart_rating: rating.worldart_rating != null ? Number(rating.worldart_rating) : undefined,
   };
 }
 

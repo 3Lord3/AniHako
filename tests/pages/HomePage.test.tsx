@@ -64,7 +64,7 @@ describe('HomePage', () => {
     } as ReturnType<typeof useAnimeModule.useSchedule>);
 
     render(<HomePage />, { wrapper: createWrapper() });
-    const skeletons = document.querySelectorAll('.animate-pulse');
+    const skeletons = document.querySelectorAll('.animate-shimmer');
     expect(skeletons.length).toBeGreaterThan(0);
   });
 
@@ -79,7 +79,7 @@ describe('HomePage', () => {
     } as ReturnType<typeof useAnimeModule.useSchedule>);
 
     render(<HomePage />, { wrapper: createWrapper() });
-    const skeletons = document.querySelectorAll('.animate-pulse');
+    const skeletons = document.querySelectorAll('.animate-shimmer');
     expect(skeletons.length).toBeGreaterThan(0);
   });
 

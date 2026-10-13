@@ -3,7 +3,7 @@ import { Suspense, lazy } from 'react';
 import { Layout } from '@/components/Layout';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import { SuspenseFallback } from '@/components/SuspenseFallback';
-import { useUser } from '@/hooks';
+import { useUser, useScrollRestoration } from '@/hooks';
 import { useT } from '@/i18n';
 
 // Lazy load pages for code splitting
@@ -36,6 +36,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 export function App() {
+  useScrollRestoration();
+
   return (
     <ErrorBoundary>
       <Suspense fallback={<SuspenseFallback />}>

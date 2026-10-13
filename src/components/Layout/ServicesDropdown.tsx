@@ -21,25 +21,41 @@ export function ServicesDropdown({ items, active, variant = 'mobile' }: Services
   const triggerClass =
     variant === 'desktop'
       ? cn(
-          'flex items-center gap-2 transition-colors cursor-pointer',
-          active ? 'text-primary font-medium' : 'hover:text-primary'
+          'inline-flex items-center gap-2 px-3 h-9 rounded-xl text-sm transition-colors cursor-pointer',
+          active
+            ? 'bg-brand-tint text-primary font-medium'
+            : 'text-muted-foreground hover:bg-muted hover:text-foreground'
         )
       : cn(
-          'flex flex-col items-center justify-center h-full gap-0.5 text-[10px] font-medium transition-colors cursor-pointer',
+          'group relative flex flex-col items-center justify-center h-full gap-0.5 text-[10px] font-medium transition-colors cursor-pointer',
           active ? 'text-primary' : 'text-muted-foreground'
         );
   return (
     <DropdownMenu>
       <DropdownMenuTrigger className={triggerClass}>
-        <Wand2
-          className={cn('w-5 h-5', active && variant === 'mobile' && 'stroke-[2.5]')}
-        />
-        <span className={variant === 'desktop' ? 'text-sm' : undefined}>{t('nav.services')}</span>
+        {variant === 'desktop' ? (
+          <>
+            <Wand2 className="w-4 h-4" />
+            <span>{t('nav.services')}</span>
+          </>
+        ) : (
+          <>
+            <span
+              className={cn(
+                'inline-flex items-center justify-center size-9 rounded-xl transition-all',
+                active ? 'bg-brand-tint' : 'group-hover:bg-muted'
+              )}
+            >
+              <Wand2 className={cn('w-5 h-5', active && 'stroke-[2.5]')} />
+            </span>
+            <span className="truncate max-w-full px-1">{t('nav.services')}</span>
+          </>
+        )}
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="end"
         side={variant === 'mobile' ? 'top' : 'bottom'}
-        className={cn('w-48', variant === 'mobile' && 'mb-2')}
+        className={cn('w-52', variant === 'mobile' && 'mb-2')}
       >
         {items.map((item) => {
           const Icon = item.icon;

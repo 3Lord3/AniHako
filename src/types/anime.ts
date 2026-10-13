@@ -136,6 +136,11 @@ export interface AnimeCatalogItem {
   rating: {
     average: number;
     counters: number;
+    kp_rating?: number;
+    anidub_rating?: number;
+    myanimelist_rating?: number;
+    shikimori_rating?: number;
+    worldart_rating?: number;
   };
   title: string;
   type: AnimeType;
