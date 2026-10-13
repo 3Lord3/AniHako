@@ -1,13 +1,14 @@
 import { Link } from 'react-router-dom';
 import useEmblaCarousel from 'embla-carousel-react';
-import { useHomePage } from '@/hooks';
-import { ChevronLeft, ChevronRight, Star } from 'lucide-react';
+import { useHomePage, usePageTitle } from '@/hooks';
+import { ChevronLeft, ChevronRight, Star, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { TooltipWrap } from '@/components/ui/tooltip';
 import { AnimeTitle } from '@/components/anime/AnimeTitle';
 import { ScheduleRow } from '@/components/anime/ScheduleRow';
 import { CarouselSkeleton, ScheduleSkeleton } from '@/components/loaders/AnimeCardSkeleton';
+import { EmptyState } from '@/components/States';
 import type { AnimeCatalogItem } from '@/types/anime';
 import { getRatingColor } from '@/types/constants';
 import { buildAnimeUrl } from '@/lib/animeUrl';
@@ -29,14 +30,14 @@ function CarouselCard({ anime }: CarouselCardProps) {
 
   return (
     <Link to={url} className="group block flex-shrink-0 w-[160px]">
-      <div className="aspect-[3/4] relative overflow-hidden rounded-lg">
+      <div className="aspect-[3/4] relative overflow-hidden rounded-xl ring-1 ring-border/60 bg-muted">
         <img
           src={anime.poster?.huge || anime.poster?.big || anime.poster?.medium}
           alt={displayTitle}
-          className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
+          className="object-cover w-full h-full transition-opacity duration-200 group-hover:opacity-95"
           loading="lazy"
         />
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3 pt-12">
+        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent p-3 pt-12">
           <AnimeTitle title={displayTitle} className="font-semibold text-sm text-white" />
         </div>
         {validRating && (
@@ -44,12 +45,12 @@ function CarouselCard({ anime }: CarouselCardProps) {
             <div
               aria-label={t('animeCard.rating', { rating: rating.toFixed(1) })}
               className={cn(
-                'absolute top-2 right-2 h-8 px-1.5 rounded flex items-center gap-0.5',
+                'absolute top-2 right-2 h-7 px-1.5 rounded-md flex items-center gap-0.5',
                 getRatingColor(rating)
               )}
             >
-              <Star className="w-4 h-4 fill-white text-white" />
-              <span className="text-sm font-bold text-white">
+              <Star className="w-3.5 h-3.5 fill-white text-white" />
+              <span className="text-xs font-bold text-white">
                 {rating.toFixed(1)}
               </span>
             </div>
@@ -104,6 +105,7 @@ function AnimeCarousel({ anime }: { anime: AnimeCatalogItem[] }) {
 
 export function HomePage() {
   const { t } = useT();
+  usePageTitle();
   const {
     currentYear,
     seasonName,
@@ -118,29 +120,37 @@ export function HomePage() {
   } = useHomePage();
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-12 md:space-y-16">
       <section>
-        <h2 className="text-2xl font-bold text-foreground mb-6">
+        <h2 className="heading-brand text-2xl md:text-3xl font-bold text-foreground mb-6 tracking-tight">
           {seasonName} {currentYear}
         </h2>
         {seasonalLoading ? (
           <CarouselSkeleton />
         ) : !seasonalData?.data?.length ? (
-          <div className="text-center py-8 text-muted-foreground">{t('home.noAnime')}</div>
+          <EmptyState
+            title={t('home.noAnime')}
+            icon={<Calendar className="w-5 h-5" aria-hidden />}
+          />
         ) : (
           <AnimeCarousel anime={seasonalData.data} />
         )}
       </section>
 
       <section>
-        <h2 className="text-2xl font-bold text-foreground mb-6">{t('home.scheduleTitle')}</h2>
+        <h2 className="heading-brand text-2xl md:text-3xl font-bold text-foreground mb-6 tracking-tight">
+          {t('home.scheduleTitle')}
+        </h2>
         {scheduleLoading ? (
           <ScheduleSkeleton />
         ) : !scheduleData?.length ? (
-          <div className="text-center py-8 text-muted-foreground">{t('home.noData')}</div>
+          <EmptyState
+            title={t('home.noData')}
+            icon={<Calendar className="w-5 h-5" aria-hidden />}
+          />
         ) : (
           <>
-            <div className="flex gap-2 mb-6 overflow-x-auto px-1 pt-1 pb-2">
+            <div className="flex gap-2 mb-6 overflow-x-auto px-1 pt-1 pb-2 -mx-1">
               {sortedDates.map((dateKey) => {
                 const date = new Date(dateKey);
                 const isToday = dateKey === new Date().toDateString();
@@ -152,7 +162,7 @@ export function HomePage() {
                     onClick={() => selectDate(dateKey)}
                     className={cn(
                       'cursor-pointer shrink-0',
-                      isToday && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
+                      isToday && 'ring-2 ring-primary/40'
                     )}
                   >
                     {formatDayMonth(date.getTime() / 1000)}
@@ -161,22 +171,24 @@ export function HomePage() {
               })}
             </div>
 
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">{t('home.colTitle')}</th>
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground hidden sm:table-cell">{t('home.colEpisodes')}</th>
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground hidden md:table-cell">{t('home.colPrevious')}</th>
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground hidden lg:table-cell">{t('home.colNext')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {displayItems.map((item) => (
-                    <ScheduleRow key={item.anime_id} item={item} />
-                  ))}
-                </tbody>
-              </table>
+            <div className="rounded-2xl border border-border overflow-hidden bg-card">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-border bg-muted/40">
+                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">{t('home.colTitle')}</th>
+                      <th className="text-left py-3 px-4 font-medium text-muted-foreground hidden sm:table-cell">{t('home.colEpisodes')}</th>
+                      <th className="text-left py-3 px-4 font-medium text-muted-foreground hidden md:table-cell">{t('home.colPrevious')}</th>
+                      <th className="text-left py-3 px-4 font-medium text-muted-foreground hidden lg:table-cell">{t('home.colNext')}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {displayItems.map((item) => (
+                      <ScheduleRow key={item.anime_id} item={item} />
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </>
         )}

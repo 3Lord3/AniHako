@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useUser, useFriendActions } from '@/hooks';
+import { useUser, useFriendActions, usePageTitle } from '@/hooks';
 import { Card, CardContent } from '@/components/ui/card';
 import { LoginRequired } from '@/components/LoginRequired';
 import { AddFriendDialog } from '@/components/friends/AddFriendDialog';
@@ -12,6 +12,7 @@ import { useT } from '@/i18n';
 export function FriendsPage() {
   const { data: user, isLoading: isUserLoading } = useUser();
   const { t } = useT();
+  usePageTitle(t('friends.pageTitle'));
   const [tab, setTab] = useState<FriendsTab>('all');
   const { addFriend, removeFriend, pendingFriendIds, error: actionError } = useFriendActions(user?.id);
 
@@ -24,8 +25,8 @@ export function FriendsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-foreground">{t('friends.pageTitle')}</h1>
+    <div className="space-y-8">
+      <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight heading-brand">{t('friends.pageTitle')}</h1>
       {actionError && <p className="text-sm text-destructive">{actionError}</p>}
 
       <div className="flex flex-col gap-6 md:flex-row md:items-start">

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useLoginForm } from '@/hooks';
+import { useLoginForm, usePageTitle } from '@/hooks';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +9,7 @@ import { useT } from '@/i18n';
 
 export function LoginPage() {
   const { t } = useT();
+  usePageTitle(t('login.title'));
   const {
     login,
     setLogin,
@@ -26,13 +27,13 @@ export function LoginPage() {
     <div className="flex items-center justify-center min-h-[calc(100dvh-10rem)] py-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle>{t('login.title')}</CardTitle>
+          <CardTitle className="text-2xl tracking-tight">{t('login.title')}</CardTitle>
           <CardDescription>{t('login.subtitle')}</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4 pb-4">
+          <CardContent className="space-y-4 pb-5">
             {error && (
-              <div className="bg-destructive/10 text-destructive p-3 rounded-md text-sm">
+              <div className="bg-destructive/10 text-destructive p-3 rounded-xl text-sm">
                 {error}
               </div>
             )}
@@ -63,12 +64,12 @@ export function LoginPage() {
             )}
           </CardContent>
           <CardFooter className="flex flex-col gap-4 border-border">
-            <Button type="submit" className="w-full" disabled={isLoggingIn}>
+            <Button type="submit" className="w-full" size="lg" disabled={isLoggingIn}>
               {isLoggingIn ? t('login.loggingIn') : t('login.action')}
             </Button>
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground text-center">
               {t('login.noAccount')}{' '}
-              <Link to="/register" className="text-primary hover:underline">
+              <Link to="/register" className="text-primary hover:underline font-medium">
                 {t('login.registerLink')}
               </Link>
             </p>
