@@ -11,12 +11,15 @@ import {
   useToggleVideoViewed,
 } from './useAnime';
 import { useUser } from './useAuth';
+import { useT } from '@/i18n';
+import { toast } from '@/components/Toaster';
 import { mapStatusToListId } from '@/types';
 import type { AnimeStatus, AnimeVideo, YummyUserAnimeRate } from '@/types';
 
 export function useAnimeDetailPage(url: string) {
   const navigate = useNavigate();
   const { data: user } = useUser();
+  const { t } = useT();
 
   const { data: anime, isLoading } = useAnimeDetail(url);
 
@@ -64,15 +67,23 @@ export function useAnimeDetailPage(url: string) {
       requireAuth(() => {
         const statusId = mapStatusToListId(status);
         if (userListId === statusId) {
-          removeFromList(animeId, { onError: () => {} });
+          removeFromList(animeId, {
+            onError: () => toast.error(t('animeDetail.toast.removeError')),
+          });
         } else if (userAnime) {
-          updateListEntry({ animeId, data: { status } }, { onError: () => {} });
+          updateListEntry(
+            { animeId, data: { status } },
+            { onError: () => toast.error(t('animeDetail.toast.statusError')) }
+          );
         } else {
-          addToList({ animeId, status, episodes: 0 }, { onError: () => {} });
+          addToList(
+            { animeId, status, episodes: 0 },
+            { onError: () => toast.error(t('animeDetail.toast.statusError')) }
+          );
         }
       });
     },
-    [requireAuth, userListId, animeId, userAnime, removeFromList, updateListEntry, addToList]
+    [requireAuth, userListId, animeId, userAnime, removeFromList, updateListEntry, addToList, t]
   );
 
   const handleToggleFavorite = useCallback(() => {
