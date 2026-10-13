@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import { Star, Calendar, Clock, Film, Building2, Tag } from 'lucide-react';
+import { Calendar, Clock, Film, Building2, Tag } from 'lucide-react';
 import { KIND_LABELS } from '@/types/constants';
 import { SEASONS, type Season } from '@/lib/seasons';
 import { useT, type TranslationKey } from '@/i18n';
@@ -44,8 +44,6 @@ export function AnimeCharacteristics({ anime, className }: AnimeCharacteristicsP
   const genres = anime.genres?.map(g => g.title) || [];
   const studios = anime.studios?.map(s => s.title) || anime.creators?.map(c => c.title) || [];
 
-  const rating = anime.rating?.average;
-
   const status = anime.anime_status?.alias;
   const statusTitle = anime.anime_status?.title;
 
@@ -62,15 +60,6 @@ export function AnimeCharacteristics({ anime, className }: AnimeCharacteristicsP
 
   return (
     <div className={`grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-1 ${className || ''}`}>
-      <CharacteristicItem
-        label={t('characteristics.rating')}
-        icon={<Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />}
-        value={
-          rating && !isNaN(rating) ? (
-            <span className="font-medium text-foreground">{rating.toFixed(2)}</span>
-          ) : null
-        }
-      />
       <CharacteristicItem
         label={t('characteristics.year')}
         icon={<Calendar className="w-3.5 h-3.5" />}

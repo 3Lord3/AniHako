@@ -9,6 +9,7 @@ import { AnimeDetailPageSkeleton } from '@/components/loaders/PageSkeletons';
 import { AnimeCharacteristics } from './AnimeDetailPage/components/AnimeCharacteristics';
 import { EpisodeViewer } from './AnimeDetailPage/components/EpisodeViewer';
 import { ViewingOrder } from './AnimeDetailPage/components/ViewingOrder';
+import { RatingsBar } from './AnimeDetailPage/components/RatingsBar';
 import { StatusButtonGroup } from '@/components/detail/StatusButtonGroup';
 import { RatingBlock } from '@/components/detail/RatingBlock';
 
@@ -108,6 +109,7 @@ export function AnimeDetailPage() {
             <p className="hidden md:block text-xl text-muted-foreground select-text">{englishTitle}</p>
           )}
 
+          <RatingsBar rating={anime.rating} />
           <AnimeCharacteristics anime={anime} />
         </div>
       </div>
