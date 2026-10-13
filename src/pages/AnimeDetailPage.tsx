@@ -68,6 +68,12 @@ export function AnimeDetailPage() {
         </div>
       )}
 
+      <h1 className="md:hidden text-2xl font-bold text-foreground select-text tracking-tight">
+        {displayTitle}
+      </h1>
+      {englishTitle && englishTitle !== displayTitle && (
+        <p className="md:hidden text-base text-muted-foreground select-text">{englishTitle}</p>
+      )}
       <div className="flex flex-col md:flex-row gap-8">
         <div className="flex-shrink-0 flex flex-col items-center self-center md:self-auto">
           <img
@@ -97,9 +103,9 @@ export function AnimeDetailPage() {
           )}
         </div>
         <div className="flex-1 space-y-4">
-          <h1 className="text-3xl font-bold text-foreground select-text">{displayTitle}</h1>
+          <h1 className="hidden md:block text-3xl font-bold text-foreground select-text">{displayTitle}</h1>
           {englishTitle && englishTitle !== displayTitle && (
-            <p className="text-xl text-muted-foreground select-text">{englishTitle}</p>
+            <p className="hidden md:block text-xl text-muted-foreground select-text">{englishTitle}</p>
           )}
 
           <AnimeCharacteristics anime={anime} />
