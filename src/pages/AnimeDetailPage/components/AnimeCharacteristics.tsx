@@ -9,13 +9,14 @@ interface CharacteristicItemProps {
   label: string;
   value: React.ReactNode;
   icon?: React.ReactNode;
+  className?: string;
 }
 
-function CharacteristicItem({ label, value, icon }: CharacteristicItemProps) {
+function CharacteristicItem({ label, value, icon, className }: CharacteristicItemProps) {
   if (!value) return null;
 
   return (
-    <div className="flex flex-col gap-1 py-2 px-2 rounded-md hover:bg-muted/50 transition-colors min-w-0">
+    <div className={`flex flex-col gap-1 py-2 px-2 rounded-md hover:bg-muted/50 transition-colors min-w-0 ${className || ''}`}>
       <div className="flex items-center gap-1.5 text-muted-foreground text-sm font-medium select-text">
         {icon}
         <span>{label}</span>
@@ -121,6 +122,7 @@ export function AnimeCharacteristics({ anime, className }: AnimeCharacteristicsP
       <CharacteristicItem
         label={t('characteristics.genres')}
         icon={<Tag className="w-3.5 h-3.5" />}
+        className="col-span-2"
         value={
           genres.length > 0 ? (
             <div className="flex flex-wrap gap-1">
