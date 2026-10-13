@@ -82,26 +82,25 @@ export function AnimeDetailPage() {
             alt={displayTitle}
             className="w-64 rounded-lg shadow-lg"
           />
-          {user && (
-            <div className="mt-4 flex flex-col items-center gap-3 w-full">
-              <StatusButtonGroup
-                isFavorite={isFavorite}
-                userListId={userListId}
-                onToggleFavorite={handleToggleFavorite}
-                onAddToList={handleAddToList}
+          <div className="mt-4 flex flex-col items-center gap-3 w-full">
+            <StatusButtonGroup
+              isFavorite={isFavorite}
+              userListId={userListId}
+              onToggleFavorite={handleToggleFavorite}
+              onAddToList={handleAddToList}
+              disabled={!user}
+            />
+            {anime.anime_id > 0 && (
+              <RatingBlock
+                key={anime.anime_id}
+                animeId={anime.anime_id}
+                currentUserRating={anime.user?.rating}
+                overallRating={anime.rating?.average}
+                votes={anime.rating?.counters}
+                enabled={!!user}
               />
-              {anime.anime_id > 0 && (
-                <RatingBlock
-                  key={anime.anime_id}
-                  animeId={anime.anime_id}
-                  currentUserRating={anime.user?.rating}
-                  overallRating={anime.rating?.average}
-                  votes={anime.rating?.counters}
-                  enabled
-                />
-              )}
-            </div>
-          )}
+            )}
+          </div>
         </div>
         <div className="flex-1 space-y-4">
           <h1 className="hidden md:block text-3xl font-bold text-foreground select-text">{displayTitle}</h1>
