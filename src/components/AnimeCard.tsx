@@ -31,13 +31,14 @@ export function AnimeCard({ anime, showRating = true, userStatus, isFavorite }: 
 
   return (
     <Link to={url} className="group block">
-      <div className="aspect-[3/4] relative overflow-hidden rounded-lg">
+      <div className="aspect-[3/4] relative overflow-hidden rounded-xl ring-1 ring-border/60 bg-muted">
         <img
           src={getImageUrl(getPosterUrl(anime))}
           alt={displayTitle}
-          className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
+          className="object-cover w-full h-full transition-opacity duration-200 group-hover:opacity-95"
           loading="lazy"
         />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
         {/* Badges row - left top */}
         <div className="absolute top-2 left-2 right-2 flex justify-between items-start gap-1">
           <div className="flex gap-1">
@@ -62,9 +63,9 @@ export function AnimeCard({ anime, showRating = true, userStatus, isFavorite }: 
           </div>
           {showRating && validRating && (
             <TooltipWrap content={ratingLabel}>
-              <div aria-label={ratingLabel} className={`${getRatingColor(rating)} h-9 px-1.5 rounded flex items-center gap-0.5 cursor-pointer`}>
-                <Star className="w-4 h-4 fill-white text-white" />
-                <span className="text-sm font-bold text-white">
+              <div aria-label={ratingLabel} className={`${getRatingColor(rating)} h-7 px-1.5 rounded-md flex items-center gap-0.5 cursor-pointer`}>
+                <Star className="w-3.5 h-3.5 fill-white text-white" />
+                <span className="text-xs font-bold text-white">
                   {rating.toFixed(1)}
                 </span>
               </div>
@@ -72,7 +73,7 @@ export function AnimeCard({ anime, showRating = true, userStatus, isFavorite }: 
           )}
         </div>
         {/* Gradient overlay for title */}
-        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/60 to-transparent p-3 pt-12">
+        <div className="absolute inset-x-0 bottom-0 p-3 pt-12">
           <AnimeTitle title={displayTitle} className="font-semibold text-sm text-white" />
         </div>
       </div>

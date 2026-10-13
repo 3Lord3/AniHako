@@ -121,7 +121,7 @@ export function AnimeGrid({ anime, userAnimeList, isLoading, skeletonCount, view
     return (
       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
         {Array.from({ length: skeletonItems }).map((_, i) => (
-          <div key={i} className="aspect-[3/4] rounded-lg bg-muted animate-pulse" />
+          <div key={i} className="aspect-[3/4] rounded-xl bg-muted animate-pulse" />
         ))}
       </div>
     );
@@ -137,7 +137,7 @@ export function AnimeGrid({ anime, userAnimeList, isLoading, skeletonCount, view
 
   if (view === 'list') {
     return (
-      <div className="space-y-1">
+      <div className="space-y-1.5">
         {anime.map((item) => {
           const userAnime = userAnimeMap.get(item.anime_id);
           return (
